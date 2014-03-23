@@ -22,6 +22,7 @@ gem "bicycle_tour_manager", :git => "git@github.com:akihisa-nq/BicycleTourManage
 gem "i18n_generators"
 gem "uglifier"
 gem "activerecord-postgresql-adapter"
+gem "activerecord-postgis-adapter"
 gem "rails"
 gem "jquery-rails"
 gem "jquery-ui-rails"
