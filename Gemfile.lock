@@ -186,6 +186,8 @@ GEM
     thread_safe (0.3.1)
       atomic (>= 1.1.7, < 2)
     tilt (1.4.1)
+    turbolinks (2.2.1)
+      coffee-rails
     tzinfo (0.3.39)
     uglifier (2.5.0)
       execjs (>= 0.3.0)
@@ -224,6 +226,7 @@ DEPENDENCIES
   selenium-webdriver
   sqlite3
   therubyracer
+  turbolinks
   uglifier
   unicorn
   will_paginate!

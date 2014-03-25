@@ -53,4 +53,8 @@ BicycleTourManagerWeb::Application.routes.draw do
   #     # (app/controllers/admin/products_controller.rb)
   #     resources :products
   #   end
+
+  get "/", to: "tour_result#index"
+  post "/tour_result/create", to: "tour_result#create"
+  get "/tour_result/show/:id", to: "tour_result#show"
 end

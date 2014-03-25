@@ -30,6 +30,7 @@ gem "jquery-rails"
 gem "jquery-ui-rails"
 gem "sass-rails"
 gem "coffee-rails"
+gem "turbolinks"
 
 gem "acts_as_tree", :git => %Q|https://github.com/amerine/acts_as_tree.git|
 gem "acts_as_list", :git => %Q|https://github.com/swanandp/acts_as_list.git|

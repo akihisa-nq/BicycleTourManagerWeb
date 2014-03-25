@@ -11,3 +11,20 @@
  *= require_self
  *= require_tree .
  */
+
+p, .text
+{
+	text-indent : 1em;
+	max-width : 35em;
+}
+
+ul.linklist li
+{
+	margin-top : 0.5em;
+	margin-bottom : 0.5em;
+}
+
+dt
+{
+	font-weight : bold;
+}
