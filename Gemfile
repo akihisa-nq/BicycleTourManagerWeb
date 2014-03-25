@@ -9,6 +9,8 @@ group :development, :test do
 	gem "database_cleaner"
 	gem "launchy"
 	gem "selenium-webdriver"
+
+	gem "ffi-geos"
 end
 
 platforms :ruby do
