@@ -46,7 +46,7 @@ class TourResult < ActiveRecord::Base
 		tour_result
 	end
 
-	def to_tour(is_public_data)
+	def to_tour(is_public_data, kind)
 		tour = BTM::Tour.new
 		tour.start_date = self.start_time
 		tour.name = self.name
@@ -62,10 +62,19 @@ class TourResult < ActiveRecord::Base
 			tour.routes << BTM::Route.new
 			tour.routes.last.path_list << BTM::Path.new
 
-			r.result_points.each do |p|
-				pt = BTM::Point.new(p.point.y, p.point.x, p.elevation)
-				pt.time = p.time
-				tour.routes.last.path_list.last.steps << pt
+			case kind
+			when :route
+				r.path.points.each do |p|
+					pt = BTM::Point.new(p.y, p.x)
+					tour.routes.last.path_list.last.steps << pt
+				end
+
+			when :graph
+				r.result_points.each do |p|
+					pt = BTM::Point.new(p.point.y, p.point.x, p.elevation)
+					pt.time = p.time
+					tour.routes.last.path_list.last.steps << pt
+				end
 			end
 		end
 
@@ -73,8 +82,8 @@ class TourResult < ActiveRecord::Base
 		tour
 	end
 
-	def to_gpx(is_public_data)
-		tour = self.to_tour(is_public_data)
+	def to_gpx(is_public_data, kind)
+		tour = self.to_tour(is_public_data, kind)
 		io = StringIO.new("", "w")
 		BTM::GpxStream.write_routes_to_stream(io, tour)
 		io.string

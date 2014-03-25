@@ -21,6 +21,6 @@ class TourResultController < ApplicationController
 		@tour_result = TourResult.find(params[:id])
 
 		headers["Content-Type"] = "application/xml; charset=UTF-8"
-		render(:text => @tour_result.to_gpx(true), :layout => false)
+		render(:text => @tour_result.to_gpx(true, :route), :layout => false)
 	end
 end
