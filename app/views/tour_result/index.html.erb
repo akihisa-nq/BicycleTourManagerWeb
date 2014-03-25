@@ -2,13 +2,15 @@
 <div>
 	<ul class="linklist">
 		<% @list.each do |tour| %>
-			<li><a href="<%= link_to(action: :show, :id => tour) %>"><%= tour.start_time.strftime("%Y/%m/%d") %> <%=tour.name %></a>
+    <li>
+      <%= link_to("#{tour.start_time.strftime("%Y/%m/%d")} #{tour.name}", action: :show, :id => tour) %>
+    </li>
 		<% end %>
 	</ul>
 </div>
 <h2>追加</h2>
 <div>
-	<%= form_tag(action: :create) do %>
+	<%= form_tag({action: :create}, multipart: true) do %>
 	GPX ファイル: <%= file_field(:tour_result, :gpx_file) %><br />
 	<%=	submit_tag("送信") %>
 	<% end %>

@@ -57,4 +57,5 @@ BicycleTourManagerWeb::Application.routes.draw do
   get "/", to: "tour_result#index"
   post "/tour_result/create", to: "tour_result#create"
   get "/tour_result/show/:id", to: "tour_result#show"
+  get "/tour_result/gpx/:id.xml", to: "tour_result#gpx_file"
 end

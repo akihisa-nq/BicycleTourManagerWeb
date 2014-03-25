@@ -1,6 +1,7 @@
 # coding: utf-8
 
 require "bicycle_tour_manager"
+require "stringio"
 
 class TourResult < ActiveRecord::Base
 	has_many :public_result_routes, -> { order("position ASC") }
@@ -43,5 +44,39 @@ class TourResult < ActiveRecord::Base
 		end
 
 		tour_result
+	end
+
+	def to_tour(is_public_data)
+		tour = BTM::Tour.new
+		tour.start_date = self.start_time
+		tour.name = self.name
+
+		list = []
+		if is_public_data
+			list = self.public_result_routes
+		else
+			list = self.private_result_routes
+		end
+
+		list.each do |r|
+			tour.routes << BTM::Route.new
+			tour.routes.last.path_list << BTM::Path.new
+
+			r.result_points.each do |p|
+				pt = BTM::Point.new(p.point.y, p.point.x, p.elevation)
+				pt.time = p.time
+				tour.routes.last.path_list.last.steps << pt
+			end
+		end
+
+		tour.set_start_end
+		tour
+	end
+
+	def to_gpx(is_public_data)
+		tour = self.to_tour(is_public_data)
+		io = StringIO.new("", "w")
+		BTM::GpxStream.write_routes_to_stream(io, tour)
+		io.string
 	end
 end

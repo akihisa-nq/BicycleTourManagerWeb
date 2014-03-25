@@ -1,3 +1,15 @@
 // Place all the styles related to the TourResult controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+html.tour_result_viewer, body.tour_result_viewer {
+	margin : 0px;
+	padding : 0px;
+	width : 100%;
+	height : 100%;
+}
+
+body.tour_result_viewer div {
+	margin : 0px;
+	padding : 0px;
+}
