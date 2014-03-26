@@ -23,4 +23,16 @@ class TourResultController < ApplicationController
 		headers["Content-Type"] = "application/xml; charset=UTF-8"
 		render(:text => @tour_result.to_gpx(true, :route), :layout => false)
 	end
+
+	def create_images
+		tour_result = TourResult.find(params[:id])
+
+		params[:tour_result][:images].each do |i|
+			tour_result.tour_images.build(image_data: i)
+		end
+
+		tour_result.save!
+
+		redirect_to(action: :show, :id => tour_result.id)
+	end
 end

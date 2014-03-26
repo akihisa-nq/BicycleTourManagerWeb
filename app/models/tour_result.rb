@@ -7,6 +7,7 @@ require "fileutils"
 class TourResult < ActiveRecord::Base
 	has_many :public_result_routes, -> { order("position ASC") }
 	has_many :private_result_routes, -> { order("position ASC") }
+	has_many :tour_images, -> { order("shot_on ASC") }
 
 	after_save -> { plot_altitude_graph(true) }
 

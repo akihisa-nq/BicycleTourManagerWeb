@@ -1,6 +1,4 @@
-﻿<% image_list = [] %>
-
-<script type="text/javascript">
+﻿<script type="text/javascript">
      //<![CDATA[
      var g_info_window = {};
      var g_marker = {};
@@ -18,8 +16,9 @@
                  parser.centerAndZoom(data);
                  parser.addTrackpointsToMap();
 
-                 <% image_list.each.with_index do |img, i| %>
-                     CreatePicture(<%= i %>, <%= img[:point].lat %>, <%= img[:point].lon %>, "<img src=\"<%= img[:thumbnail] %>\" style=\"width : auto; height : 100%;\" />");
+                 <% @tour_result.tour_images.each.with_index do |img, i| %>
+                     <% next unless img.point %>
+                     CreatePicture(<%= i %>, <%= img.point.y %>, <%= img.point.x %>, "<%=j image_tag( img.thumbnail_url, style: "width : auto; height : 100%;") %>" );
                  <% end %>
              }
          });
@@ -71,12 +70,17 @@
     </div>
     <div style="float:left;width:100%;height:85%;">
         <div style="overflow:auto;position:relative;width:100%;height:100%;">
+            <%= form_tag({action: :create_images, :id => @tour_result.id }, multipart: true) do %>
+                画像ファイル: <%= file_field("tour_result", "images", multiple: true) %><br />
+                <%= submit_tag("アップロード") %>
+            <% end %>
+
             <div style="text-align:center;">
-                <% image_list.each.with_index do |img, i| %>
+                <% @tour_result.tour_images.each.with_index do |img, i| %>
                 <div style="margin-bottom:1em;">
-                    <%= img[:date].strftime("%Y/%m/%d %H:%M:%S") %><br />
-                    <a href="javascript:FocusPicture(<%= i %>);"><img src="<%= img[:thumbnail] %>" style="width:100%;height:auto;" /></a><br />
-                    <a href="javascript:FocusPicture(<%= i %>);">地図に表示</a> <a href="<%= img[:link] %>">拡大</a> <br />
+                    <%= img.shot_on.strftime("%Y/%m/%d %H:%M:%S") %><br />
+                    <a href="javascript:FocusPicture(<%= i %>);"><%= image_tag(img.thumbnail_url, style: "width:100%;height:auto;") %></a><br />
+                    <a href="javascript:FocusPicture(<%= i %>);">地図に表示</a><a href="<%= img.image_url %>">拡大</a> <br />
                 </div>
             <% end %>
             </div>
