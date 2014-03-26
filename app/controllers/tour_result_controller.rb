@@ -1,6 +1,6 @@
 class TourResultController < ApplicationController
 	def index
-		@list = TourResult.all
+		@list = TourResult.all.order("start_time DESC")
 	end
 
 	def show
