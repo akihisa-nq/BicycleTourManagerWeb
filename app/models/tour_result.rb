@@ -130,7 +130,7 @@ class TourResult < ActiveRecord::Base
 		plotter.elevation_max = 1100
 		plotter.elevation_min = -100
 		plotter.distance_max = (tour.total_distance + 10.0).to_i
-		plotter.font = ENV["FONT"]
+		plotter.font = File.join(Rails.root, "vendor/font/mikachan-p.ttf")
 
 		FileUtils.mkdir_p(File.dirname(altitude_graph_path))
 		plotter.plot(tour, altitude_graph_path)
