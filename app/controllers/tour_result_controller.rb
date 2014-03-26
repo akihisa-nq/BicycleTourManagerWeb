@@ -1,4 +1,6 @@
 class TourResultController < ApplicationController
+	before_action :authenticate_user!, only: [ :create, :create_images ]
+
 	def index
 		@list = TourResult.all.order("start_time DESC")
 	end

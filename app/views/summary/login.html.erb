@@ -1,0 +1,38 @@
+<div>
+	<%= link_to("戻る", action: :index) %>
+</div>
+
+<h1>ログイン</h1>
+<div>
+	<% unless user_signed_in? %>
+	<ul>
+		<li><%= link_to "サインアップ", new_user_registration_path %></li>
+		<li><%= link_to "ログイン", new_user_session_path %></li>
+	</ul>
+	<% end %>
+
+	<% if can? :manage, User %>
+		<%= form_tag(action: :edit_user) do %>
+		<table>
+			<tr>
+				<th>ユーザー</th>
+				<th>ロール</th>
+			</tr>
+		<% @users.each do |user| %>
+			<% @user = user %>
+			<tr>
+				<td><%= user.email %></td>
+				<td><%= text_field("user[]", "role") %></td>
+			</tr>
+		<% end %>
+		</table>
+		<%= submit_tag("更新") %>
+		<% end %>
+	<% end %>
+
+	<ul>
+	<% if can? :edit, TourResult %>
+		<li>旅の結果を編集できます</li>
+	<% end %>
+	</ul>
+</div>
