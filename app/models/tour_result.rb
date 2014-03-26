@@ -17,29 +17,59 @@ class TourResult < ActiveRecord::Base
 
 		tour.routes.each do |r|
 			r.path_list.each do |p|
-				line = BTM.factory.line_string(p.steps.map {|s| s.point_geos })
+				pub_route = tour_result.public_result_routes.build
+				pri_route = tour_result.private_result_routes.build
+
+				logger.debug("check peak")
+				p.check_peak
+				p.check_distance_from_start
+
+				logger.debug("check steps")
+				line_points = []
+				prev_line = p.steps.first
+				prev_pt = p.steps.first
+
+				p.steps.each do |s|
+					add_line = false
+					add_point = false
+
+					if s.min_max != nil
+						add_line = true
+						add_point = true
+					else
+						add_line = (prev_line.distance_on_path(s) > 0.05)
+						add_point = (prev_pt.distance_on_path(s) > 0.15)
+					end
+
+					if add_line
+						line_points << s.point_geos
+						prev_line = s
+					end
+
+					if add_point
+						pt = ResultPoint.new
+						pt.point = s.point_geos
+						pt.elevation = s.ele
+						pt.time = s.time.getlocal
+
+						pub_route.result_points << pt
+						pri_route.result_points << pt
+
+						prev_pt = s
+					end
+				end
+
+				line = BTM.factory.line_string(line_points)
 
 				# 公開
-				pub_route = tour_result.public_result_routes.build
 				pub_route.start_time = p.steps[0].time.getlocal
 				pub_route.finish_time = p.steps[-1].time.getlocal
 				pub_route.path = line
 
 				# 非公開
-				pri_route = tour_result.private_result_routes.build
 				pri_route.start_time = p.steps[0].time.getlocal
 				pri_route.finish_time = p.steps[-1].time.getlocal
 				pri_route.path = line
-
-				p.steps.each do |s|
-					pt = ResultPoint.new
-					pt.point = s.point_geos
-					pt.elevation = s.ele
-					pt.time = s.time.getlocal
-
-					pub_route.result_points << pt
-					pri_route.result_points << pt
-				end
 			end
 		end
 
