@@ -2,10 +2,13 @@
 
 require "bicycle_tour_manager"
 require "stringio"
+require "fileutils"
 
 class TourResult < ActiveRecord::Base
 	has_many :public_result_routes, -> { order("position ASC") }
 	has_many :private_result_routes, -> { order("position ASC") }
+
+	after_save -> { plot_altitude_graph(true) }
 
 	def self.load(stream)
 		tour = BTM::GpxStream.read_from_stream(stream)
@@ -117,5 +120,27 @@ class TourResult < ActiveRecord::Base
 		io = StringIO.new("", "w")
 		BTM::GpxStream.write_routes_to_stream(io, tour)
 		io.string
+	end
+
+	def plot_altitude_graph(is_public_data)
+		tour = self.to_tour(is_public_data, :graph)
+
+		plotter = BTM::AltitudePloter.new(ENV["GNUPLOT"], File.join(Rails.root, "tmp"))
+		plotter.elevation_max = 1100
+		plotter.elevation_min = -100
+		plotter.distance_max = (tour.total_distance + 10.0).to_i
+		plotter.font = ENV["FONT"]
+
+		FileUtils.mkdir_p(File.dirname(altitude_graph_path))
+		plotter.plot(tour, altitude_graph_path)
+	end
+
+	def altitude_graph_path
+		public_root = File.join(Rails.root, "public")
+		File.join(public_root, altitude_graph_url)
+	end
+
+	def altitude_graph_url
+		"/generated/tour_result/altitude_graph/#{id}.png"
 	end
 end
