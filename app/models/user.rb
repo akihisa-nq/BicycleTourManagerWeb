@@ -6,6 +6,14 @@ class User < ActiveRecord::Base
 	devise :database_authenticatable, :registerable,
 		:recoverable, :rememberable, :trackable, :validatable
 
+	def self.update_role(user, attrs)
+		if user.can? :manage, User
+			attrs.each do |id, attr|
+				User.find(id).update(attr)
+			end
+		end
+	end
+
 	def manager?
 		self.role == "manager"
 	end
@@ -13,6 +21,12 @@ class User < ActiveRecord::Base
 	def editor?
 		self.role == "editor"
 	end
+
+	def ability
+		@ability ||= Ability.new(self)
+	end
+
+	delegate :can?, :cannot?, to: :ability
 
 	private
 

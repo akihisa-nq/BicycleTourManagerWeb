@@ -9,12 +9,7 @@ class SummaryController < ApplicationController
 	end
 
 	def edit_user
-		if can? :manage, User
-			params[:user].each do |id, attr|
-				User.find(id).update(attr)
-			end
-		end
-
+		User.update_role(current_user, params[:user])
 		redirect_to(action: :login)
 	end
 end
