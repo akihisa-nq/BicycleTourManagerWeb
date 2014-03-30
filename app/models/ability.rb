@@ -3,10 +3,16 @@ class Ability
 
 	def initialize(user)
 		user ||= User.new # guest user (not logged in)
-		if user.manager?
-			can :manage, :all
-		elsif user.editor?
-			can :edit, TourResult
+
+		case
+		when user.manager?
+			can :manage, User
+			can :read, :all
+
+		when user.editor?
+			can :manage, TourResult
+			can :read, :all
+
 		else
 			can :read, :all
 		end
