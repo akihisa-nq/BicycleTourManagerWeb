@@ -10,6 +10,7 @@
 		<% end %>
 	</ul>
 </div>
+<% if can? :edit, TourResult %>
 <h2>追加</h2>
 <div>
 	<%= form_tag({action: :create}, multipart: true) do %>
@@ -17,3 +18,4 @@
 	<%=	submit_tag("送信") %>
 	<% end %>
 </div>
+<% end %>
