@@ -2,6 +2,8 @@
 
 require 'spec_helper'
 
+require "stringio"
+
 describe TourResult do
 	it "load gpx stream" do
 		path = File.join(File.dirname(__FILE__), "track.gpx")
@@ -20,4 +22,75 @@ describe TourResult do
 
 		t.save!
 	end
+
+	context "guest user" do
+		it "cannot load and save" do
+			path = File.join(File.dirname(__FILE__), "track.gpx")
+			expect(File.exist?(path)).to eq true
+
+			user = User.new(email: "test@test.com", password: "testtest")
+			user.role = nil
+			expect(TourResult.load_and_save(user, File.open(path, "r:utf-8"))).to eq nil
+		end
+
+		it "cannot add images" do
+			tour = TourResult.create
+
+			image = File.join(File.dirname(__FILE__), "image.jpg")
+			images = [ StringIO.new(File.open(image, "rb") {|f| f.read })]
+
+			user = User.new(email: "test@test.com", password: "testtest")
+			user.role = nil
+			TourResult.add_images(user, tour.id, images)
+			expect(tour.tour_images.length).to eq 0
+		end
+	end
+
+	context "manager" do
+		it "cannot load and save" do
+			path = File.join(File.dirname(__FILE__), "track.gpx")
+			expect(File.exist?(path)).to eq true
+
+			user = User.new(email: "test@test.com", password: "testtest")
+			user.role = "manager"
+			expect(TourResult.load_and_save(user, File.open(path, "r:utf-8"))).to eq nil
+		end
+
+		it "cannot add images" do
+			tour = TourResult.create
+
+			image = File.join(File.dirname(__FILE__), "image.jpg")
+			images = [ StringIO.new(File.open(image, "rb") {|f| f.read })]
+
+			user = User.new(email: "test@test.com", password: "testtest")
+			user.role = "manager"
+			TourResult.add_images(user, tour.id, images)
+			expect(tour.tour_images.length).to eq 0
+		end
+	end
+
+	context "editor" do
+		it "can load and save" do
+			path = File.join(File.dirname(__FILE__), "track.gpx")
+			expect(File.exist?(path)).to eq true
+
+			user = User.new(email: "test@test.com", password: "testtest")
+			user.role = "editor"
+			expect(TourResult.load_and_save(user, File.open(path, "r:utf-8"))).not_to eq nil
+		end
+
+		it "can add images" do
+			tour = TourResult.create
+
+			image = File.join(File.dirname(__FILE__), "image.jpg")
+			images = [ StringIO.new(File.open(image, "rb") {|f| f.read })]
+
+			user = User.new(email: "test@test.com", password: "testtest")
+			user.role = "editor"
+			TourResult.add_images(user, tour.id, images)
+			expect(tour.tour_images.length).to eq 1
+		end
+	end
+
+	# FIXME: need test for loading images
 end

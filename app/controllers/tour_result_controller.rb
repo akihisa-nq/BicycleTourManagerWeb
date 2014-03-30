@@ -13,9 +13,7 @@ class TourResultController < ApplicationController
 
 	def create
 		attr = params[:tour_result].permit(:gpx_file)
-		tour_result = TourResult.load(attr[:gpx_file])
-		tour_result.save!
-
+		TourResult.load_and_save(current_user, attr[:gpx_file])
 		redirect_to(action: :index, :id => nil)
 	end
 
@@ -27,14 +25,7 @@ class TourResultController < ApplicationController
 	end
 
 	def create_images
-		tour_result = TourResult.find(params[:id])
-
-		params[:tour_result][:images].each do |i|
-			tour_result.tour_images.build(image_data: i)
-		end
-
-		tour_result.save!
-
-		redirect_to(action: :show, :id => tour_result.id)
+		TourResult.add_images(current_user, params[:id], params[:tour_result][:images])
+		redirect_to(action: :show, :id => params[:id])
 	end
 end

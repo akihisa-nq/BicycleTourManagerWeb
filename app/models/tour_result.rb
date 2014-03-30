@@ -80,6 +80,30 @@ class TourResult < ActiveRecord::Base
 		tour_result
 	end
 
+	def self.load_and_save(user, gpx_file)
+		if user.can? :edit, TourResult
+			tour_result = self.load(gpx_file)
+			tour_result.save!
+			tour_result
+		else
+			nil
+		end
+	end
+
+	def self.add_images(user, id, images)
+		if user.can? :edit, TourResult
+			tour_result = TourResult.find(id)
+
+			images.each do |i|
+				tour_result.tour_images.build(image_data: i)
+			end
+
+			tour_result.save!
+		end
+
+		nil
+	end
+
 	def to_tour(is_public_data, kind)
 		tour = BTM::Tour.new
 		tour.start_date = self.start_time
