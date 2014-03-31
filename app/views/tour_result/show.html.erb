@@ -83,6 +83,9 @@
                     <%= img.shot_on.strftime("%Y/%m/%d %H:%M:%S") %><br />
                     <a href="javascript:FocusPicture(<%= i %>);"><%= image_tag(img.thumbnail_url, style: "width:100%;height:auto;") %></a><br />
                     <a href="javascript:FocusPicture(<%= i %>);">地図に表示</a><a href="<%= img.image_url %>">拡大</a> <br />
+ 	                  <% if can? :delete, TourResult %>
+	                  <%= link_to("削除", {action: :destroy_image, id: @tour_result, image_id: img}, method: :delete) %>
+	                  <% end %>
                 </div>
             <% end %>
             </div>

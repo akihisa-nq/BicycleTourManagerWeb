@@ -1,5 +1,8 @@
 class TourResultController < ApplicationController
-	before_action :authenticate_user!, only: [ :create, :create_images ]
+	before_action :authenticate_user!, only: [
+		:create, :destroy,
+		:create_images, :destroy_image,
+	]
 
 	def index
 		@list = TourResult.all.order("start_time DESC")
@@ -17,6 +20,11 @@ class TourResultController < ApplicationController
 		redirect_to(action: :index, :id => nil)
 	end
 
+	def destroy
+		TourResult.destroy_with_auth(current_user, params[:id])
+		redirect_to(action: :index, :id => nil)
+	end
+
 	def gpx_file
 		@tour_result = TourResult.find(params[:id])
 
@@ -26,6 +34,11 @@ class TourResultController < ApplicationController
 
 	def create_images
 		TourResult.add_images(current_user, params[:id], params[:tour_result][:images])
+		redirect_to(action: :show, :id => params[:id])
+	end
+
+	def destroy_image
+		TourImage.destroy_with_auth(current_user, params[:image_id])
 		redirect_to(action: :show, :id => params[:id])
 	end
 end

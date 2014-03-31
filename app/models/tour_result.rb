@@ -168,4 +168,10 @@ class TourResult < ActiveRecord::Base
 	def altitude_graph_url
 		"/generated/tour_result/altitude_graph/#{id}.png"
 	end
+
+	def self.destroy_with_auth(user, id)
+		if user.can? :delete, TourResult
+			destroy(id)
+		end
+	end
 end

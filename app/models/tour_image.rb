@@ -66,6 +66,12 @@ class TourImage < ActiveRecord::Base
 		end
 	end
 
+	def self.destroy_with_auth(user, id)
+		if user.can? :delete, TourResult
+			destroy(id)
+		end
+	end
+
 	attr_accessor :image_data
 
 	private
