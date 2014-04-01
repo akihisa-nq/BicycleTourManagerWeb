@@ -78,7 +78,7 @@
             <% if can?(:delete, TourResult) || can?(:edit, TourResult) %>
             <ul>
               <% if can? :delete, TourResult %>
-              <li><%= link_to("削除", {action: :destroy, id: @tour_result}, method: :delete) %></li>
+              <li><%= link_to("削除", {action: :destroy, id: @tour_result}, method: :delete, confirm: "削除しますか?") %></li>
               <% end %>
               <% if can? :edit, TourResult %>
               <li><%= link_to(@tour_result.published ? "非公開" : "公開", {action: :toggle_visible, id: @tour_result}, method: :post) %></li>
@@ -102,7 +102,7 @@
                     <a href="javascript:FocusPicture(<%= i %>);"><%= image_tag(img.thumbnail_url, style: "width:100%;height:auto;") %></a><br />
                     <a href="javascript:FocusPicture(<%= i %>);">地図に表示</a><a href="<%= img.image_url %>">拡大</a> <br />
  	                  <% if can? :delete, TourResult %>
-	                  <%= link_to("削除", {action: :destroy_image, id: @tour_result, image_id: img}, method: :delete) %>
+	                  <%= link_to("削除", {action: :destroy_image, id: @tour_result, image_id: img}, method: :delete, confirm: "削除しますか?") %>
 	                  <% end %>
                 </div>
             <% end %>
