@@ -11,6 +11,14 @@ class TourResult < ActiveRecord::Base
 
 	after_save -> { plot_altitude_graph(true) }
 
+	def self.list_all(user)
+		if user.can? :edit, TourResult
+			TourResult.all.order("start_time DESC")
+		else
+			TourResult.all.where("published = true").order("start_time DESC")
+		end
+	end
+
 	def self.load(stream)
 		tour = BTM::GpxStream.read_from_stream(stream)
 
@@ -83,6 +91,7 @@ class TourResult < ActiveRecord::Base
 	def self.load_and_save(user, gpx_file)
 		if user.can? :edit, TourResult
 			tour_result = self.load(gpx_file)
+			tour_result.publised = false
 			tour_result.save!
 			tour_result
 		else
@@ -102,6 +111,14 @@ class TourResult < ActiveRecord::Base
 		end
 
 		nil
+	end
+
+	def self.find_with_auth(user, id)
+		ret = TourResult.find(id)
+		unless user.can?(:edit, TourResult) && !ret.published
+			ret = nil
+		end
+		ret
 	end
 
 	def to_tour(is_public_data, kind)
@@ -172,6 +189,14 @@ class TourResult < ActiveRecord::Base
 	def self.destroy_with_auth(user, id)
 		if user.can? :delete, TourResult
 			destroy(id)
+		end
+	end
+
+	def self.toggle_visible(user, id)
+		if user.can? :edit, TourResult
+			ret = TourResult.find(id)
+			ret.published = !ret.published
+			ret.save!
 		end
 	end
 end

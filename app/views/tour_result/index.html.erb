@@ -5,9 +5,17 @@
 	<ul class="linklist">
 		<% @list.each do |tour| %>
     <li>
+	  <% if can?(:edit, TourResult) && !tour.published %>
+	  [非公開]
+	  <% end %>
+
       <%= link_to("#{tour.start_time.strftime("%Y/%m/%d")} #{tour.name}", action: :show, :id => tour) %>
+
 	  <% if can? :delete, TourResult %>
 	  <%= link_to("削除", {action: :destroy, id: tour}, method: :delete) %>
+	  <% end %>
+	  <% if can? :edit, TourResult %>
+	  <%= link_to(tour.published ? "非公開" : "公開", {action: :toggle_visible, id: tour}, method: :post) %>
 	  <% end %>
     </li>
 		<% end %>
