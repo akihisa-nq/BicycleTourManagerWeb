@@ -57,6 +57,9 @@
          loadGPXFileIntoGoogleMap("<%= url_for(action: :gpx_file, :id => @tour_result) %>");
          $('body').layout({
              applyDefaultStyles: true,
+             north: {
+               closable: false
+             },
              south: {
                  size: 250
              },
@@ -71,38 +74,47 @@
  //]]>
 </script>
 
-<div class="ui-layout-north">
-  <%= link_to("戻る", action: :index) %>
-  <h1 style="font-size:18pt;">
-    <%= @tour_result.name %>
-  </h1>
-  <% if can? :edit, TourResult %>
-  <% unless @tour_result.published %>
-    [非公開]
-  <% end %>
+<div id="drop1" class="f-dropdown" data-dropdown-content>
+  <%= form_tag({action: :create_images, :id => @tour_result.id }, multipart: true) do %>
+    <%= file_field("tour_result", "images", multiple: true) %>
+    <%= submit_tag("アップロード", class: "button") %>
   <% end %>
 </div>
-<div class="ui-layout-west">
-    <% if can?(:delete, TourResult) || can?(:edit, TourResult) %>
-    <ul>
-      <% if can? :delete, TourResult %>
-      <li><%= link_to("削除", {action: :destroy, id: @tour_result}, method: :delete, confirm: "削除しますか?") %></li>
-      <% end %>
-      <% if can? :edit, TourResult %>
-      <li><%= link_to(@tour_result.published ? "非公開" : "公開", {action: :toggle_visible, id: @tour_result}, method: :post) %></li>
-      <% end %>
-      <% if can? :edit, TourResult %>
-      <li>
-        <%= form_tag({action: :create_images, :id => @tour_result.id }, multipart: true) do %>
-        画像ファイルの追加:<br />
-        <%= file_field("tour_result", "images", multiple: true) %><br />
-        <%= submit_tag("アップロード") %>
+
+<div class="ui-layout-north">
+  <nav class="top-bar" data-topbar style="margin : -10px;">
+    <ul class="title-area">
+      <li class="name">
+        <h1><a href="#"><%= @tour_result.name %></a></h1>
+        <% if can? :edit, TourResult %>
+        <% unless @tour_result.published %>
+          <span style="color:white">[非公開]</span>
+        <% end %>
         <% end %>
       </li>
-      <% end %>
     </ul>
-    <% end %>
 
+    <section class="top-bar-section">
+      <ul class="left">
+        <li class="active"><%= link_to("戻る", action: :index) %></li>
+      </ul>
+      <% if can?(:edit, TourResult) || can?(:delete, TourResult) %>
+      <ul class="right">
+        <% if can? :edit, TourResult %>
+        <li class="active"><a href="#" data-dropdown="drop1">画像ファイルの追加</a></li>
+        <% end %>
+        <% if can? :edit, TourResult %>
+        <li class="active"><%= link_to(@tour_result.published ? "非公開" : "公開", {action: :toggle_visible, id: @tour_result}, method: :post) %></li>
+        <% end %>
+        <% if can? :delete, TourResult %>
+        <li class="active"><%= link_to("削除", {action: :destroy, id: @tour_result}, method: :delete, confirm: "削除しますか?") %></li>
+        <% end %>
+      </ul>
+      <% end %>
+    </section>
+  </nav>
+</div>
+<div class="ui-layout-west">
    <div style="text-align:center;">
        <% @tour_result.tour_images.each.with_index do |img, i| %>
        <div style="margin-bottom:1em;">
