@@ -6,6 +6,7 @@ BicycleTourManagerWeb::Application.routes.draw do
   post "/edit_user", to: "summary#edit_user"
 
   get "/tour_result", to: "tour_result#index"
+  get "/tour_result/page/:page", to: "tour_result#index"
   post "/tour_result/create", to: "tour_result#create"
   delete "/tour_result/:id/destroy", to: "tour_result#destroy"
   get "/tour_result/:id/show", to: "tour_result#show"

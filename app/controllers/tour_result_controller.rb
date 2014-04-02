@@ -5,7 +5,7 @@ class TourResultController < ApplicationController
 	]
 
 	def index
-		@list = TourResult.list_all(current_user_or_guest)
+		@list = TourResult.list_all(current_user_or_guest, params[:page])
 	end
 
 	def show
@@ -16,18 +16,23 @@ class TourResultController < ApplicationController
 
 	def create
 		attr = params[:tour_result].permit(:gpx_file)
-		TourResult.load_and_save(current_user_or_guest, attr[:gpx_file])
-		redirect_to(action: :index, :id => nil)
+		ret = TourResult.load_and_save(current_user_or_guest, attr[:gpx_file])
+		if ret
+			redirect_to(action: :index, id: nil, page: TourResult.page_for(current_user_or_guest, ret.id))
+		else
+			redirect_to(action: :index, id: nil, page: params[:page])
+		end
 	end
 
 	def destroy
+		page = TourResult.page_for(current_user_or_guest, params[:id])
 		TourResult.destroy_with_auth(current_user_or_guest, params[:id])
-		redirect_to(action: :index, :id => nil)
+		redirect_to(action: :index, id: nil, page: page)
 	end
 
 	def toggle_visible
 		TourResult.toggle_visible(current_user_or_guest, params[:id])
-		redirect_to(action: :index, :id => nil)
+		redirect_to(action: :index, id: nil, page: TourResult.page_for(current_user_or_guest, params[:id]))
 	end
 
 	def gpx_file

@@ -11,11 +11,20 @@ class TourResult < ActiveRecord::Base
 
 	after_save -> { plot_altitude_graph(true) }
 
-	def self.list_all(user)
+	def self.list_all(user, page)
 		if user.can? :edit, TourResult
-			TourResult.all.order("start_time DESC")
+			TourResult.paginate(page: page, per_page: 10).order("start_time DESC")
 		else
-			TourResult.all.where("published = true").order("start_time DESC")
+			TourResult.paginate(page: page, per_page: 10).where("published = true").order("start_time DESC")
+		end
+	end
+
+	def self.page_for(user, id)
+		tour = find_with_auth(user, id)
+		if tour
+			(TourResult.where(["start_time > ?", tour.start_time]).count - 1) / 10 + 1
+		else
+			1
 		end
 	end
 

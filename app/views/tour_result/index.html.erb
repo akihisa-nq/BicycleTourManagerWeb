@@ -2,6 +2,8 @@
 
 <h2>ツアー一覧</h2>
 <div>
+	<%= will_paginate @list %>
+
 	<ul class="linklist">
 		<% @list.each do |tour| %>
     <li>
@@ -23,6 +25,8 @@
     </li>
 		<% end %>
 	</ul>
+
+	<%= will_paginate @list %>
 </div>
 <% if can? :edit, TourResult %>
 <h2>追加</h2>
