@@ -2,7 +2,7 @@
 
 <h2>ツアー一覧</h2>
 <div>
-	<%= will_paginate @list %>
+	<%= will_paginate @list, renderer: FoundationPagination::Rails %>
 
 	<ul class="linklist">
 		<% @list.each do |tour| %>
@@ -26,7 +26,7 @@
 		<% end %>
 	</ul>
 
-	<%= will_paginate @list %>
+	<%= will_paginate @list, renderer: FoundationPagination::Rails %>
 </div>
 <% if can? :edit, TourResult %>
 <h2>追加</h2>
