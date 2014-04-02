@@ -59,6 +59,11 @@
              applyDefaultStyles: true,
              south: {
                  size: 250
+             },
+             center: {
+                 onresize: function() {
+                    google.maps.event.trigger(g_map, 'resize');
+                 }
              }
          });
      });
