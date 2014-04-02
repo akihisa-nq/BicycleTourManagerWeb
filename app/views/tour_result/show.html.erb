@@ -55,69 +55,66 @@
          };
          g_map = new google.maps.Map(document.getElementById("map"), mapOptions);
          loadGPXFileIntoGoogleMap("<%= url_for(action: :gpx_file, :id => @tour_result) %>");
+         $('body').layout({
+             applyDefaultStyles: true,
+             south: {
+                 size: 250
+             }
+         });
      });
 
  //]]>
 </script>
 
-<div style="float : left; width : 15%; height : 100%;">
-    <div style="float:left;width:100%;height:15%;">
-        <div>
-            <%= link_to("戻る", action: :index) %>
-        </div>
-
-        <h1 style="font-size:18pt;"><%= @tour_result.name %></h1>
-        <% if can? :edit, TourResult %>
-          <% unless @tour_result.published %>
-            [非公開]
-          <% end %>
-        <% end %>
-    </div>
-    <div style="float:left;width:100%;height:85%;">
-        <div style="overflow:auto;position:relative;width:100%;height:100%;">
-            <% if can?(:delete, TourResult) || can?(:edit, TourResult) %>
-            <ul>
-              <% if can? :delete, TourResult %>
-              <li><%= link_to("削除", {action: :destroy, id: @tour_result}, method: :delete, confirm: "削除しますか?") %></li>
-              <% end %>
-              <% if can? :edit, TourResult %>
-              <li><%= link_to(@tour_result.published ? "非公開" : "公開", {action: :toggle_visible, id: @tour_result}, method: :post) %></li>
-              <% end %>
-              <% if can? :edit, TourResult %>
-              <li>
-                <%= form_tag({action: :create_images, :id => @tour_result.id }, multipart: true) do %>
-                画像ファイルの追加:<br />
-                <%= file_field("tour_result", "images", multiple: true) %><br />
-                <%= submit_tag("アップロード") %>
-                <% end %>
-              </li>
-              <% end %>
-            </ul>
-            <% end %>
-
-            <div style="text-align:center;">
-                <% @tour_result.tour_images.each.with_index do |img, i| %>
-                <div style="margin-bottom:1em;">
-                    <%= img.shot_on.strftime("%Y/%m/%d %H:%M:%S") %><br />
-                    <a href="javascript:FocusPicture(<%= i %>);"><%= image_tag(img.thumbnail_url, style: "width:100%;height:auto;") %></a><br />
-                    <a href="javascript:FocusPicture(<%= i %>);">地図に表示</a><a href="<%= img.image_url %>">拡大</a> <br />
- 	                  <% if can? :delete, TourResult %>
-	                  <%= link_to("削除", {action: :destroy_image, id: @tour_result, image_id: img}, method: :delete, confirm: "削除しますか?") %>
-	                  <% end %>
-                </div>
-            <% end %>
-            </div>
-        </div>
-    </div>
+<div class="ui-layout-north">
+  <%= link_to("戻る", action: :index) %>
+  <h1 style="font-size:18pt;">
+    <%= @tour_result.name %>
+  </h1>
+  <% if can? :edit, TourResult %>
+  <% unless @tour_result.published %>
+    [非公開]
+  <% end %>
+  <% end %>
 </div>
-<div style="float:left;width:85%;height:100%;">
-    <div style="float:left;width:100%;height:70%;">
-        <div id="map" style="width: 100%; height: 100%;"></div>
-    </div>
-    <div style="float:left;width:100%;height:30%;">
-        <div style="width:100%;height:100%;overflow:auto;position:relative;">
-            <%= image_tag( @tour_result.altitude_graph_url, style: "height:100%;width:auto;" ) %>
-        </div>
-    </div>
+<div class="ui-layout-west">
+    <% if can?(:delete, TourResult) || can?(:edit, TourResult) %>
+    <ul>
+      <% if can? :delete, TourResult %>
+      <li><%= link_to("削除", {action: :destroy, id: @tour_result}, method: :delete, confirm: "削除しますか?") %></li>
+      <% end %>
+      <% if can? :edit, TourResult %>
+      <li><%= link_to(@tour_result.published ? "非公開" : "公開", {action: :toggle_visible, id: @tour_result}, method: :post) %></li>
+      <% end %>
+      <% if can? :edit, TourResult %>
+      <li>
+        <%= form_tag({action: :create_images, :id => @tour_result.id }, multipart: true) do %>
+        画像ファイルの追加:<br />
+        <%= file_field("tour_result", "images", multiple: true) %><br />
+        <%= submit_tag("アップロード") %>
+        <% end %>
+      </li>
+      <% end %>
+    </ul>
+    <% end %>
+
+   <div style="text-align:center;">
+       <% @tour_result.tour_images.each.with_index do |img, i| %>
+       <div style="margin-bottom:1em;">
+           <%= img.shot_on.strftime("%Y/%m/%d %H:%M:%S") %><br />
+           <a href="javascript:FocusPicture(<%= i %>);"><%= image_tag(img.thumbnail_url, style: "width:100%;height:auto;") %></a><br />
+           <a href="javascript:FocusPicture(<%= i %>);">地図に表示</a><a href="<%= img.image_url %>">拡大</a> <br />
+             <% if can? :delete, TourResult %>
+             <%= link_to("削除", {action: :destroy_image, id: @tour_result, image_id: img}, method: :delete, confirm: "削除しますか?") %>
+             <% end %>
+       </div>
+       <% end %>
+   </div>
+</div>
+<div class="ui-layout-center">
+   <div id="map" style="width: 100%; height: 100%;"></div>
+</div>
+<div class="ui-layout-south">
+    <%= image_tag( @tour_result.altitude_graph_url, style: "height:100%;width:auto;max-width:none;" ) %>
 </div>
 
