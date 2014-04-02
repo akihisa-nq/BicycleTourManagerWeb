@@ -7,7 +7,7 @@ BicycleTourManagerWeb::Application.routes.draw do
 
   get "/tour_result", to: "tour_result#index"
   post "/tour_result/create", to: "tour_result#create"
-  delete "/tour_result/destroy", to: "tour_result#destroy"
+  delete "/tour_result/:id/destroy", to: "tour_result#destroy"
   get "/tour_result/:id/show", to: "tour_result#show"
   get "/tour_result/:id/gpx.xml", to: "tour_result#gpx_file"
   post "/tour_result/:id/toggle_visible", to: "tour_result#toggle_visible"
