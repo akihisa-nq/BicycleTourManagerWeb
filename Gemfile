@@ -38,5 +38,6 @@ gem "acts_as_tree", :git => %Q|https://github.com/amerine/acts_as_tree.git|
 gem "acts_as_list", :git => %Q|https://github.com/swanandp/acts_as_list.git|
 gem "will_paginate", :git => %Q|https://github.com/mislav/will_paginate.git|
 
+gem "modernizr-rails"
 gem "foundation-rails"
 gem "will_paginate-foundation"
