@@ -91,7 +91,7 @@ class TourResult < ActiveRecord::Base
 	def self.load_and_save(user, gpx_file)
 		if user.can? :edit, TourResult
 			tour_result = self.load(gpx_file)
-			tour_result.publised = false
+			tour_result.published = false
 			tour_result.save!
 			tour_result
 		else
