@@ -115,7 +115,7 @@ class TourResult < ActiveRecord::Base
 
 	def self.find_with_auth(user, id)
 		ret = TourResult.find(id)
-		unless user.can?(:edit, TourResult) && !ret.published
+		if ! user.can?(:edit, TourResult) && !ret.published
 			ret = nil
 		end
 		ret
