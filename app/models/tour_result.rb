@@ -22,7 +22,7 @@ class TourResult < ActiveRecord::Base
 	def self.page_for(user, id)
 		tour = find_with_auth(user, id)
 		if tour
-			(TourResult.where(["start_time > ?", tour.start_time]).count - 1) / 10 + 1
+			(TourResult.where(["start_time >= ?", tour.start_time]).count - 1) / 10 + 1
 		else
 			1
 		end
