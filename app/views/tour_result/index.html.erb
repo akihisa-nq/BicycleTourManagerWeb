@@ -10,6 +10,9 @@
 	  <% end %>
 
       <%= link_to("#{tour.start_time.strftime("%Y/%m/%d")} #{tour.name}", action: :show, :id => tour) %>
+	  <% if tour.tour_images.count > 0 %>
+	  □<%= tour.tour_images.count %>
+	  <% end %>
 
 	  <% if can? :delete, TourResult %>
 	  <%= link_to("削除", {action: :destroy, id: tour}, method: :delete, confirm: "削除しますか?") %>

@@ -11,9 +11,19 @@ class Samples::Set
 		Samples::User.set_test_users
 
 		::TourResult.delete_all
+		::TourImage.delete_all
+
 		Dir.glob(File.join(File.dirname(__FILE__), "gpx/*.gpx")) do |file|
 			puts file
-			TourResult.load(File.open(file, "r:utf-8")).save!
+			tour = ::TourResult.load(File.open(file, "r:utf-8"))
+
+			if File.basename(file) == "track_9.gpx"
+				Dir.glob(File.join(File.dirname(__FILE__), "images/*.JPG")) do |img|
+					tour.tour_images.build(image_data: File.open(img, "rb"))
+				end
+			end
+
+			tour.save!
 		end
 	end
 end
