@@ -1,1 +1,9 @@
-<%= link_to "旅の記録", controller: :tour_result, action: :index %>
+<% content_for(:title) do %>
+自転車旅の計画と記録
+<% end %>
+
+<div class="row">
+    <div class="medium-12 columns">
+        <%= link_to "旅の記録", controller: :tour_result, action: :index %>
+    </div>
+</div>

@@ -16,19 +16,25 @@
  *= require_tree .
  */
 
-p, .text
+.btw-footer a
 {
-	text-indent : 1em;
-	max-width : 35em;
+    color : white;
 }
 
-ul.linklist li
+.btw-footer a:hover
 {
-	margin-top : 0.5em;
-	margin-bottom : 0.5em;
+    color : gray;
 }
 
-dt
+.btw-footer
 {
-	font-weight : bold;
+    padding-top : 24px;
+    padding-bottom : 10px;
+    background-color : black;
+    color : white;
+}
+
+.btw-footer ul.inline-list
+{
+    float : right;
 }

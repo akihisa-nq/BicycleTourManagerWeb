@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>BicycleTourManagerWeb</title>
+  <title><%= yield(:title) %></title>
 
   <%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true %>
 
@@ -16,18 +16,47 @@
 <body>
 
 <% if user_signed_in? %>
-<div style="text-align:right">
-	<strong><%= current_user.email %></strong> としてログイン中
-	<%= link_to 'プロフィールを編集', edit_user_registration_path %> |
-	<%= link_to "ログアウト", destroy_user_session_path, method: :delete %>
-</div>
+<ul id="user" data-dropdown-content class="f-dropdown">
+<li><%= link_to 'プロフィールを編集', edit_user_registration_path %></li>
+<li><%= link_to "ログアウト", destroy_user_session_path, method: :delete %></li>
+</ul>
 <% end %>
+
+<nav class="top-bar" data-topbar>
+  <ul class="title-area">
+    <li class="name">
+      <h1><a href="#"><%= yield(:title) %></a></h1>
+    </li>
+  </ul>
+
+  <section class="top-bar-section">
+    <ul class="left">
+        <%= yield(:menus) %>
+    </ul>
+    <% if user_signed_in? || content_for?(:manage) %>
+    <ul class="right">
+        <%= yield(:manage) %>
+        <% if user_signed_in? %>
+        <li><a href="#" data-dropdown="user"><strong><%= current_user.email %></strong></a></li>
+        <% end %>
+    </ul>
+    <% end %>
+  </section>
+</nav>
 
 <%= yield %>
 
-<div>
-	<hr />
-	&copy; 2011-2014 Akihisa Higuchi All rights reserved.
+<div class="btw-footer">
+    <div class="row">
+        <div class="medium-4 columns push-8">
+            <ul class="inline-list">
+                <li><a href="https://github.com/akihisa-nq/BicycleTourManagerWeb">GitHub</a></li>
+            </ul>
+        </div>
+        <div class="medium-8 columns pull-4">
+            &copy; 2011-2014 Akihisa Higuchi All rights reserved.
+        </div>
+    </div>
 </div>
 
 </body>

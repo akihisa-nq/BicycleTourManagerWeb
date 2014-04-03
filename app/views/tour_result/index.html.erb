@@ -1,39 +1,52 @@
-<%= link_to "戻る", controller: :summary, action: :index %>
+<% content_for(:title) do %>
+旅の記録
+<% end %>
 
-<h2>ツアー一覧</h2>
-<div>
-	<%= will_paginate @list, renderer: FoundationPagination::Rails %>
+<% content_for(:menus) do %>
+<li class="active"><%= link_to "戻る", controller: :summary, action: :index %></li>
+<% end %>
 
-	<ul class="linklist">
-		<% @list.each do |tour| %>
-    <li>
-	  <% if can?(:edit, TourResult) && !tour.published %>
-	  [非公開]
-	  <% end %>
-
-      <%= link_to("#{tour.start_time.strftime("%Y/%m/%d")} #{tour.name}", action: :show, :id => tour) %>
-	  <% if tour.tour_images.count > 0 %>
-	  □<%= tour.tour_images.count %>
-	  <% end %>
-
-	  <% if can? :delete, TourResult %>
-	  <%= link_to("削除", {action: :destroy, id: tour}, method: :delete, confirm: "削除しますか?") %>
-	  <% end %>
-	  <% if can? :edit, TourResult %>
-	  <%= link_to(tour.published ? "非公開" : "公開", {action: :toggle_visible, id: tour}, method: :post) %>
-	  <% end %>
-    </li>
-		<% end %>
-	</ul>
-
-	<%= will_paginate @list, renderer: FoundationPagination::Rails %>
-</div>
+<% content_for(:manage) do %>
 <% if can? :edit, TourResult %>
-<h2>追加</h2>
-<div>
+	<li class="active"><a href="#" data-dropdown="edit_menu">追加</a></li>
+<% end %>
+<% end %>
+
+<% if can? :edit, TourResult %>
+<div class="f-dropdown" data-dropdown-content id="edit_menu">
 	<%= form_tag({action: :create}, multipart: true) do %>
 	GPX ファイル: <%= file_field(:tour_result, :gpx_file) %><br />
 	<%=	submit_tag("送信") %>
 	<% end %>
 </div>
 <% end %>
+
+<div class="row">
+    <div class="medium-12 columns">
+		<%= will_paginate @list, renderer: FoundationPagination::Rails %>
+
+		<ul class="linklist">
+			<% @list.each do |tour| %>
+		<li>
+		  <% if can?(:edit, TourResult) && !tour.published %>
+		  [非公開]
+		  <% end %>
+
+		  <%= link_to("#{tour.start_time.strftime("%Y/%m/%d")} #{tour.name}", action: :show, :id => tour) %>
+		  <% if tour.tour_images.count > 0 %>
+		  □<%= tour.tour_images.count %>
+		  <% end %>
+
+		  <% if can? :delete, TourResult %>
+		  <%= link_to("削除", {action: :destroy, id: tour}, method: :delete, confirm: "削除しますか?") %>
+		  <% end %>
+		  <% if can? :edit, TourResult %>
+		  <%= link_to(tour.published ? "非公開" : "公開", {action: :toggle_visible, id: tour}, method: :post) %>
+		  <% end %>
+		</li>
+			<% end %>
+		</ul>
+
+		<%= will_paginate @list, renderer: FoundationPagination::Rails %>
+	</div>
+</div>
