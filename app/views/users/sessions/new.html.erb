@@ -1,17 +1,37 @@
-<h2>Sign in</h2>
-
-<%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
-  <div><%= f.label :email %><br />
-  <%= f.email_field :email, autofocus: true %></div>
-
-  <div><%= f.label :password %><br />
-    <%= f.password_field :password, autocomplete: "off" %></div>
-
-  <% if devise_mapping.rememberable? -%>
-    <div><%= f.check_box :remember_me %> <%= f.label :remember_me %></div>
-  <% end -%>
-
-  <div><%= f.submit "Sign in" %></div>
+<% content_for :title do %>
+Sign in
 <% end %>
 
-<%= render "users/shared/links" %>
+<% content_for(:menus) do %>
+<li class="active">
+  <%= link_to "戻る", controller: "/summary", action: :index %>
+</li>
+<% end %>
+  
+<div class="row">
+  <div class="medium-12 columns">
+    <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+    <div>
+      <%= f.label :email %><br />
+      <%= f.email_field :email, autofocus: true %>
+    </div>
+
+    <div>
+      <%= f.label :password %><br />
+      <%= f.password_field :password, autocomplete: "off" %>
+    </div>
+
+    <% if devise_mapping.rememberable? -%>
+    <div>
+      <%= f.check_box :remember_me %> <%= f.label :remember_me %>
+    </div>
+    <% end -%>
+
+  <div>
+      <%= f.submit "Sign in" %>
+    </div>
+    <% end %>
+
+    <%= render "users/shared/links" %>
+  </div>
+</div>
