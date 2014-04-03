@@ -208,4 +208,8 @@ class TourResult < ActiveRecord::Base
 			ret.save!
 		end
 	end
+
+	def distance
+		0.0 # FIXME
+	end
 end

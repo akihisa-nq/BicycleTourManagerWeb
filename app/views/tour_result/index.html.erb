@@ -21,32 +21,60 @@
 </div>
 <% end %>
 
-<div class="row">
+<div class="btmw-tour-result-list">
+  <div class="row">
     <div class="medium-12 columns">
 		<%= will_paginate @list, renderer: FoundationPagination::Rails %>
 
-		<ul class="linklist">
-			<% @list.each do |tour| %>
-		<li>
-		  <% if can?(:edit, TourResult) && !tour.published %>
-		  [非公開]
-		  <% end %>
+		<% @list.each do |tour| %>
+		<div class="btmw-tour-result-item">
+          <div class="row">
+		    <div class="medium-9 columns">
+			  <div class="btmw-tour-result-item-thumbnail">
+			  <% if tour.tour_images.count > 0 %>
+			  <a href="<%= tour.tour_images[0].image_url %>" class="th">
+			  <%= image_tag(tour.tour_images[0].thumbnail_url) %>
+			  </a>
+			  <% end %>
+			  </div>
+              <div><%= tour.start_time.strftime("%Y/%m/%d") %></div>
+		      <h3><%= tour.name %></h3>
+			  <p>
+              <% if can?(:edit, TourResult) && !tour.published %>
+		      [非公開]
+		      <% end %>
+			  </p>
 
-		  <%= link_to("#{tour.start_time.strftime("%Y/%m/%d")} #{tour.name}", action: :show, :id => tour) %>
-		  <% if tour.tour_images.count > 0 %>
-		  □<%= tour.tour_images.count %>
-		  <% end %>
-
-		  <% if can? :delete, TourResult %>
-		  <%= link_to("削除", {action: :destroy, id: tour}, method: :delete, confirm: "削除しますか?") %>
-		  <% end %>
-		  <% if can? :edit, TourResult %>
-		  <%= link_to(tour.published ? "非公開" : "公開", {action: :toggle_visible, id: tour}, method: :post) %>
-		  <% end %>
-		</li>
-			<% end %>
-		</ul>
+			  <ul class="button-group round">
+			  <li><%= link_to("表示", { action: :show, id: tour }, class: "tiny button") %></li>
+              <% if can?(:delete, TourResult) || can?(:edit, TourResult) %>
+			  <li><a href="#" data-dropdown="manage_<%= tour.id %>" class="tiny button">&nbsp;</a></li>
+              <% end %>
+			  </ul>
+              <% if can?(:delete, TourResult) || can?(:edit, TourResult) %>
+			  <ul id="manage_<%= tour.id %>" data-dropdown-content class="f-dropdown">
+                <% if can? :delete, TourResult %>
+                <li><%= link_to("削除", {action: :destroy, id: tour}, method: :delete, confirm: "削除しますか?") %></li>
+                <% end %>
+                <% if can? :edit, TourResult %>
+                <li><%= link_to(tour.published ? "非公開" : "公開", {action: :toggle_visible, id: tour}, method: :post) %></li>
+                <% end %>
+              </ul>
+              <% end %>
+            </div>
+		    <div class="medium-3 columns">
+			  <div class="panel">
+		        距離: <%= tour.distance %> km<br />
+                <% if tour.tour_images.count > 0 %>
+		        写真: <%= tour.tour_images.count %>枚<br />
+		        <% end %>
+			  </div>
+            </div>
+		  </div>
+		</div>
+		<% end %>
 
 		<%= will_paginate @list, renderer: FoundationPagination::Rails %>
 	</div>
+  </div>
 </div>

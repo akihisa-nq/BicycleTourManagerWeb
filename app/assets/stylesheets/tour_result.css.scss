@@ -2,7 +2,8 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
-html.tour_result_viewer, body.tour_result_viewer {
+html.tour_result_viewer, body.tour_result_viewer
+{
 	margin : 0px;
 	padding : 0px;
 	width : 100%;
@@ -17,4 +18,43 @@ body.tour_result_viewer div {
 #map img
 {
     max-width : none;
+}
+
+.btmw-tour-result-list
+{
+	padding-top: 10px;
+	padding-bottom: 24px;
+}
+
+.btmw-tour-result-item
+{
+	margin-top: 10px;
+	margin-bottom: 10px;
+	padding-bottom: 10px;
+	border-bottom : 1px black solid;
+}
+
+.btmw-tour-result-item .button-group
+{
+	float: right;
+}
+
+.btmw-tour-result-item .middle-4
+{
+	display: table-cell;
+	vertical-align: bottom;
+}
+
+.btmw-tour-result-item-thumbnail
+{
+	width : 200px;
+	min-height: 80px;
+	float: left;
+	margin-right: 24px;
+}
+
+.btmw-tour-result-item-thumbnail img
+{
+	width: 100%;
+	height: auto;
 }
