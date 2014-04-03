@@ -18,7 +18,7 @@
 
                  <% @tour_result.tour_images.each.with_index do |img, i| %>
                      <% next unless img.point %>
-                     CreatePicture(<%= i %>, <%= img.point.y %>, <%= img.point.x %>, "<%=j image_tag( img.thumbnail_url, style: "width : auto; height : 100%;") %>" );
+                     CreatePicture(<%= i %>, <%= img.point.y %>, <%= img.point.x %>, "<%=j render partial: "show_marker", locals: {img: img} %>" );
                  <% end %>
              }
          });
@@ -56,12 +56,20 @@
          g_map = new google.maps.Map(document.getElementById("map"), mapOptions);
          loadGPXFileIntoGoogleMap("<%= url_for(action: :gpx_file, :id => @tour_result) %>");
          $('body').layout({
-             applyDefaultStyles: true,
+             slidable: true,
+             resizable: true,
+             livePaneResizing: true,
+             stateManagement__enabled: true,
              north: {
-               closable: false
+               closable: false,
+               spacing_open: 0,
+               spacing_close: 0
+             },
+             west: {
+                 size: 300
              },
              south: {
-                 size: 250
+                 size: 200
              },
              center: {
                  onresize: function() {
@@ -81,8 +89,23 @@
   <% end %>
 </div>
 
+<% if can? :delete, TourResult %>
+<% @tour_result.tour_images.each.with_index do |img, i| %>
+<ul id="manage_<%= img.id %>" data-dropdown-content class="f-dropdown">
+  <li><%= link_to("削除", {action: :destroy_image, id: @tour_result, image_id: img}, method: :delete, confirm: "削除しますか?") %></li>
+</ul>
+<% end %>
+<% end %>
+
+<% if user_signed_in? %>
+<ul id="user" data-dropdown-content class="f-dropdown">
+<li><%= link_to 'プロフィールを編集', edit_user_registration_path %></li>
+<li><%= link_to "ログアウト", destroy_user_session_path, method: :delete %></li>
+</ul>
+<% end %>
+
 <div class="ui-layout-north">
-  <nav class="top-bar" data-topbar style="margin : -10px;">
+  <nav class="top-bar" data-topbar>
     <ul class="title-area">
       <li class="name">
         <h1><a href="#"><%= @tour_result.name %></a></h1>
@@ -109,21 +132,30 @@
         <% if can? :delete, TourResult %>
         <li class="active"><%= link_to("削除", {action: :destroy, id: @tour_result}, method: :delete, confirm: "削除しますか?") %></li>
         <% end %>
+        <% if user_signed_in? %>
+        <li><a href="#" data-dropdown="user"><strong><%= current_user.email %></strong></a></li>
+        <% end %>
       </ul>
       <% end %>
     </section>
   </nav>
 </div>
 <div class="ui-layout-west">
-   <div style="text-align:center;">
+   <div class="row">
        <% @tour_result.tour_images.each.with_index do |img, i| %>
-       <div style="margin-bottom:1em;">
-           <%= img.shot_on.strftime("%Y/%m/%d %H:%M:%S") %><br />
-           <a href="javascript:FocusPicture(<%= i %>);"><%= image_tag(img.thumbnail_url, style: "width:100%;height:auto;") %></a><br />
-           <a href="javascript:FocusPicture(<%= i %>);">地図に表示</a><a href="<%= img.image_url %>">拡大</a> <br />
+       <div class="small-11 small-centered columns">
+           <h5 class="subheader"><%= img.shot_on.strftime("%Y/%m/%d %H:%M:%S") %></h5>
+
+           <a class="th" href="javascript:FocusPicture(<%= i %>);"><%= image_tag(img.thumbnail_url, style: "width:100%;height:auto;") %></a><br />
+           <p><%= img.text %></p>
+
+           <ul class="button-group round">
+             <li><a class="tiny button" href="javascript:FocusPicture(<%= i %>);">場所</a></li>
+             <li><a class="tiny button" href="<%= img.image_url %>">拡大</a></li>
              <% if can? :delete, TourResult %>
-             <%= link_to("削除", {action: :destroy_image, id: @tour_result, image_id: img}, method: :delete, confirm: "削除しますか?") %>
+             <li><a class="tiny button dropdown" data-dropdown="manage_<%= img.id %>" href="<%= img.image_url %>">&nbsp;</a></li>
              <% end %>
+           </ul>
        </div>
        <% end %>
    </div>
