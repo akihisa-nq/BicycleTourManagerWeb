@@ -26,6 +26,11 @@ body.tour_result_viewer div {
 	padding-bottom: 24px;
 }
 
+.btmw-tour-result-list-nav
+{
+	text-align : center;
+}
+
 .btmw-tour-result-item
 {
 	margin-top: 10px;
@@ -37,12 +42,6 @@ body.tour_result_viewer div {
 .btmw-tour-result-item .button-group
 {
 	float: right;
-}
-
-.btmw-tour-result-item .middle-4
-{
-	display: table-cell;
-	vertical-align: bottom;
 }
 
 .btmw-tour-result-item-thumbnail
