@@ -24,7 +24,9 @@
 <div class="btmw-tour-result-list">
   <div class="row">
     <div class="medium-12 columns">
-		<%= will_paginate @list, renderer: FoundationPagination::Rails %>
+		<div class="pagination-centered">
+			<%= will_paginate @list, renderer: FoundationPagination::Rails %>
+		</div>
 
 		<% @list.each do |tour| %>
 		<div class="btmw-tour-result-item">
@@ -74,7 +76,9 @@
 		</div>
 		<% end %>
 
-		<%= will_paginate @list, renderer: FoundationPagination::Rails %>
+		<div class="pagination-centered">
+			<%= will_paginate @list, renderer: FoundationPagination::Rails %>
+		</div>
 	</div>
   </div>
 </div>
