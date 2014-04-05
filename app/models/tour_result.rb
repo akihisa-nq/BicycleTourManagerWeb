@@ -210,6 +210,10 @@ class TourResult < ActiveRecord::Base
 	end
 
 	def distance
-		0.0 # FIXME
+		ret = TourResult.find_by_sql([<<-EOS, id])[0].length
+SELECT ST_Length(t.path, false) as length FROM
+	(SELECT ST_Collect(path) AS path FROM public_result_routes WHERE tour_result_id = ?) as t
+		EOS
+		ret.to_i / 1000
 	end
 end
