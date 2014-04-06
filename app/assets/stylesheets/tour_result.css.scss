@@ -13,14 +13,9 @@
 	overflow: hidden;
 }
 
-.reveal-modal
-{
-    max-width : none;
-}
-
 #map img
 {
-    max-width : none;
+    max-width: none;
 }
 
 .btmw-tour-result-list
@@ -31,7 +26,7 @@
 
 .btmw-tour-result-list-nav
 {
-	text-align : center;
+	text-align: center;
 }
 
 .btmw-tour-result-item
@@ -39,7 +34,7 @@
 	margin-top: 10px;
 	margin-bottom: 10px;
 	padding-bottom: 10px;
-	border-bottom : 1px black solid;
+	border-bottom: 1px black solid;
 }
 
 .btmw-tour-result-item .button-group
@@ -50,7 +45,7 @@
 .btmw-tour-result-item-thumbnail
 {
 	width : 200px;
-	min-height: 80px;
+	min-height: 120px;
 	float: left;
 	margin-right: 24px;
 }
