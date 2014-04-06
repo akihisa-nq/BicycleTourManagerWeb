@@ -1,0 +1,88 @@
+<% content_for(:title) do %>
+管理
+<% end %>
+
+<% content_for(:menus) do %>
+<li class="active"><%= link_to "戻る", controller: :summary, action: :index %></li>
+<% end %>
+
+<script type="text/javascript">
+function EditColumn(id)
+{
+    $("#form_update").show();
+    $("#form_create").hide();
+    $("#update_exclusion_area_lon").val([$("#data_" + id + "_lon").html()]);
+    $("#update_exclusion_area_lat").val([$("#data_" + id + "_lat").html()]);
+    $("#update_exclusion_area_distance").val([$("#data_" + id + "_distance").html()]);
+    $("#update_exclusion_area_id").val([id]);
+}
+
+function CancelEditColumn()
+{
+    $("#form_update").hide();
+    $("#form_create").show();
+}
+</script>
+
+<div class="btmw-summary-management">
+  <div class="row">
+    <div class="medium-12 columns">
+      <dl class="tabs" data-tab>
+        <% if can?(:edit, ExclusionArea) %>
+        <dd class="active"><a href="#exclusion">除外区域</a></dd>
+        <% end %>
+      </dl>
+
+      <div class="tabs-content">
+        <% if can?(:edit, ExclusionArea) %>
+        <table>
+          <thead>
+            <th>緯度</th>
+            <th>経度</th>
+            <th>距離</th>
+            <th>管理</th>
+          </thead>
+          <tbody>
+            <% @areas.each do |area| %>
+            <tr>
+              <td id="data_<%= area.id %>_lon"><%= area.point.y %></td>
+              <td id="data_<%= area.id %>_lat"><%= area.point.x %></td>
+              <td id="data_<%= area.id %>_distance"><%= area.distance %></td>
+              <td>
+                <ul class="button-group round" id="menu_<%= area.id %>">
+                  <li><a href="javascript:EditColumn(<%= area.id %>);" class="tiny button">編集</a></li>
+                  <li><%= link_to("削除", {action: :destroy_exclusion_area, id: area.id}, confirm: "削除しますか?", method: :delete, class: "tiny button") %></li>
+                </ul>
+              </td>
+            </tr>
+            <% end %>
+          </tbody>
+        </table>
+
+        <div class="content active" id="exclusion">
+          <%= form_tag({action: :create_exclusion_area}, id: "form_create") do %>
+            <div class="row">
+              <%= render partial: "form_exclusion_area", locals: { prefix: "" } %>
+              <div class="medium-8 columns push-4">
+                <%= submit_tag("追加", class: "button") %>
+              </div>
+            </div>
+          <% end %>
+
+          <%= form_tag({action: :update_exclusion_area}, id: "form_update", style: "display:none") do %>
+            <div class="row">
+              <%= render partial: "form_exclusion_area", locals: { prefix: "update_" } %>
+              <div class="medium-8 columns push-4">
+                <%= hidden_field(:update_exclusion_area, :id) %>
+                <%= submit_tag("編集", class: "button") %>
+                <a href="javascript:CancelEditColumn();">キャンセル</a>
+              </div>
+            </div>
+          <% end %>
+        </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+

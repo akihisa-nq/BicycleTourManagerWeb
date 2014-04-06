@@ -11,11 +11,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140406173339) do
+ActiveRecord::Schema.define(version: 20140407022634) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "postgis"
+
+  create_table "exclusion_areas", force: true do |t|
+    t.float   "distance"
+    t.spatial "point",    limit: {:srid=>4326, :type=>"point"}
+  end
 
   create_table "private_result_routes", force: true do |t|
     t.integer  "tour_result_id"

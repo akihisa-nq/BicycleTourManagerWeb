@@ -62,10 +62,4 @@ class TourResultController < ApplicationController
 		headers["Content-Type"] = "text/javascript"
 		render(partial: "update_image_text")
 	end
-
-	private
-
-	def current_user_or_guest
-		current_user || User.new
-	end
 end

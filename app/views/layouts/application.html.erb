@@ -13,14 +13,9 @@
 
   <%= csrf_meta_tags %>
 </head>
-<body>
+<body class="off-canvas hide-extras">
 
-<% if user_signed_in? %>
-<ul id="user" data-dropdown-content class="f-dropdown">
-<li><%= link_to 'プロフィールを編集', edit_user_registration_path %></li>
-<li><%= link_to "ログアウト", destroy_user_session_path, method: :delete %></li>
-</ul>
-<% end %>
+<%= render partial: "layouts/login_menu" %>
 
 <nav class="top-bar" data-topbar>
   <ul class="title-area">

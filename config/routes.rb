@@ -4,6 +4,11 @@ BicycleTourManagerWeb::Application.routes.draw do
   get "/", to: "summary#index"
   get "/login", to: "summary#login"
   post "/edit_user", to: "summary#edit_user"
+  get "/management", to: "summary#management"
+
+  post "/exclusion_area/create", to: "summary#create_exclusion_area"
+  delete "/exclusion_area/:id/destroy", to: "summary#destroy_exclusion_area"
+  post "/exclusion_area/update", to: "summary#update_exclusion_area"
 
   get "/tour_result", to: "tour_result#index"
   get "/tour_result/page/:page", to: "tour_result#index"

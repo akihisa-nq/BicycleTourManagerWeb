@@ -36,9 +36,9 @@ class TourResult < ActiveRecord::Base
 		tour_result.start_time = tour.routes[0].path_list[0].steps[0].time
 		tour_result.finish_time = tour.routes[-1].path_list[-1].steps[-1].time
 
+		# 非公開
 		tour.routes.each do |r|
 			r.path_list.each do |p|
-				pub_route = tour_result.public_result_routes.build
 				pri_route = tour_result.private_result_routes.build
 
 				logger.debug("check peak")
@@ -73,7 +73,6 @@ class TourResult < ActiveRecord::Base
 						pt.elevation = s.ele
 						pt.time = s.time.getlocal
 
-						pub_route.result_points << pt
 						pri_route.result_points << pt
 
 						prev_pt = s
@@ -82,15 +81,64 @@ class TourResult < ActiveRecord::Base
 
 				line = BTM.factory.line_string(line_points)
 
-				# 公開
-				pub_route.start_time = p.steps[0].time.getlocal
-				pub_route.finish_time = p.steps[-1].time.getlocal
-				pub_route.path = line
-
-				# 非公開
 				pri_route.start_time = p.steps[0].time.getlocal
 				pri_route.finish_time = p.steps[-1].time.getlocal
 				pri_route.path = line
+			end
+		end
+
+		# 公開
+		ExclusionArea.all.each do |area|
+			tour.delete_by_distance(area.point, area.distance)
+		end
+
+		tour.routes.each do |r|
+			r.path_list.each do |p|
+				pub_route = tour_result.public_result_routes.build
+
+				logger.debug("check peak")
+				p.check_peak
+				p.check_distance_from_start
+
+				logger.debug("check steps")
+				line_points = []
+				prev_line = p.steps.first
+				prev_pt = p.steps.first
+
+				p.steps.each do |s|
+					add_line = false
+					add_point = false
+
+					if s.min_max != nil
+						add_line = true
+						add_point = true
+					else
+						add_line = (prev_line.distance_on_path(s) > 0.05)
+						add_point = (prev_pt.distance_on_path(s) > 0.15)
+					end
+
+					if add_line
+						line_points << s.point_geos
+						prev_line = s
+					end
+
+					if add_point
+						pt = ResultPoint.new
+						pt.point = s.point_geos
+						pt.elevation = s.ele
+						pt.time = s.time.getlocal
+
+						pub_route.result_points << pt
+
+						prev_pt = s
+					end
+				end
+
+				line = BTM.factory.line_string(line_points)
+
+				pub_route.start_time = p.steps[0].time.getlocal
+				pub_route.finish_time = p.steps[-1].time.getlocal
+				pub_route.path = line
 			end
 		end
 
@@ -213,10 +261,11 @@ class TourResult < ActiveRecord::Base
 		end
 	end
 
-	def distance
+	def distance(is_public_data)
+		table_name = is_public_data ? "public_result_routes" : "private_result_routes"
 		ret = TourResult.find_by_sql([<<-EOS, id])[0].length
 SELECT ST_Length(t.path, false) as length FROM
-	(SELECT ST_Collect(path) AS path FROM public_result_routes WHERE tour_result_id = ?) as t
+	(SELECT ST_Collect(path) AS path FROM #{table_name} WHERE tour_result_id = ?) as t
 		EOS
 		ret.to_i / 1000
 	end

@@ -75,12 +75,21 @@
               <% end %>
             </div>
 		    <div class="medium-3 columns">
-			  <div class="panel">
-		        距離: <%= tour.distance %> km<br />
-                <% if tour.tour_images.count > 0 %>
-		        写真: <%= tour.tour_images.count %>枚<br />
-		        <% end %>
-			  </div>
+				<table>
+					<tbody>
+						<tr>
+							<th>距離 (公開)</th><td><%= tour.distance(true) %> km</td>
+						</tr>
+						<tr>
+							<th>距離 (実走)</th><td><%= tour.distance(false) %> km</td>
+						</tr>
+						<% if tour.tour_images.count > 0 %>
+						<tr>
+							<th>写真</th><td><%= tour.tour_images.count %>枚</td>
+						</tr>
+						<% end %>
+					</tbody>
+				</table>
             </div>
 		  </div>
 		</div>

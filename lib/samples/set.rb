@@ -10,6 +10,12 @@ class Samples::Set
 		::User.delete_all
 		Samples::User.set_test_users
 
+		::ExclusionArea.delete_all
+		area = ::ExclusionArea.new
+		area.point = ::ExclusionArea.rgeo_factory_for_column(:point).point(135.746702, 34.979099)
+		area.distance = 20.0
+		area.save!
+
 		::TourResult.delete_all
 		::TourImage.delete_all
 
