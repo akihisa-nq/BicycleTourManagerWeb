@@ -82,11 +82,17 @@
  //]]>
 </script>
 
-<div id="drop1" class="f-dropdown" data-dropdown-content>
+<div id="drop1" class="reveal-modal" data-reveal>
   <%= form_tag({action: :create_images, :id => @tour_result.id }, multipart: true) do %>
-    <%= file_field("tour_result", "images", multiple: true) %>
-    <%= submit_tag("アップロード", class: "button") %>
+    <div class="row">
+        <div class="medium-3 columns">画像ファイル:</div>
+        <div class="medium-9 columns"><%= file_field("tour_result", "images", multiple: true) %></div>
+    </div>
+    <div class="row">
+        <div class="medium-9 columns push-3"><%= submit_tag("アップロード", class: "button") %></div>
+    </div>
   <% end %>
+  <a class="close-reveal-modal">&#215;</a>
 </div>
 
 <% if can? :delete, TourResult %>
@@ -124,7 +130,7 @@
       <% if can?(:edit, TourResult) || can?(:delete, TourResult) %>
       <ul class="right">
         <% if can? :edit, TourResult %>
-        <li class="active"><a href="#" data-dropdown="drop1">画像ファイルの追加</a></li>
+        <li class="active"><a href="#" data-reveal-id="drop1">画像ファイルの追加</a></li>
         <% end %>
         <% if can? :edit, TourResult %>
         <li class="active"><%= link_to(@tour_result.published ? "非公開" : "公開", {action: :toggle_visible, id: @tour_result}, method: :post) %></li>
@@ -144,7 +150,7 @@
    <div class="row">
        <% @tour_result.tour_images.each.with_index do |img, i| %>
        <div class="small-11 small-centered columns">
-           <h5 class="subheader"><%= img.shot_on.strftime("%Y/%m/%d %H:%M:%S") %></h5>
+           <h5 class="subheader"><%= img.shot_on_local.strftime("%Y/%m/%d %H:%M:%S") %></h5>
 
            <a class="th" href="javascript:FocusPicture(<%= i %>);"><%= image_tag(img.thumbnail_url, style: "width:100%;height:auto;") %></a><br />
            <p><%= img.text %></p>
