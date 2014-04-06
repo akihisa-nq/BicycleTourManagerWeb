@@ -72,6 +72,10 @@ class TourImage < ActiveRecord::Base
 		end
 	end
 
+	def shot_on_local
+		shot_on.in_time_zone(tour_result.time_zone)
+	end
+
 	attr_accessor :image_data
 
 	private

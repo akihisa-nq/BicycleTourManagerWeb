@@ -15,7 +15,7 @@ class Samples::Set
 
 		Dir.glob(File.join(File.dirname(__FILE__), "gpx/*.gpx")) do |file|
 			puts file
-			tour = ::TourResult.load(File.open(file, "r:utf-8"))
+			tour = ::TourResult.load(File.open(file, "r:utf-8"), "Tokyo")
 
 			if File.basename(file) == "track_9.gpx"
 				Dir.glob(File.join(File.dirname(__FILE__), "images/*.JPG")) do |img|

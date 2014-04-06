@@ -30,7 +30,7 @@ describe TourResult do
 
 			user = User.new(email: "test@test.com", password: "testtest")
 			user.role = nil
-			expect(TourResult.load_and_save(user, File.open(path, "r:utf-8"))).to eq nil
+			expect(TourResult.load_and_save(user, File.open(path, "r:utf-8"), "Tokyo")).to eq nil
 		end
 
 		it "cannot add images" do
@@ -53,7 +53,7 @@ describe TourResult do
 
 			user = User.new(email: "test@test.com", password: "testtest")
 			user.role = "manager"
-			expect(TourResult.load_and_save(user, File.open(path, "r:utf-8"))).to eq nil
+			expect(TourResult.load_and_save(user, File.open(path, "r:utf-8"), "Tokyo")).to eq nil
 		end
 
 		it "cannot add images" do
@@ -76,7 +76,7 @@ describe TourResult do
 
 			user = User.new(email: "test@test.com", password: "testtest")
 			user.role = "editor"
-			expect(TourResult.load_and_save(user, File.open(path, "r:utf-8"))).not_to eq nil
+			expect(TourResult.load_and_save(user, File.open(path, "r:utf-8"), "Tokyo")).not_to eq nil
 		end
 
 		it "can add images" do

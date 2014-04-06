@@ -28,13 +28,13 @@ class TourResult < ActiveRecord::Base
 		end
 	end
 
-	def self.load(stream)
+	def self.load(stream, time_zone)
 		tour = BTM::GpxStream.read_from_stream(stream)
 
 		tour_result = TourResult.new
 		tour_result.name = tour.name
-		tour_result.start_time = tour.start_date.getlocal
-		tour_result.finish_time = tour.routes[-1].path_list[-1].steps[-1].time.getlocal
+		tour_result.start_time = tour.routes[0].path_list[0].steps[0].time
+		tour_result.finish_time = tour.routes[-1].path_list[-1].steps[-1].time
 
 		tour.routes.each do |r|
 			r.path_list.each do |p|
@@ -94,12 +94,14 @@ class TourResult < ActiveRecord::Base
 			end
 		end
 
+		tour_result.time_zone = time_zone
+
 		tour_result
 	end
 
-	def self.load_and_save(user, gpx_file)
+	def self.load_and_save(user, gpx_file, time_zone)
 		if user.can? :edit, TourResult
-			tour_result = self.load(gpx_file)
+			tour_result = self.load(gpx_file, time_zone)
 			tour_result.published = false
 			tour_result.save!
 			tour_result
@@ -215,5 +217,17 @@ SELECT ST_Length(t.path, false) as length FROM
 	(SELECT ST_Collect(path) AS path FROM public_result_routes WHERE tour_result_id = ?) as t
 		EOS
 		ret.to_i / 1000
+	end
+
+	def time_zone
+		'Tokyo'
+	end
+
+	def start_time_on_local
+		start_time.in_time_zone(time_zone)
+	end
+
+	def finish_time_on_local
+		finish_time.in_time_zone(time_zone)
 	end
 end
