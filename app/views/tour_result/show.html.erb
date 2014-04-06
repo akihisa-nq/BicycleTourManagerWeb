@@ -82,6 +82,7 @@
  //]]>
 </script>
 
+<% if can? :edit, TourResult %>
 <div id="drop1" class="reveal-modal" data-reveal>
   <%= form_tag({action: :create_images, :id => @tour_result.id }, multipart: true) do %>
     <div class="row">
@@ -94,6 +95,7 @@
   <% end %>
   <a class="close-reveal-modal">&#215;</a>
 </div>
+<% end %>
 
 <% if can? :delete, TourResult %>
 <% @tour_result.tour_images.each.with_index do |img, i| %>
