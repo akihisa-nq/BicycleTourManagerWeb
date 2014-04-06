@@ -128,6 +128,8 @@ class TourResult < ActiveRecord::Base
 		ret = TourResult.find(id)
 		if ! user.can?(:edit, TourResult) && !ret.published
 			ret = nil
+		else
+			ret.tour_images.each {|i| i.tour_result = ret }
 		end
 		ret
 	end
