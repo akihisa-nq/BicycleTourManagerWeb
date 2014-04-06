@@ -18,7 +18,7 @@
 
                  <% @tour_result.tour_images.each.with_index do |img, i| %>
                      <% next unless img.point %>
-                     CreatePicture(<%= i %>, <%= img.point.y %>, <%= img.point.x %>, "<%=j render partial: "show_marker", locals: {img: img} %>" );
+                     CreatePicture(<%= i %>, <%= img.point.y %>, <%= img.point.x %>, $("#marker_<%= i %>").html() );
                  <% end %>
              }
          });
@@ -46,6 +46,14 @@
 
      function FocusPicture(id) {
          g_info_window[id].open(g_map, g_marker[id]);
+     }
+
+     function ClosePicture(id) {
+         g_info_window[id].close(g_map, g_marker[id]);
+     }
+
+     function UpdatePicture(id) {
+         g_info_window[id].content = $("#marker_" + id).html();
      }
 
      $(document).ready(function() {
@@ -79,6 +87,18 @@
          });
      });
 
+    function cancelEditText(id)
+    {
+        $("#text_" + id).show();
+        $("#text_edit_" + id).hide();
+    }
+
+    function editText(id)
+    {
+        $("#text_" + id).hide();
+        $("#text_edit_" + id).show();
+    }
+
  //]]>
 </script>
 
@@ -97,10 +117,15 @@
 </div>
 <% end %>
 
-<% if can? :delete, TourResult %>
+<% if can?(:delete, TourResult) || can?(:edit, TourResult) %>
 <% @tour_result.tour_images.each.with_index do |img, i| %>
 <ul id="manage_<%= img.id %>" data-dropdown-content class="f-dropdown">
+  <% if can?(:delete, TourResult) %>
   <li><%= link_to("削除", {action: :destroy_image, id: @tour_result, image_id: img}, method: :delete, confirm: "削除しますか?") %></li>
+  <% end %>
+  <% if can?(:edit, TourResult) %>
+  <li><a href="javascript:editText(<%= img.id %>);">テキストの編集</a></li>
+  <% end %>
 </ul>
 <% end %>
 <% end %>
@@ -150,17 +175,30 @@
 </div>
 <div class="ui-layout-west">
    <div class="row">
-       <% @tour_result.tour_images.each.with_index do |img, i| %>
+       <% @tour_result.tour_images.each.with_index do |img, i|; @img = img %>
        <div class="small-11 small-centered columns">
            <h5 class="subheader"><%= img.shot_on_local.strftime("%Y/%m/%d %H:%M:%S") %></h5>
 
            <a class="th" href="javascript:FocusPicture(<%= i %>);"><%= image_tag(img.thumbnail_url, style: "width:100%;height:auto;") %></a><br />
-           <p><%= img.text %></p>
+           <p id="text_<%= img.id %>"><%= img.text %></p>
+
+           <% if can?(:edit, TourResult) %>
+           <%= form_tag({ action: :update_image_text, id: img.id, index: i }, remote: true, id: "text_edit_#{img.id}", class: "hide") do %>
+               <%= text_field(:img, :text) %>
+               <%= submit_tag("更新") %>
+               <a href="javascript:cancelEditText(<%= img.id %>);">キャンセル</a>
+           <% end %>
+           <% end %>
+
+           <div class="hide" id="marker_<%= i %>">
+             <a href="<%= img.image_url %>" class="th"><%= image_tag( img.thumbnail_url, style: "width : auto; height : 70%;") %></a>
+             <p id="marker_text_<%= img.id %>"><%= img.text %></p>
+           </div>
 
            <ul class="button-group round">
              <li><a class="tiny button" href="javascript:FocusPicture(<%= i %>);">場所</a></li>
              <li><a class="tiny button" href="<%= img.image_url %>">拡大</a></li>
-             <% if can? :delete, TourResult %>
+             <% if can?(:delete, TourResult) || can?(:edit, TourResult) %>
              <li><a class="tiny button dropdown" data-dropdown="manage_<%= img.id %>" href="<%= img.image_url %>">&nbsp;</a></li>
              <% end %>
            </ul>

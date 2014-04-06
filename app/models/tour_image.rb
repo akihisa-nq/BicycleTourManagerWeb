@@ -76,6 +76,12 @@ class TourImage < ActiveRecord::Base
 		shot_on.in_time_zone(tour_result.time_zone)
 	end
 
+	def self.update_text(user, id, text)
+		if user.can? :edit, TourResult
+			TourImage.where(["id = ?", id]).update_all(["text = ?", text])
+		end
+	end
+
 	attr_accessor :image_data
 
 	private

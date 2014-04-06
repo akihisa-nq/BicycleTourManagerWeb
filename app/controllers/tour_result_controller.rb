@@ -2,6 +2,7 @@ class TourResultController < ApplicationController
 	before_action :authenticate_user!, only: [
 		:create, :destroy, :toggle_visible,
 		:create_images, :destroy_image,
+		:update_image_text
 	]
 
 	def index
@@ -50,6 +51,16 @@ class TourResultController < ApplicationController
 	def destroy_image
 		TourImage.destroy_with_auth(current_user_or_guest, params[:image_id])
 		redirect_to(action: :show, :id => params[:id])
+	end
+
+	def update_image_text
+		attr = params[:img].permit(:text)
+		TourImage.update_text(current_user_or_guest, params[:id], attr[:text])
+		@id = params[:id]
+		@text = attr[:text]
+		@index = params[:index]
+		headers["Content-Type"] = "text/javascript"
+		render(partial: "update_image_text")
 	end
 
 	private

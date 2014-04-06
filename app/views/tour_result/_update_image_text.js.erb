@@ -1,0 +1,6 @@
+$("#text_<%= @id %>").html("<%=j @text %>");
+$("#marker_text_<%= @id %>").html("<%=j @text %>");
+$("#text_<%= @id %>").show();
+$("#text_edit_<%= @id %>").hide();
+UpdatePicture(<%= @index %>);
+ClosePicture(<%= @index %>);

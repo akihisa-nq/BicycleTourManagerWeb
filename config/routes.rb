@@ -15,4 +15,5 @@ BicycleTourManagerWeb::Application.routes.draw do
 
   post "/tour_result/:id/create_images", to: "tour_result#create_images"
   delete "/tour_result/:id/destroy_image/:image_id", to: "tour_result#destroy_image"
+  post "/tour_result/update_image_text/:id", to: "tour_result#update_image_text"
 end
