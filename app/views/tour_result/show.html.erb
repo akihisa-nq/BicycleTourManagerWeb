@@ -152,7 +152,7 @@
 
     <section class="top-bar-section">
       <ul class="left">
-        <li class="active"><%= link_to("戻る", action: :index) %></li>
+        <li class="active"><%= link_to("戻る", action: :index, page: TourResult.page_for(current_user, @tour_result.id)) %></li>
       </ul>
       <% if can?(:edit, TourResult) || can?(:delete, TourResult) %>
       <ul class="right">
