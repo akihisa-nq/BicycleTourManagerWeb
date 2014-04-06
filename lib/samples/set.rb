@@ -32,4 +32,21 @@ class Samples::Set
 			tour.save!
 		end
 	end
+
+	def self.specified_tours
+		dir_base = ENV["TOURS_DIR"]
+		Dir.glob("#{dir_base.gsub("\\", "/")}/**/*.gpx") do |gpx|
+			puts gpx
+			tour = ::TourResult.load(File.open(gpx, "r:utf-8"), "Tokyo")
+
+			if Dir.exist?(File.join(File.dirname(gpx), "images"))
+				Dir.glob(File.join(File.dirname(gpx), "images/*.JPG")) do |img|
+					puts img
+					tour.tour_images.build(image_data: File.open(img, "rb"))
+				end
+			end
+
+			tour.save!
+		end
+	end
 end
