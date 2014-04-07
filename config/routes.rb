@@ -1,4 +1,6 @@
 BicycleTourManagerWeb::Application.routes.draw do
+  root to: "summary#index"
+
   devise_for :users
 
   get "/", to: "summary#index"
