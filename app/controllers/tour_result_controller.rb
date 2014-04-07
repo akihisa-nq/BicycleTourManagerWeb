@@ -17,7 +17,7 @@ class TourResultController < ApplicationController
 
 	def create
 		attr = params[:tour_result].permit(:gpx_file, :time_zone)
-		ret = TourResult.load_and_save(current_user_or_guest, attr[:gpx_file])
+		ret = TourResult.load_and_save(current_user_or_guest, attr[:gpx_file], attr[:time_zone])
 		if ret
 			redirect_to(action: :index, id: nil, page: TourResult.page_for(current_user_or_guest, ret.id))
 		else
