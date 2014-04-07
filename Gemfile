@@ -9,14 +9,14 @@ group :development, :test do
 	gem "database_cleaner"
 	gem "launchy"
 	gem "selenium-webdriver"
-
-	gem "ffi-geos"
 end
 
 platforms :ruby do
 	gem "therubyracer"
 	gem "unicorn"
 end
+
+gem "ffi-geos"
 
 gem "exifr"
 gem "bicycle_tour_manager", :git => "git@github.com:akihisa-nq/BicycleTourManager.git"
