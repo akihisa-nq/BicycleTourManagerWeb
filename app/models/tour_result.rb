@@ -228,7 +228,7 @@ class TourResult < ActiveRecord::Base
 	def plot_altitude_graph(is_public_data)
 		tour = self.to_tour(is_public_data, :graph)
 
-		plotter = BTM::AltitudePloter.new(ENV["GNUPLOT"], File.join(Rails.root, "tmp"))
+		plotter = BTM::AltitudePloter.new("gnuplot", File.join(Rails.root, "tmp"))
 		plotter.elevation_max = 1100
 		plotter.elevation_min = -100
 		plotter.distance_max = (tour.total_distance + 10.0).to_i
