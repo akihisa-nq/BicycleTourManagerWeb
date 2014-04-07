@@ -99,8 +99,14 @@ class TourImage < ActiveRecord::Base
 			@image_data = nil
 
 			exif = EXIFR::JPEG.new(image_path)
-			if self.shot_on != exif.date_time_original
-				self.shot_on = exif.date_time_original
+
+			zone = ActiveSupport::TimeZone.find_tzinfo(tour_result.time_zone)
+
+			o = exif.date_time_original
+			time_real = DateTime.new(o.year, o.month, o.day, o.hour, o.min, o.sec, zone.now.gmt_offset)
+			
+			if self.shot_on != time_real
+				self.shot_on = time_real
 				self.save
 			end
 		end
