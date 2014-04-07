@@ -14,12 +14,16 @@ class User < ActiveRecord::Base
 		end
 	end
 
+	def roles
+		(role || "").split(",").map {|r| r.strip }
+	end
+
 	def manager?
-		self.role == "manager"
+		roles.include?("manager")
 	end
 
 	def editor?
-		self.role == "editor"
+		roles.include?("editor")
 	end
 
 	def ability

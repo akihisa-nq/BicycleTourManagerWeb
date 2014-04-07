@@ -4,18 +4,17 @@ class Ability
 	def initialize(user)
 		user ||= User.new # guest user (not logged in)
 
-		case
-		when user.manager?
+		if user.manager?
 			can :manage, User
 			can :read, :all
+		end
 
-		when user.editor?
+		if user.editor?
 			can :manage, TourResult
 			can :manage, ExclusionArea
 			can :read, :all
-
-		else
-			can :read, :all
 		end
+
+		can :read, :all
 	end
 end

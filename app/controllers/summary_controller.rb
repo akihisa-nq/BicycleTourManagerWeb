@@ -9,15 +9,15 @@ class SummaryController < ApplicationController
 	end
 
 	def login
-		@users = User.all
 	end
 
 	def edit_user
 		User.update_role(current_user, params[:user])
-		redirect_to(action: :login)
+		redirect_to(action: :management)
 	end
 
 	def management
+		@users = User.all
 		@areas = ExclusionArea.all_with_auth(current_user_or_guest)
 	end
 
