@@ -150,6 +150,7 @@ class TourResult < ActiveRecord::Base
 	def self.load_and_save(user, gpx_file, time_zone)
 		if user.can? :edit, TourResult
 			tour_result = self.load(gpx_file, time_zone)
+			tour_result.need_update_graph = true
 			tour_result.published = false
 			tour_result.save!
 			tour_result
@@ -226,16 +227,18 @@ class TourResult < ActiveRecord::Base
 	end
 
 	def plot_altitude_graph(is_public_data)
-		tour = self.to_tour(is_public_data, :graph)
+		if need_update_graph
+			tour = self.to_tour(is_public_data, :graph)
 
-		plotter = BTM::AltitudePloter.new("gnuplot", File.join(Rails.root, "tmp"))
-		plotter.elevation_max = 1100
-		plotter.elevation_min = -100
-		plotter.distance_max = (tour.total_distance + 10.0).to_i
-		plotter.font = File.join(Rails.root, "vendor/font/mikachan-p.ttf")
+			plotter = BTM::AltitudePloter.new("gnuplot", File.join(Rails.root, "tmp"))
+			plotter.elevation_max = 1100
+			plotter.elevation_min = -100
+			plotter.distance_max = (tour.total_distance + 10.0).to_i
+			plotter.font = File.join(Rails.root, "vendor/font/mikachan-p.ttf")
 
-		FileUtils.mkdir_p(File.dirname(altitude_graph_path))
-		plotter.plot(tour, altitude_graph_path)
+			FileUtils.mkdir_p(File.dirname(altitude_graph_path))
+			plotter.plot(tour, altitude_graph_path)
+		end
 	end
 
 	def altitude_graph_path
@@ -255,9 +258,7 @@ class TourResult < ActiveRecord::Base
 
 	def self.toggle_visible(user, id)
 		if user.can? :edit, TourResult
-			ret = TourResult.find(id)
-			ret.published = !ret.published
-			ret.save!
+			TourResult.where(["id = ?", id]).update_all("published = CASE WHEN published = TRUE THEN FALSE ELSE TRUE END")
 		end
 	end
 
@@ -281,4 +282,6 @@ SELECT ST_Length(t.path, false) as length FROM
 	def finish_time_on_local
 		finish_time.in_time_zone(time_zone)
 	end
+
+	attr_accessor :need_update_graph
 end
