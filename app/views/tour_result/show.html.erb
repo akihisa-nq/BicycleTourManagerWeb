@@ -186,7 +186,7 @@
            <% end %>
 
            <div class="hide" id="marker_<%= i %>">
-             <a href="<%= img.image_url %>" class="th"><%= image_tag( img.thumbnail_url, style: "width : auto; height : 70%;") %></a>
+             <a href="<%= path_to_image(img.image_url) %>" class="th"><%= image_tag( img.thumbnail_url, style: "width : auto; height : 70%;") %></a>
              <p id="marker_text_<%= img.id %>"><%= img.text %></p>
            </div>
 
