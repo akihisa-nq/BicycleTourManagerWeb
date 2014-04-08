@@ -44,7 +44,7 @@
 		    <div class="medium-9 columns">
 			  <div class="btmw-tour-result-item-thumbnail">
 			  <% if tour.tour_images.count > 0 %>
-			  <a href="<%= tour.tour_images[0].image_url %>" class="th">
+			  <a href="<%= url_for(tour.tour_images[0].image_url) %>" class="th">
 			  <%= image_tag(tour.tour_images[0].thumbnail_url) %>
 			  </a>
 			  <% end %>
