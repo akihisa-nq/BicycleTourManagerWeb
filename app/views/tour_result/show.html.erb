@@ -192,9 +192,9 @@
 
            <ul class="button-group round">
              <li><a class="tiny button" href="javascript:FocusPicture(<%= i %>);">場所</a></li>
-             <li><a class="tiny button" href="<%= url_for(img.image_url) %>">拡大</a></li>
+             <li><a class="tiny button" href="<%= path_to_image(img.image_url) %>">拡大</a></li>
              <% if can?(:delete, TourResult) || can?(:edit, TourResult) %>
-             <li><a class="tiny button dropdown" data-dropdown="manage_<%= img.id %>" href="<%= url_for(img.image_url) %>">&nbsp;</a></li>
+             <li><a class="tiny button dropdown" data-dropdown="manage_<%= img.id %>" href="<%= path_to_image(img.image_url) %>">&nbsp;</a></li>
              <% end %>
            </ul>
        </div>
