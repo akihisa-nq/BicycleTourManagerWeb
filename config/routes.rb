@@ -23,4 +23,11 @@ BicycleTourManagerWeb::Application.routes.draw do
   post "/tour_result/:id/create_images", to: "tour_result#create_images"
   delete "/tour_result/:id/destroy_image/:image_id", to: "tour_result#destroy_image"
   post "/tour_result/update_image_text/:id", to: "tour_result#update_image_text"
+
+  get "/tour_plan", to: "tour_plan#index"
+  post "/tour_plan/create", to: "tour_plan#create"
+  delete "/tour_plan/:id/destroy", to: "tour_plan#destroy"
+  post "/tour_plan/:id/toggle_visible", to: "tour_plan#toggle_visible"
+  get "/tour_plan/:id/show", to: "tour_plan#show"
+  get "/tour_plan/:id/edit", to: "tour_plan#edit"
 end

@@ -11,6 +11,7 @@ class Ability
 
 		if user.editor?
 			can :manage, TourResult
+			can :manage, TourPlan
 			can :manage, ExclusionArea
 			can :read, :all
 		end

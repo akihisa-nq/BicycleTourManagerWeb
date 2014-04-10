@@ -1,0 +1,84 @@
+<% content_for(:title) do %>
+旅の計画
+<% end %>
+
+<% content_for(:menus) do %>
+<li class="active"><%= link_to "戻る", controller: :summary, action: :index %></li>
+<% end %>
+
+<% content_for(:manage) do %>
+<% if can? :edit, TourResult %>
+	<li class="active"><a href="#" data-reveal-id="edit_menu">追加</a></li>
+<% end %>
+<% end %>
+
+<% if can? :edit, TourResult %>
+<div class="reveal-modal" data-reveal id="edit_menu">
+	<%= form_tag({action: :create}, multipart: true) do %>
+	<div class="row">
+		<div class="medium-3 columns">名前:</div>
+		<div class="medium-9 columns"><%= text_field(:tour_plan, :name) %></div>
+	</div>
+	<div class="row">
+		<div class="medium-3 columns">GoogleMap URL:</div>
+		<div class="medium-9 columns"><%= text_field(:tour_plan, :google_map_url) %></div>
+	</div>
+	<div class="row">
+		<div class="medium-9 columns push-3"><%= submit_tag("送信", class: "button") %></div>
+	</div>
+	<% end %>
+	<a class="close-reveal-modal">&#215;</a>
+</div>
+<% end %>
+
+<div class="btmw-tour-result-list">
+  <div class="row">
+    <div class="medium-12 columns">
+		<div class="pagination-centered">
+			<%= will_paginate @tour_plans, renderer: FoundationPagination::Rails %>
+		</div>
+
+		<% @tour_plans.each do |tour| %>
+		<div class="btmw-tour-result-item">
+          <div class="row">
+		    <div class="medium-9 columns">
+              <div><%= tour.created_at.strftime("%Y/%m/%d") %></div>
+		      <h3><%= tour.name %></h3>
+			  <p>
+              <% if can?(:edit, TourPlan) && !tour.published %>
+		      [非公開]
+		      <% end %>
+			  </p>
+
+			  <ul class="button-group round">
+			  <li><%= link_to("表示", { action: :show, id: tour }, class: "tiny button") %></li>
+              <% if can?(:delete, TourPlan) || can?(:edit, TourPlan) %>
+			  <li><a href="#" data-dropdown="manage_<%= tour.id %>" class="tiny button">&nbsp;</a></li>
+              <% end %>
+			  </ul>
+              <% if can?(:delete, TourPlan) || can?(:edit, TourPlan) %>
+			  <ul id="manage_<%= tour.id %>" data-dropdown-content class="f-dropdown">
+                <% if can? :edit, TourPlan %>
+                <li><%= link_to("編集", action: :edit, id: tour) %></li>
+                <% end %>
+                <% if can? :delete, TourPlan %>
+                <li><%= link_to("削除", {action: :destroy, id: tour}, method: :delete, confirm: "削除しますか?") %></li>
+                <% end %>
+                <% if can? :edit, TourPlan %>
+                <li><%= link_to(tour.published ? "非公開" : "公開", {action: :toggle_visible, id: tour}, method: :post) %></li>
+                <% end %>
+              </ul>
+              <% end %>
+            </div>
+		    <div class="medium-3 columns">
+            </div>
+		  </div>
+		</div>
+		<% end %>
+
+		<div class="pagination-centered">
+			<%= will_paginate @tour_plans, renderer: FoundationPagination::Rails %>
+		</div>
+	</div>
+  </div>
+</div>

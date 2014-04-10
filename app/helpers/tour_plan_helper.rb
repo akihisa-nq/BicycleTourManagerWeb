@@ -1,0 +1,2 @@
+module TourPlanHelper
+end
