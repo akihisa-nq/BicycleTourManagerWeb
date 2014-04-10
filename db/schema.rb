@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140407022634) do
+ActiveRecord::Schema.define(version: 20140410150040) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -57,6 +57,43 @@ ActiveRecord::Schema.define(version: 20140407022634) do
     t.integer  "tour_result_id"
     t.datetime "shot_on"
     t.string   "text"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "tour_plan_caches", force: true do |t|
+    t.text    "request"
+    t.text    "response"
+    t.spatial "point",    limit: {:srid=>4326, :type=>"point"}
+  end
+
+  create_table "tour_plan_paths", force: true do |t|
+    t.integer "tour_plan_route_id"
+    t.string  "google_map_url"
+    t.integer "position"
+  end
+
+  create_table "tour_plan_points", force: true do |t|
+    t.integer "tour_route_id"
+    t.string  "name"
+    t.string  "comment"
+    t.string  "direction"
+    t.float   "rest_time"
+    t.float   "target_speed"
+    t.float   "limit_speed"
+    t.integer "position"
+    t.spatial "point",         limit: {:srid=>4326, :type=>"point"}
+  end
+
+  create_table "tour_plan_routes", force: true do |t|
+    t.integer "tour_plan_id"
+    t.string  "name"
+    t.integer "position"
+  end
+
+  create_table "tour_plans", force: true do |t|
+    t.string   "name"
+    t.boolean  "published"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
