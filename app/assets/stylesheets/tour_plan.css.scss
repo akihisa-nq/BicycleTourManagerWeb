@@ -1,3 +1,42 @@
 // Place all the styles related to the tour_plan controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+.btmw-tour-plan-list, .btmw-tour-plan-edit
+{
+	padding-top: 10px;
+	padding-bottom: 24px;
+}
+
+.btmw-tour-plan-list-nav
+{
+	text-align: center;
+}
+
+.btmw-tour-plan-item
+{
+	margin-top: 10px;
+	margin-bottom: 10px;
+	padding-bottom: 10px;
+	border-bottom: 1px black solid;
+}
+
+.btmw-tour-plan-item .button-group
+{
+	float: right;
+}
+
+.btmw-tour-plan-edit table
+{
+	width: 100%;
+}
+
+.btmw-tour-plan-edit td:first-child
+{
+	width: 20%;
+}
+
+.btmw-tour-plan-edit td:last-child
+{
+	width: 20%;
+}

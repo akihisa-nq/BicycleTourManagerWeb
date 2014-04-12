@@ -30,4 +30,7 @@ BicycleTourManagerWeb::Application.routes.draw do
   post "/tour_plan/:id/toggle_visible", to: "tour_plan#toggle_visible"
   get "/tour_plan/:id/show", to: "tour_plan#show"
   get "/tour_plan/:id/edit", to: "tour_plan#edit"
+  post "/tour_plan/:id/update", to: "tour_plan#update"
+
+  delete "/tour_plan/:tour_plan_id/routes/paths/:id/destroy", to: "tour_plan#destroy_path"
 end

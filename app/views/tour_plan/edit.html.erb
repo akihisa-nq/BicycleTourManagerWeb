@@ -1,0 +1,64 @@
+<% content_for(:title) do %>
+旅の計画 - <%= @tour_plan.name %>
+<% end %>
+
+<% content_for(:menus) do %>
+<li class="active"><%= link_to "戻る", action: :index, page: TourPlan.page_for(current_user || User.new, @tour_plan.id) %></li>
+<% end %>
+
+<% content_for(:manage) do %>
+<% end %>
+
+<div class="btmw-tour-plan-edit">
+  <div class="row">
+    <div class="medium-12 columns">
+        <table>
+          <thead>
+             <th>ルート</th>
+             <th>パス</th>
+             <th>管理</th>
+          </thead>
+          <tbody>
+            <%= form_tag(action: :update, id: @tour_plan) do %>
+            <tr>
+              <td colspan="2"><%= text_field(:tour_plan, :name) %></td>
+              <td></td>
+            </tr>
+            <% @tour_plan.tour_plan_routes.each do |route|; @route = route %>
+            <% @route.tour_plan_paths.each.with_index do |path, i|; @path = path %>
+            <tr>
+              <% if i == 0 %>
+              <td><%= text_field("route[]", :name) %></td>
+              <% else %>
+              <td></td>
+              <% end %>
+              <td><%= text_field("path[]", :google_map_url) %></td>
+              <td>
+                <ul class="button-group round">
+                  <li><a href="<%= @path.google_map_url %>" class="tiny button" target="_blank">表示</a></li>
+                  <li><%= link_to("削除", {action: :destroy_path, tour_plan_id: @tour_plan.id, id: @path}, method: :delete, class: "tiny button") %></li>
+                </ul>
+              </td>
+            </tr>
+            <% @path = nil; end %>
+            <tr>
+              <td></td>
+              <td><%= text_field("path_new[#{@route.id}]", :google_map_url) %></td>
+              <td></td>
+            </tr>
+            <% @route = nil; end %>
+            <tr>
+              <td><%= text_field(:route_new, :name) %></td>
+              <td><%= text_field(:route_new, :google_map_url) %></td>
+              <td></td>
+            </tr>
+              <td></td>
+              <td></td>
+              <td><%= submit_tag("編集", class: "tiny button") %></td>
+            </tr>
+            <% end %>
+          </tbody>
+        </table>
+    </div>
+  </div>
+</div>
