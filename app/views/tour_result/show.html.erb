@@ -1,15 +1,11 @@
 ﻿<script type="text/javascript">
      //<![CDATA[
-     var g_info_window = {};
-     var g_marker = {};
-     var g_map = null;
-
      function loadGPXFileIntoGoogleMap(filename) {
          $.ajax({
              url:filename,
              dataType: "xml",
              success: function(data) {
-                 var parser = new GPXParser(data, g_map);
+                 var parser = new GPXParser(data, window.map);
                  parser.setTrackColour("#ff0000");
                  parser.setTrackWidth(5);
                  parser.setMinTrackPointDelta(0.0001);
@@ -17,51 +13,59 @@
                  parser.addTrackpointsToMap();
 
                  <% @tour_result.tour_images.each.with_index do |img, i| %>
-                     <% next unless img.point %>
-                     CreatePicture(<%= i %>, <%= img.point.y %>, <%= img.point.x %>, $("#marker_<%= i %>").html() );
+                 <% next unless img.point %>
+                 CreatePicture(<%= i %>, <%= img.point.y %>, <%= img.point.x %>, $("#marker_<%= i %>").html() );
                  <% end %>
              }
          });
      }
 
      function CreatePicture(id, lat, lon, html) {
-         if (g_marker[id] != null) {
+         if (window.marker == undefined) {
+             window.marker = [];
+         }
+
+         if (window.info_window == undefined) {
+             window.info_window = [];
+         }
+
+         if (window.marker[id] != null) {
              return;
          }
 
-         g_marker[id] = new google.maps.Marker({
+         window.marker[id] = new google.maps.Marker({
              position: new google.maps.LatLng(lat,lon),
-             map: g_map
+             map: window.map
          });
 
-         g_info_window[id] = new google.maps.InfoWindow({
+         window.info_window[id] = new google.maps.InfoWindow({
              content: html,
              size: new google.maps.Size(50,50)
          });
 
-         google.maps.event.addListener(g_marker[id], "click", function() {
-             g_info_window[id].open(g_map, g_marker[id]);
+         google.maps.event.addListener(window.marker[id], "click", function() {
+             window.info_window[id].open(window.map, window.marker[id]);
          });
      }
 
      function FocusPicture(id) {
-         g_info_window[id].open(g_map, g_marker[id]);
+         window.info_window[id].open(window.map, window.marker[id]);
      }
 
      function ClosePicture(id) {
-         g_info_window[id].close(g_map, g_marker[id]);
+         window.info_window[id].close(window.map, window.marker[id]);
      }
 
      function UpdatePicture(id) {
-         g_info_window[id].content = $("#marker_" + id).html();
+         window.info_window[id].content = $("#marker_" + id).html();
      }
 
-     $(document).ready(function() {
+     $(document).on('ready page:load', function() {
          var mapOptions = {
            zoom: 8,
            mapTypeId: google.maps.MapTypeId.ROADMAP
          };
-         g_map = new google.maps.Map(document.getElementById("map"), mapOptions);
+         window.map = new google.maps.Map(document.getElementById("map"), mapOptions);
          loadGPXFileIntoGoogleMap("<%= url_for(action: :gpx_file, :id => @tour_result) %>");
          $('body').layout({
              slidable: true,
@@ -81,7 +85,7 @@
              },
              center: {
                  onresize: function() {
-                    google.maps.event.trigger(g_map, 'resize');
+                    google.maps.event.trigger(window.map, 'resize');
                  }
              }
          });
@@ -101,6 +105,10 @@
 
  //]]>
 </script>
+
+<% content_for(:title) do %>
+<%= @tour_result.name %>
+<% end %>
 
 <% if can? :edit, TourResult %>
 <div id="drop1" class="reveal-modal" data-reveal>
@@ -136,7 +144,7 @@
   <nav class="top-bar" data-topbar>
     <ul class="title-area">
       <li class="name">
-        <h1><a href="#"><%= @tour_result.name %></a></h1>
+        <h1><a href="#"><%= yield :title %></a></h1>
         <% if can? :edit, TourResult %>
         <% unless @tour_result.published %>
           <span style="color:white">[非公開]</span>
@@ -202,7 +210,7 @@
    </div>
 </div>
 <div class="ui-layout-center">
-   <div id="map" style="width: 100%; height: 100%;"></div>
+   <div class="map" id="map" style="width: 100%; height: 100%;"></div>
 </div>
 <div class="ui-layout-south">
     <%= image_tag( @tour_result.altitude_graph_url, style: "height:100%;width:auto;max-width:none;" ) %>

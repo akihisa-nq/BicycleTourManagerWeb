@@ -1,17 +1,19 @@
 <% content_for(:title) do %>
-旅の計画 - <%= @tour_plan.name %>
+旅の計画 - パスの編集 - <%= @tour_plan.name %>
 <% end %>
 
 <% content_for(:menus) do %>
 <li class="active"><%= link_to "戻る", action: :index, page: TourPlan.page_for(current_user || User.new, @tour_plan.id) %></li>
+<li><%= link_to "ノードの編集", action: :edit_node, id: @tour_plan %></li>
 <% end %>
 
 <% content_for(:manage) do %>
 <% end %>
 
-<div class="btmw-tour-plan-edit">
+<div class="btmw-tour-plan-edit-path">
   <div class="row">
     <div class="medium-12 columns">
+      <%= form_tag(action: :update_path, id: @tour_plan) do %>
         <table>
           <thead>
              <th>ルート</th>
@@ -19,7 +21,6 @@
              <th>管理</th>
           </thead>
           <tbody>
-            <%= form_tag(action: :update, id: @tour_plan) do %>
             <tr>
               <td colspan="2"><%= text_field(:tour_plan, :name) %></td>
               <td></td>
@@ -52,13 +53,10 @@
               <td><%= text_field(:route_new, :google_map_url) %></td>
               <td></td>
             </tr>
-              <td></td>
-              <td></td>
-              <td><%= submit_tag("編集", class: "tiny button") %></td>
-            </tr>
-            <% end %>
           </tbody>
         </table>
+        <%= submit_tag("編集", class: "tiny button") %>
+      <% end %>
     </div>
   </div>
 </div>

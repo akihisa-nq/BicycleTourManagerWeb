@@ -21,14 +21,16 @@ gem "ffi-geos"
 gem "exifr"
 gem "bicycle_tour_manager", :git => "git@github.com:akihisa-nq/BicycleTourManager.git"
 
+gem "tzinfo-data"
 gem "i18n_generators"
 gem "uglifier"
 gem "activerecord-postgresql-adapter"
 gem "activerecord-postgis-adapter"
-gem "rails"
+gem "rails", '~> 4.0.4', '< 4.1.0'
 gem "jquery-rails"
 gem "jquery-ui-rails"
-gem "sass-rails"
+gem "jquery-turbolinks"
+gem "sass-rails", '~> 4.0.0', '>= 4.0.2'
 gem "coffee-rails"
 gem "turbolinks"
 gem "devise"

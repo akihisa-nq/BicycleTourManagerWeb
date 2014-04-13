@@ -1,0 +1,120 @@
+<% content_for(:title) do %>
+旅の計画 - ノードの編集 - <%= @tour_route.tour_plan.name %> - <%= @tour_route.name %>
+<% end %>
+
+<% content_for(:menus) do %>
+<li class="active"><%= link_to "戻る", action: :index, page: TourPlan.page_for(current_user || User.new, @tour_route.tour_plan.id) %></li>
+<li><%= link_to "パスの編集", action: :edit_path, id: @tour_route.tour_plan.id %></li>
+<% end %>
+
+<% content_for(:manage) do %>
+<% end %>
+
+<script type="text/javascript">
+$(document).on('ready page:load', function() {
+    <% @tour_route.tour_plan_points.each do |node|; @node = node %>
+    var pos = new google.maps.LatLng( <%= @node.lat %>, <%= @node.lon %> );
+
+    var mapOptions = {
+        zoom: 16,
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        center: pos
+    };
+    var map = new google.maps.Map(document.getElementById("map_<%= @node.id %>"), mapOptions);
+
+    var markerOptions = {
+        map: map,
+        position: pos
+    };
+    new google.maps.Marker(markerOptions);
+    <% end %>
+});
+</script>
+
+<div class="btmw-tour-plan-edit-node">
+  <div class="row">
+    <div class="medium-12 columns">
+        <div class="pagination-centered">
+          <%= will_paginate @tour_routes, renderer: FoundationPagination::Rails %>
+        </div>
+        <ul>
+        <% @tour_route.tour_plan_paths.each do |node| %>
+          <li><a href="<%= node.google_map_url %>" target="_blank">URL <%= node.id %></a></li>
+        <% end %>
+        </ul>
+        <%= form_tag(action: :update_node, id: @tour_route.tour_plan.id, page: params[:page]) do %>
+          <table>
+            <thead>
+            </thead>
+            <tbody>
+              <% @tour_route.tour_plan_points.each do |node|; @node = node %>
+              <tr>
+                <td>
+                  <div class"map" id="map_<%= @node.id %>" style="width:200px; height:200px;"></div>
+                  <a href="https://www.google.co.jp/maps/place/<%= @node.lat %>,<%= @node.lon %>/@<%= @node.lat %>,<%= @node.lon %>,16z" target="_blank">別ウィンドウで表示</a>
+                </td>
+                <td style="vertical-align:top">
+                交差点:
+                <table class="btmw-tour-plan-road">
+                  <tr>
+                      <td>
+                        <%= radio_button("node[]", :dir_src, "nw") %>
+                        <%= text_field("node[]", :road_nw) %>
+                        <%= radio_button("node[]", :dir_dest, "nw") %>
+                      </td>
+                      <td>
+                        <%= radio_button("node[]", :dir_src, "n") %>
+                        <%= text_field("node[]", :road_n) %>
+                        <%= radio_button("node[]", :dir_dest, "n") %>
+                      </td>
+                      <td>
+                        <%= radio_button("node[]", :dir_src, "ne") %>
+                        <%= text_field("node[]", :road_ne) %>
+                        <%= radio_button("node[]", :dir_dest, "ne") %>
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>
+                        <%= radio_button("node[]", :dir_src, "w") %>
+                        <%= text_field("node[]", :road_w) %>
+                        <%= radio_button("node[]", :dir_dest, "w") %>
+                      </td>
+                      <td><%= text_field("node[]", :name, style: "width : 80%;") %></td>
+                      <td>
+                        <%= radio_button("node[]", :dir_src, "e") %>
+                        <%= text_field("node[]", :road_e) %>
+                        <%= radio_button("node[]", :dir_dest, "e") %>
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>
+                        <%= radio_button("node[]", :dir_src, "sw") %>
+                        <%= text_field("node[]", :road_sw) %>
+                        <%= radio_button("node[]", :dir_dest, "sw") %>
+                      </td>
+                      <td>
+                        <%= radio_button("node[]", :dir_src, "s") %>
+                        <%= text_field("node[]", :road_s) %>
+                        <%= radio_button("node[]", :dir_dest, "s") %>
+                      </td>
+                      <td>
+                        <%= radio_button("node[]", :dir_src, "se") %>
+                        <%= text_field("node[]", :road_se) %>
+                        <%= radio_button("node[]", :dir_dest, "se") %>
+                      </td>
+                  </tr>
+                </table><br />
+                コメント: <%= text_field("node[]", :comment, style: "width : 80%;") %><br />
+                目標速度: <%= text_field("node[]", :target_speed, style: "width : 15%;") %>
+                制限速度: <%= text_field("node[]", :limit_speed, style: "width : 15%;") %>
+                休憩時間: <%= text_field("node[]", :rest_time, style: "width : 15%;") %><br />
+                </td>
+              </tr>
+              <% @node = nil; end %>
+              <% end %>
+            </tbody>
+          </table>
+        <%= submit_tag("編集", class: "tiny button") %>
+    </div>
+  </div>
+</div>

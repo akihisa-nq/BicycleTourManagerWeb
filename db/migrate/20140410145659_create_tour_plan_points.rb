@@ -1,7 +1,7 @@
 class CreateTourPlanPoints < ActiveRecord::Migration
 	def change
 		create_table :tour_plan_points do |t|
-			t.integer :tour_route_id
+			t.integer :tour_plan_route_id
 			t.point :point, :srid => 4326
 			t.string :name
 			t.string :comment

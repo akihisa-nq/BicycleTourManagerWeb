@@ -69,12 +69,12 @@ ActiveRecord::Schema.define(version: 20140410150040) do
 
   create_table "tour_plan_paths", force: true do |t|
     t.integer "tour_plan_route_id"
-    t.string  "google_map_url"
+    t.text    "google_map_url"
     t.integer "position"
   end
 
   create_table "tour_plan_points", force: true do |t|
-    t.integer "tour_route_id"
+    t.integer "tour_plan_route_id"
     t.string  "name"
     t.string  "comment"
     t.string  "direction"
@@ -82,7 +82,7 @@ ActiveRecord::Schema.define(version: 20140410150040) do
     t.float   "target_speed"
     t.float   "limit_speed"
     t.integer "position"
-    t.spatial "point",         limit: {:srid=>4326, :type=>"point"}
+    t.spatial "point",              limit: {:srid=>4326, :type=>"point"}
   end
 
   create_table "tour_plan_routes", force: true do |t|

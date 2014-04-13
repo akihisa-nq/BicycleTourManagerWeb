@@ -59,7 +59,8 @@
               <% if can?(:delete, TourPlan) || can?(:edit, TourPlan) %>
 			  <ul id="manage_<%= tour.id %>" data-dropdown-content class="f-dropdown">
                 <% if can? :edit, TourPlan %>
-                <li><%= link_to("編集", action: :edit, id: tour) %></li>
+                <li><%= link_to("パスの編集", action: :edit_path, id: tour) %></li>
+                <li><%= link_to("ノードの編集", action: :edit_node, id: tour) %></li>
                 <% end %>
                 <% if can? :delete, TourPlan %>
                 <li><%= link_to("削除", {action: :destroy, id: tour}, method: :delete, confirm: "削除しますか?") %></li>

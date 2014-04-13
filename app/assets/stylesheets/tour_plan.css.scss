@@ -2,7 +2,7 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
-.btmw-tour-plan-list, .btmw-tour-plan-edit
+.btmw-tour-plan-list, .btmw-tour-plan-edit-path, .btmw-tour-plan-edit-node
 {
 	padding-top: 10px;
 	padding-bottom: 24px;
@@ -26,17 +26,43 @@
 	float: right;
 }
 
-.btmw-tour-plan-edit table
+.btmw-tour-plan-edit-path table,
+.btmw-tour-plan-edit-node table
 {
 	width: 100%;
 }
 
-.btmw-tour-plan-edit td:first-child
+.btmw-tour-plan-edit-path td:first-child,
+.btmw-tour-plan-edit-node td:first-child
 {
 	width: 20%;
 }
 
-.btmw-tour-plan-edit td:last-child
+.btmw-tour-plan-edit-path td:last-child
 {
 	width: 20%;
 }
+
+.btmw-tour-plan-edit-node input[type="text"]
+{
+	display: inline-block;
+}
+
+table.btmw-tour-plan-road
+{
+	display: inline-table;
+	width: 80%;
+}
+
+table.btmw-tour-plan-road td,
+table.btmw-tour-plan-road td:first-child
+{
+	width: 33%;
+}
+
+table.btmw-tour-plan-road td input[type="text"]
+{
+	display: inline-block;
+	width:60%;
+}
+
