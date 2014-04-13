@@ -10,8 +10,15 @@ class TourPlanController < ApplicationController
 	end
 
 	def create
-		attr = params[:tour_plan].permit(:name, :google_map_url)
-		plan = TourPlan.create_with_auth(current_user_or_guest, attr[:name], attr[:google_map_url])
+		attr_plan = params[:tour_plan].permit(:name, :time_zone)
+		attr_plan[:start_time] = Time.new(
+			2000, 1, 1,
+			params[:tour_plan]["start_time(4i)"].to_i,
+			params[:tour_plan]["start_time(5i)"].to_i,
+			0, 0
+			)
+		attr_path = params[:tour_path].permit(:google_map_url)
+		plan = TourPlan.create_with_auth(current_user_or_guest, attr_plan, attr_path)
 		redirect_to( action: :edit_path, id: plan.id )
 	end
 
@@ -32,10 +39,18 @@ class TourPlanController < ApplicationController
 	end
 
 	def update_path
+		attr_plan = params[:tour_plan].permit(:name, :time_zone)
+		attr_plan[:start_time] = Time.new(
+			2000, 1, 1,
+			params[:tour_plan]["start_time(4i)"].to_i,
+			params[:tour_plan]["start_time(5i)"].to_i,
+			0, 0
+			)
+
 		TourPlan.update_route_with_auth(
 			current_user_or_guest,
 			params[:id],
-			params[:tour_plan].permit(:name),
+			attr_plan,
 			params[:route],
 			params[:path],
 			)

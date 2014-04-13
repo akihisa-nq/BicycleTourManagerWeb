@@ -22,11 +22,13 @@ class TourPlan < ActiveRecord::Base
 		end
 	end
 
-	def self.create_with_auth(user, name, url)
+	def self.create_with_auth(user, attr_plan, attr_path)
 		if user.can? :edit, TourPlan
-			plan = TourPlan.new(name: name)
-			plan.tour_plan_routes.build(name: name)
-			plan.tour_plan_routes[0].tour_plan_paths.build(google_map_url: url)
+			attr_plan[:start_time] = ActiveSupport::TimeZone.find_tzinfo(attr_plan[:time_zone]).local_to_utc(attr_plan[:start_time])
+
+			plan = TourPlan.new(attr_plan)
+			plan.tour_plan_routes.build(name: attr_plan[:name])
+			plan.tour_plan_routes[0].tour_plan_paths.build(attr_path)
 			plan.save!
 
 			create_points(user, plan.id)
@@ -45,7 +47,9 @@ class TourPlan < ActiveRecord::Base
 
 	def self.edit_route_with_auth(user, id)
 		if user.can? :edit, TourPlan
-			TourPlan.find(id)
+			plan = TourPlan.find(id)
+			plan.start_time = ActiveSupport::TimeZone.find_tzinfo(plan.time_zone).utc_to_local(plan.start_time)
+			plan
 		else
 			nil
 		end
@@ -61,14 +65,21 @@ class TourPlan < ActiveRecord::Base
 
 	def self.find_with_auth(user, id)
 		if user.can? :edit, TourPlan
-			TourPlan.find(id)
+			plan = TourPlan.find(id)
 		else
-			TourPlan.where("published = 'true'").find(id)
+			plan = TourPlan.where("published = 'true'").find(id)
 		end
+
+		if plan
+			plan.start_time = ActiveSupport::TimeZone.find_tzinfo(plan.time_zone).utc_to_local(plan.start_time)
+		end
+
+		plan
 	end
 
 	def self.update_route_with_auth(user, id, attr, routes, paths)
 		if user.can?(:edit, TourPlan)
+			attr[:start_time] = ActiveSupport::TimeZone.find_tzinfo(attr[:time_zone]).local_to_utc(attr[:start_time])
 			TourPlan.where(["id = ?", id]).update_all(attr)
 
 			routes.each do |key, value|
@@ -120,6 +131,8 @@ class TourPlan < ActiveRecord::Base
 			parser = BTM::GoogleMapUriParser.new(TourPlanCache)
 			plan.tour_plan_routes.each do |route|
 				route.tour_plan_paths.each do |path|
+					next if path.google_map_url.nil? || path.google_map_url.empty?
+
 					btmw_route = parser.parse_uri(path.google_map_url)
 
 					btmw_route.path_list.each do |btmw_path|

@@ -25,7 +25,12 @@
               <td colspan="2"><%= text_field(:tour_plan, :name) %></td>
               <td></td>
             </tr>
-            <% @tour_plan.tour_plan_routes.each do |route|; @route = route %>
+            <tr>
+              <td class="btmw-time"><%= time_select(:tour_plan, :start_time) %></td>
+              <td><%= time_zone_select(:tour_plan, :time_zone) %></td>
+              <td></td>
+            </tr>
+			<% @tour_plan.tour_plan_routes.each do |route|; @route = route %>
             <% @route.tour_plan_paths.each.with_index do |path, i|; @path = path %>
             <tr>
               <% if i == 0 %>

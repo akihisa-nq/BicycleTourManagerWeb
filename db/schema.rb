@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140410150040) do
+ActiveRecord::Schema.define(version: 20140414033842) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -74,21 +74,25 @@ ActiveRecord::Schema.define(version: 20140410150040) do
   end
 
   create_table "tour_plan_points", force: true do |t|
-    t.integer "tour_plan_route_id"
-    t.string  "name"
-    t.string  "comment"
-    t.string  "direction"
-    t.float   "rest_time"
-    t.float   "target_speed"
-    t.float   "limit_speed"
-    t.integer "position"
-    t.spatial "point",              limit: {:srid=>4326, :type=>"point"}
+    t.integer  "tour_plan_route_id"
+    t.string   "name"
+    t.string   "comment"
+    t.string   "direction"
+    t.float    "rest_time"
+    t.float    "target_speed"
+    t.float    "limit_speed"
+    t.integer  "position"
+    t.spatial  "point",              limit: {:srid=>4326, :type=>"point"}
+    t.datetime "target_time"
+    t.datetime "limit_time"
   end
 
   create_table "tour_plan_routes", force: true do |t|
     t.integer "tour_plan_id"
     t.string  "name"
     t.integer "position"
+    t.spatial "public_line",  limit: {:srid=>4326, :type=>"line_string"}
+    t.spatial "private_line", limit: {:srid=>4326, :type=>"line_string"}
   end
 
   create_table "tour_plans", force: true do |t|
@@ -96,6 +100,8 @@ ActiveRecord::Schema.define(version: 20140410150040) do
     t.boolean  "published"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "time_zone"
+    t.time     "start_time"
   end
 
   create_table "tour_results", force: true do |t|

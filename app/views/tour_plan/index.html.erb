@@ -20,8 +20,16 @@
 		<div class="medium-9 columns"><%= text_field(:tour_plan, :name) %></div>
 	</div>
 	<div class="row">
+		<div class="medium-3 columns">タイムゾーン:</div>
+		<div class="medium-9 columns"><%= time_zone_select(:tour_plan, :time_zone, nil, default: "Tokyo") %></div>
+	</div>
+	<div class="row">
+		<div class="medium-3 columns">スタート時刻:</div>
+		<div class="medium-9 columns btmw-time"><%= time_select(:tour_plan, :start_time) %></div>
+	</div>
+	<div class="row">
 		<div class="medium-3 columns">GoogleMap URL:</div>
-		<div class="medium-9 columns"><%= text_field(:tour_plan, :google_map_url) %></div>
+		<div class="medium-9 columns"><%= text_field(:tour_path, :google_map_url) %></div>
 	</div>
 	<div class="row">
 		<div class="medium-9 columns push-3"><%= submit_tag("送信", class: "button") %></div>
