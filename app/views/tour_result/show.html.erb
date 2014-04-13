@@ -5,12 +5,17 @@
              url:filename,
              dataType: "xml",
              success: function(data) {
+                 google.maps.event.trigger(window.map, 'resize');
+
                  var parser = new GPXParser(data, window.map);
                  parser.setTrackColour("#ff0000");
                  parser.setTrackWidth(5);
                  parser.setMinTrackPointDelta(0.0001);
                  parser.centerAndZoom(data);
                  parser.addTrackpointsToMap();
+
+                 window.marker = [];
+                 window.info_window = [];
 
                  <% @tour_result.tour_images.each.with_index do |img, i| %>
                  <% next unless img.point %>
@@ -21,18 +26,6 @@
      }
 
      function CreatePicture(id, lat, lon, html) {
-         if (window.marker == undefined) {
-             window.marker = [];
-         }
-
-         if (window.info_window == undefined) {
-             window.info_window = [];
-         }
-
-         if (window.marker[id] != null) {
-             return;
-         }
-
          window.marker[id] = new google.maps.Marker({
              position: new google.maps.LatLng(lat,lon),
              map: window.map
@@ -60,13 +53,16 @@
          window.info_window[id].content = $("#marker_" + id).html();
      }
 
-     $(document).on('ready page:load', function() {
+     function ShowViewer()
+     {
          var mapOptions = {
            zoom: 8,
            mapTypeId: google.maps.MapTypeId.ROADMAP
          };
          window.map = new google.maps.Map(document.getElementById("map"), mapOptions);
-         loadGPXFileIntoGoogleMap("<%= url_for(action: :gpx_file, :id => @tour_result) %>");
+
+         loadGPXFileIntoGoogleMap("<%= url_for(action: :gpx_file, id: @tour_result) %>");
+
          $('body').layout({
              slidable: true,
              resizable: true,
@@ -89,7 +85,12 @@
                  }
              }
          });
-     });
+
+         $(document).unbind('ready page:load', ShowViewer);
+
+     }
+
+     $(document).on('ready page:load', ShowViewer);
 
     function cancelEditText(id)
     {

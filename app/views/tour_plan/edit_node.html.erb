@@ -11,7 +11,8 @@
 <% end %>
 
 <script type="text/javascript">
-$(document).on('ready page:load', function() {
+function loadMaps()
+{
     <% @tour_route.tour_plan_points.each do |node|; @node = node %>
     var pos = new google.maps.LatLng( <%= @node.lat %>, <%= @node.lon %> );
 
@@ -28,7 +29,11 @@ $(document).on('ready page:load', function() {
     };
     new google.maps.Marker(markerOptions);
     <% end %>
-});
+
+    $(document).unbind('ready page:load', loadMaps);
+}
+
+$(document).on('ready page:load', loadMaps);
 </script>
 
 <div class="btmw-tour-plan-edit-node">
