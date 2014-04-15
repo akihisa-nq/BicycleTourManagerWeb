@@ -38,6 +38,19 @@ class TourPlanController < ApplicationController
 		render(:text => tour_plan.to_gpx(true), :layout => false)
 	end
 
+	def show_private_gpx
+		tour_plan = TourPlan.edit_route_with_auth(current_user_or_guest, params[:id])
+		headers["Content-Type"] = "application/xml; charset=UTF-8"
+		headers["Content-Disposition"] = %Q|attachment; filename="route.gpx"|
+		render(:text => tour_plan.to_gpx(false), :layout => false)
+	end
+
+	def show_pdf
+		tour_plan = TourPlan.edit_route_with_auth(current_user_or_guest, params[:id])
+		headers["Content-Type"] = "application/pdf"
+		render(:text => File.open(tour_plan.pdf_path, "rb") {|f| f.read }, :layout => false)
+	end
+
 	def toggle_visible
 	end
 

@@ -30,6 +30,8 @@ BicycleTourManagerWeb::Application.routes.draw do
   post "/tour_plan/:id/toggle_visible", to: "tour_plan#toggle_visible"
   get "/tour_plan/:id/show", to: "tour_plan#show"
   get "/tour_plan/:id/show/gpx", to: "tour_plan#show_gpx"
+  get "/tour_plan/:id/show/private_gpx", to: "tour_plan#show_private_gpx"
+  get "/tour_plan/:id/show/pdf", to: "tour_plan#show_pdf"
   post "/tour_plan/:id/generate", to: "tour_plan#generate"
 
   get "/tour_plan/:id/routes/paths/edit", to: "tour_plan#edit_path"

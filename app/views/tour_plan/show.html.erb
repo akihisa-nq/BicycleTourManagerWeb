@@ -106,6 +106,8 @@
 
 <% content_for :manage do %>
 <% if can? :edit, TourPlan %>
+<li class="active"><%= link_to("PDF の表示", { action: :show_pdf, id: @tour_plan }, target: "_blank") %></li>
+<li class="active"><%= link_to("GPX のダウンロード", { action: :show_private_gpx, id: @tour_plan }) %></li>
 <li class="active"><%= link_to(@tour_plan.published ? "非公開" : "公開", {action: :toggle_visible, id: @tour_plan}, method: :post) %></li>
 <% end %>
 <% if can? :delete, TourPlan %>

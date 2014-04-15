@@ -4,3 +4,4 @@ log/*.log
 tmp
 setup.bat
 public/generated
+private
