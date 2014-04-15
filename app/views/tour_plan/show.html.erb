@@ -1,0 +1,130 @@
+<% content_for(:title) do %>
+<%= @tour_plan.name %>
+<% end %>
+
+<% content_for :out_of_frames do %>
+<script type="text/javascript">
+     //<![CDATA[
+     function loadGPXFileIntoGoogleMap(filename) {
+         $.ajax({
+             url:filename,
+             dataType: "xml",
+             success: function(data) {
+                 google.maps.event.trigger(window.map, 'resize');
+
+                 var parser = new GPXParser(data, window.map);
+                 parser.setTrackColour("#ff0000");
+                 parser.setTrackWidth(5);
+                 parser.setMinTrackPointDelta(0.0001);
+                 parser.centerAndZoom(data);
+                 parser.addTrackpointsToMap();
+
+                 window.marker = [];
+                 window.info_window = [];
+
+                 <% @tour_plan.tour_plan_routes.each do |route| %>
+                 <% route.tour_plan_points.each do |point| %>
+                 <% end %>
+                 <% end %>
+             }
+         });
+     }
+
+     function CreatePoint(id, lat, lon, html) {
+         window.marker[id] = new google.maps.Marker({
+             position: new google.maps.LatLng(lat,lon),
+             map: window.map
+         });
+
+         window.info_window[id] = new google.maps.InfoWindow({
+             content: html,
+             size: new google.maps.Size(50,50)
+         });
+
+         google.maps.event.addListener(window.marker[id], "click", function() {
+             window.info_window[id].open(window.map, window.marker[id]);
+         });
+     }
+
+     function FocusPoint(id) {
+         window.info_window[id].open(window.map, window.marker[id]);
+     }
+
+     function ClosePoint(id) {
+         window.info_window[id].close(window.map, window.marker[id]);
+     }
+
+     function UpdatePoint(id) {
+         window.info_window[id].content = $("#marker_" + id).html();
+     }
+
+     function ShowViewer()
+     {
+         var mapOptions = {
+           zoom: 8,
+           mapTypeId: google.maps.MapTypeId.ROADMAP
+         };
+         window.map = new google.maps.Map(document.getElementById("map"), mapOptions);
+
+         loadGPXFileIntoGoogleMap("<%= url_for(action: :show_gpx, id: @tour_plan) %>");
+
+         $('body').layout({
+             slidable: true,
+             resizable: true,
+             livePaneResizing: true,
+             stateManagement__enabled: true,
+             north: {
+               closable: false,
+               spacing_open: 0,
+               spacing_close: 0
+             },
+             west: {
+                 size: 300
+             },
+             south: {
+                 size: 200
+             },
+             center: {
+                 onresize: function() {
+                    google.maps.event.trigger(window.map, 'resize');
+                 }
+             }
+         });
+
+         $(document).unbind('ready page:load', ShowViewer);
+
+     }
+
+     $(document).on('ready page:load', ShowViewer);
+ //]]>
+</script>
+<% end %>
+
+<% content_for :menus do %>
+<li class="active"><%= link_to("戻る", action: :index, page: TourPlan.page_for(current_user || User.new, @tour_plan.id)) %></li>
+<% end %>
+
+<% content_for :manage do %>
+<% if can? :edit, TourPlan %>
+<li class="active"><%= link_to(@tour_plan.published ? "非公開" : "公開", {action: :toggle_visible, id: @tour_plan}, method: :post) %></li>
+<% end %>
+<% if can? :delete, TourPlan %>
+<li class="active"><%= link_to("削除", {action: :destroy, id: @tour_plan}, method: :delete, confirm: "削除しますか?") %></li>
+<% end %>
+<% if user_signed_in? %>
+<li><a href="#" data-dropdown="user"><strong><%= current_user.email %></strong></a></li>
+<% end %>
+<% end %>
+
+<% content_for :west do %>
+   <div class="row">
+     <% @tour_plan.tour_plan_routes.each do |route| %>
+     <% route.tour_plan_points.each do |point| %>
+     <div><%= point.name %></div>
+     <% end %>
+     <% end %>
+   </div>
+<% end %>
+<% content_for :south do %>
+  <%= image_tag( @tour_plan.altitude_graph_url, style: "height:100%;width:auto;max-width:none;" ) %>
+<% end %>

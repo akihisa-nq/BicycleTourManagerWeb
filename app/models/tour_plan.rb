@@ -170,4 +170,8 @@ class TourPlan < ActiveRecord::Base
 			end
 		end
 	end
+
+	def altitude_graph_url
+		"/generated/tour_plan/altitude_graph/#{id}.png"
+	end
 end

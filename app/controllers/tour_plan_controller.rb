@@ -29,6 +29,12 @@ class TourPlanController < ApplicationController
 
 	def show
 		@tour_plan = TourPlan.find_with_auth(current_user_or_guest, params[:id])
+		render(layout: "tour_viewer")
+	end
+
+	def show_gpx
+		headers["Content-Type"] = "application/xml; charset=UTF-8"
+		render(:text => "", :layout => false)
 	end
 
 	def toggle_visible
