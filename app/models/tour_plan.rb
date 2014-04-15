@@ -236,6 +236,15 @@ class TourPlan < ActiveRecord::Base
 					info.limit_speed = limit_speed
 					info.target_speed = target_speed
 
+					ExclusionArea.all.each do |area|
+						pt1 = BTM::Point.new(area.point.y, area.point.x)
+						pt2 = BTM::Point.new(node.point.y, node.point.x)
+						if pt1.distance(pt2) < area.distance
+							info.hide = true
+							break
+						end
+					end
+
 					if node.rest_time
 						info.rest_time = (node.rest_time * 3600).to_i
 					end
@@ -260,16 +269,23 @@ class TourPlan < ActiveRecord::Base
 
 			# PDF の生成
 			FileUtils.mkdir_p(File.dirname(plan.pdf_path))
+			FileUtils.mkdir_p(File.dirname(plan.public_pdf_path))
+
 			tour.routes.each.with_index do |r, i|
 				plotter.distance_max = 120.0
 				plotter.plot(r, File.join(File.dirname(plan.pdf_path), "PC#{i+1}.png"))
 			end
 
 			html_path = plan.pdf_path.sub(/\.pdf$/, ".html")
-			renderer = BTM::PlanHtmlRenderer.new
-			renderer.render(tour, html_path)
+			renderer = BTM::PlanHtmlRenderer.new(enable_hide: false)
 
-			system("wkhtmltopdf -s A5 -O Landscape -L 0mm -R 0mm -T 0mm  #{html_path} #{plan.pdf_path}")
+			renderer.render(tour, html_path)
+			system("wkhtmltopdf -s A5 -O Landscape -L 4mm -R 4mm -T 4mm  #{html_path} #{plan.pdf_path}")
+
+			renderer.option[:enable_hide] = true
+			renderer.render(tour, html_path)
+			system("wkhtmltopdf -s A5 -O Landscape -L 4mm -R 4mm -T 4mm  #{html_path} #{plan.public_pdf_path}")
+
 			File.delete(html_path)
 			Dir.glob(File.join(File.dirname(html_path), "*.png")) do |path|
 				File.delete(path)
@@ -297,6 +313,15 @@ class TourPlan < ActiveRecord::Base
 	def pdf_path
 		private_root = File.join(Rails.root, "private")
 		File.join(private_root, "tour_plan/pdf/#{id}.pdf")
+	end
+
+	def public_pdf_url
+		"/generated/tour_plan/pdf/#{id}.pdf"
+	end
+
+	def public_pdf_path
+		public_root = File.join(Rails.root, "public")
+		File.join(public_root, public_pdf_url)
 	end
 
 	def to_tour(is_public_data)

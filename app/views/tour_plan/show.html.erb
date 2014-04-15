@@ -115,6 +115,8 @@
 
 <% content_for :west do %>
    <div class="row">
+     <a href="<%= path_to_image(@tour_plan.public_pdf_url) %>">PDF</a><br />
+
      <% @tour_plan.tour_plan_routes.each do |route| %>
      <% route.tour_plan_points.each do |point| %>
      <div><%= point.name %></div>

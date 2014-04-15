@@ -1,6 +1,6 @@
 GIT
   remote: git@github.com:akihisa-nq/BicycleTourManager.git
-  revision: ecd50c41652fd6281160944f99b183076c9f364c
+  revision: 0dbf6e66157c5bdce3e28b6d58e52abc35f0834e
   specs:
     bicycle_tour_manager (0.0.2)
       nokogiri
@@ -215,7 +215,7 @@ GEM
     turbolinks (2.2.2)
       coffee-rails
     tzinfo (0.3.39)
-    tzinfo-data (1.2013.9)
+    tzinfo-data (1.2013.6)
     uglifier (2.5.0)
       execjs (>= 0.3.0)
       json (>= 1.8.0)
