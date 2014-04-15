@@ -88,7 +88,11 @@ $(document).on('ready page:load', loadMaps);
                         <%= text_field("node[]", :road_w) %>
                         <%= radio_button("node[]", :dir_dest, "w") %>
                       </td>
-                      <td><%= text_field("node[]", :name, style: "width : 80%;") %></td>
+                      <td>
+                        <%= radio_button("node[]", :dir_src, "c") %>
+						<%= text_field("node[]", :name) %>
+                        <%= radio_button("node[]", :dir_dest, "c") %>
+					  </td>
                       <td>
                         <%= radio_button("node[]", :dir_src, "e") %>
                         <%= text_field("node[]", :road_e) %>

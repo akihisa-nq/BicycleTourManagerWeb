@@ -226,7 +226,7 @@ class TourPlan < ActiveRecord::Base
 					end
 
 					info = BTM::NodeInfo.new
-					info.text = node.comment
+					info.text = "★#{i + 1} : " + (node.comment || "") 
 					info.name = node.name
 					info.road = node.road
 					info.orig = node.dir_src

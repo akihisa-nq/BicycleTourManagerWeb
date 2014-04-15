@@ -51,9 +51,7 @@ class TourPlanPoint < ActiveRecord::Base
 
 		dir += "|"
 
-		if attr[:dir_src] && ! attr[:dir_src].empty? && attr[:dir_dest] && ! attr[:dir_dest].empty?
-			dir += "#{attr[:dir_src]} > #{attr[:dir_dest]}"
-		end
+		dir += "#{attr[:dir_src]} > #{attr[:dir_dest]}"
 
 		attr.delete(:dir_src)
 		attr.delete(:dir_dest)
