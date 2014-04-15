@@ -16,7 +16,36 @@
 </head>
 <body>
 
-<%= yield %>
+<%= yield :out_of_frames %>
+
+<div class="ui-layout-north">
+  <nav class="top-bar" data-topbar>
+    <ul class="title-area">
+      <li class="name">
+        <h1><a href="#"><%= yield :title %></a></h1>
+        <%= yield :title_area %>
+      </li>
+    </ul>
+
+    <section class="top-bar-section">
+      <ul class="left">
+        <%= yield :menus %>
+      </ul>
+      <ul class="right">
+        <%= yield :manage %>
+      </ul>
+    </section>
+  </nav>
+</div>
+<div class="ui-layout-west">
+  <%= yield :west %>
+</div>
+<div class="ui-layout-center">
+  <div class="map" id="map" style="width: 100%; height: 100%;"></div>
+</div>
+<div class="ui-layout-south">
+  <%= yield :south %>
+</div>
 
 </body>
 </html>
