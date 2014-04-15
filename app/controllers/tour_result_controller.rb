@@ -12,7 +12,7 @@ class TourResultController < ApplicationController
 	def show
 		@tour_result = TourResult.find_with_auth(current_user_or_guest, params[:id])
 		@title = "#{@tour_result.start_time.strftime("%Y/%m/%d")} #{@tour_result.name}"
-		render layout: "tour_result_viewer"
+		render layout: "tour_viewer"
 	end
 
 	def create
