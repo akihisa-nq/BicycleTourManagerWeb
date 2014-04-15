@@ -16,16 +16,17 @@ class TourPlanPoint < ActiveRecord::Base
 		end
 	end
 
-	def road_nw; parse_direction; @road_nw; end
-	def road_n; parse_direction; @road_n; end
-	def road_ne; parse_direction; @road_ne; end
-	def road_w; parse_direction; @road_w; end
-	def road_e; parse_direction; @road_e; end
-	def road_sw; parse_direction; @road_sw; end
-	def road_s; parse_direction; @road_s; end
-	def road_se; parse_direction; @road_se; end
+	def road_nw; parse_direction; @road["nw"]; end
+	def road_n; parse_direction; @road["n"]; end
+	def road_ne; parse_direction; @road["ne"]; end
+	def road_w; parse_direction; @road["w"]; end
+	def road_e; parse_direction; @road["e"]; end
+	def road_sw; parse_direction; @road["sw"]; end
+	def road_s; parse_direction; @road["s"]; end
+	def road_se; parse_direction; @road["se"]; end
 	def dir_src; parse_direction; @dir_src; end
 	def dir_dest; parse_direction; @dir_dest; end
+	def road; parse_direction; @road; end
 
 	def self.pack_direction(attr)
 		dir = []
@@ -68,26 +69,9 @@ class TourPlanPoint < ActiveRecord::Base
 				dirs = direction.split("|").map {|s| s.strip }
 
 				if dirs[0] && ! dirs[0].empty?
-					dirs[0].split(",").map {|s| s.split(":").map {|ss| ss.strip } }.each do |i|
-						case i[0].downcase
-						when "nw"
-							@road_nw = i[1]
-						when "n"
-							@road_n = i[1]
-						when "ne"
-							@road_ne = i[1]
-						when "w"
-							@road_w = i[1]
-						when "e"
-							@road_e = i[1]
-						when "sw"
-							@road_sw = i[1]
-						when "s"
-							@road_s = i[1]
-						when "se"
-							@road_se = i[1]
-						end
-					end
+					@road = Hash[*dirs[0].split(/[:,]/).map{|i| i.strip}]
+				else
+					@road = {}
 				end
 
 				if dirs[1] && ! dirs[1].empty?

@@ -6,8 +6,8 @@ class TourPlanCache < ActiveRecord::Base
 		if cache.nil?
 			data = value.call
 
-			cache = TourPlanCache.new
-			if data.responed_to?(:x)
+			cache = TourPlanCache.new(request: key)
+			if data.respond_to?(:x)
 				cache.point = data
 			else
 				cache.response = data

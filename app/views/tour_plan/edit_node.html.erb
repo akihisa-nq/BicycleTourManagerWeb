@@ -5,6 +5,7 @@
 <% content_for(:menus) do %>
 <li class="active"><%= link_to "戻る", action: :index, page: TourPlan.page_for(current_user || User.new, @tour_route.tour_plan.id) %></li>
 <li><%= link_to "パスの編集", action: :edit_path, id: @tour_route.tour_plan.id %></li>
+<li><%= link_to "生成", { action: :generate, id: @tour_route.tour_plan.id }, method: :post %></li>
 <% end %>
 
 <% content_for(:manage) do %>

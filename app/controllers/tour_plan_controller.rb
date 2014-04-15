@@ -1,6 +1,6 @@
 class TourPlanController < ApplicationController
 	before_action :authenticate_user!, only: [
-		:create, :destroy, :toggle_visible,
+		:create, :destroy, :toggle_visible, :generate,
 		:edit_path, :update_path, :destroy_path,
 		:edit_node, :update_node, :destroy_node,
 	]
@@ -38,6 +38,11 @@ class TourPlanController < ApplicationController
 	end
 
 	def toggle_visible
+	end
+
+	def generate
+		TourPlan.geneate_with_auth(current_user_or_guest, params[:id])
+		redirect_to( action: :show, id: params[:id])
 	end
 
 	def edit_path

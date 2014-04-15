@@ -171,7 +171,125 @@ class TourPlan < ActiveRecord::Base
 		end
 	end
 
+	def self.geneate_with_auth(user, id)
+		if user.can?(:edit, TourPlan)
+			plan = TourPlan.find(id)
+
+			parser = BTM::GoogleMapUriParser.new(TourPlanCache)
+
+			tour = BTM::Tour.new
+
+			limit_speed = 15.0
+			target_speed = 15.0
+
+			plan.tour_plan_routes.each.with_index do |route, i|
+				tour.routes << BTM::Route.new
+				tour.routes.last.index = i + 1
+
+				# URL 解析
+				route.tour_plan_paths.each do |path|
+					next if path.google_map_url.nil? || path.google_map_url.empty?
+					tour.routes.last.path_list.concat(parser.parse_uri(path.google_map_url).path_list)
+				end
+
+				# ルート探索
+				tour.routes.last.search_route(TourPlanCache, TourPlanCache)
+
+				# 距離の計算など
+				tour.routes.last.path_list.each do |p|
+					p.check_peak
+					p.check_distance_from_start
+				end
+
+				# ラインの設定
+				steps = tour.routes.last.flatten.map {|s| s.point_geos }
+				route.public_line = BTM.factory.line_string(steps)
+
+				ExclusionArea.all.each do |area|
+					steps.delete_if do |p|
+						pt1 = BTM::Point.new(area.point.y, area.point.x)
+						pt2 = BTM::Point.new(p.y, p.x)
+						pt1.distance(pt2) < area.distance
+					end
+				end
+
+				route.private_line = BTM.factory.line_string(steps)
+
+				# ノード情報の割り当て
+				route.tour_plan_points.each.with_index do |node, i|
+					if node.limit_speed && node.limit_speed > 0.0
+						limit_speed = node.limit_speed
+					end
+
+					if node.target_speed && node.target_speed > 0.0
+						target_speed = node.target_speed
+					end
+
+					info = BTM::NodeInfo.new
+					info.text = node.comment
+					info.name = node.name
+					info.road = node.road
+					info.orig = node.dir_src
+					info.dest = node.dir_dest
+					info.limit_speed = limit_speed
+					info.target_speed = target_speed
+
+					if node.rest_time
+						info.rest_time = (node.rest_time * 3600).to_i
+					end
+
+					if i < tour.routes.last.path_list.count
+						tour.routes.last.path_list[i].steps[0].info = info
+					else
+						tour.routes.last.path_list.last.steps[-1].info = info
+						break
+					end
+				end
+			end
+
+			tour.set_start_end
+
+			# 画像の生成
+			plotter = BTM::AltitudePloter.new("gnuplot", File.join(Rails.root, "tmp"))
+			plotter.elevation_max = 1100
+			plotter.elevation_min = -100
+			plotter.distance_max = (tour.total_distance + 10.0).to_i
+			plotter.font = File.join(Rails.root, "vendor/font/mikachan-p.ttf")
+
+			# 全体画像の生成
+			FileUtils.mkdir_p(File.dirname(plan.altitude_graph_path))
+			plotter.plot(tour, plan.altitude_graph_path)
+
+			# PDF の生成
+			FileUtils.mkdir_p(File.dirname(plan.pdf_path))
+			tour.routes.each.with_index do |r, i|
+				plotter.distance_max = 120.0
+				plotter.plot(r, File.join(File.dirname(plan.pdf_path), "PC#{i+1}.png"))
+			end
+
+			html_path = plan.pdf_path.sub(/\.pdf$/, ".html")
+			renderer = BTM::PlanHtmlRenderer.new
+			renderer.render(tour, html_path)
+
+			system("wkhtmltopdf -s A5 -O Landscape -L 0mm -R 0mm -T 0mm  #{html_path} #{plan.pdf_path}")
+			File.delete(html_path)
+			Dir.glob(File.join(File.dirname(html_path), "*.png")) do |path|
+				File.delete(path)
+			end
+		end
+	end
+
+	def altitude_graph_path
+		public_root = File.join(Rails.root, "public")
+		File.join(public_root, altitude_graph_url)
+	end
+
 	def altitude_graph_url
 		"/generated/tour_plan/altitude_graph/#{id}.png"
+	end
+
+	def pdf_path
+		private_root = File.join(Rails.root, "private")
+		File.join(private_root, "tour_plan/pdf/#{id}.pdf")
 	end
 end
