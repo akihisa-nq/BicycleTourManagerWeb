@@ -155,9 +155,6 @@
 <% if can? :delete, TourResult %>
 <li class="active"><%= link_to("削除", {action: :destroy, id: @tour_result}, method: :delete, confirm: "削除しますか?") %></li>
 <% end %>
-<% if user_signed_in? %>
-<li><a href="#" data-dropdown="user"><strong><%= current_user.email %></strong></a></li>
-<% end %>
 <% end %>
 
 <% content_for :title_area do %>

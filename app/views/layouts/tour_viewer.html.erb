@@ -18,6 +18,8 @@
 
 <%= yield :out_of_frames %>
 
+<%= render partial: "layouts/login_menu" %>
+
 <div class="ui-layout-north">
   <nav class="top-bar" data-topbar>
     <ul class="title-area">
@@ -33,6 +35,9 @@
       </ul>
       <ul class="right">
         <%= yield :manage %>
+        <% if user_signed_in? %>
+        <li><a href="#" data-dropdown="user"><strong><%= current_user.email %></strong></a></li>
+        <% end %>
       </ul>
     </section>
   </nav>

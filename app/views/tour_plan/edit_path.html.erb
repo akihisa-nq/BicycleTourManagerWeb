@@ -8,6 +8,9 @@
 <% end %>
 
 <% content_for(:manage) do %>
+<% if can? :delete, TourPlan %>
+<li class="active"><%= link_to("削除", {action: :destroy, id: @tour_plan}, method: :delete, confirm: "削除しますか?") %></li>
+<% end %>
 <% end %>
 
 <div class="btmw-tour-plan-edit-path">

@@ -65,13 +65,13 @@ class TourPlanPoint < ActiveRecord::Base
 
 	def parse_direction
 		unless @parsed
+			@road = {}
+
 			if direction
 				dirs = direction.split("|").map {|s| s.strip }
 
 				if dirs[0] && ! dirs[0].empty?
 					@road = Hash[*dirs[0].split(/[:,]/).map{|i| i.strip}]
-				else
-					@road = {}
 				end
 
 				if dirs[1] && ! dirs[1].empty?
