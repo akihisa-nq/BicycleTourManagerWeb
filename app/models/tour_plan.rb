@@ -203,7 +203,7 @@ class TourPlan < ActiveRecord::Base
 
 				# ラインの設定
 				steps = tour.routes.last.flatten.map {|s| s.point_geos }
-				route.public_line = BTM.factory.line_string(steps)
+				route.private_line = BTM.factory.line_string(steps)
 
 				ExclusionArea.all.each do |area|
 					steps.delete_if do |p|
@@ -213,7 +213,9 @@ class TourPlan < ActiveRecord::Base
 					end
 				end
 
-				route.private_line = BTM.factory.line_string(steps)
+				route.public_line = BTM.factory.line_string(steps)
+
+				route.save!
 
 				# ノード情報の割り当て
 				route.tour_plan_points.each.with_index do |node, i|
@@ -256,10 +258,6 @@ class TourPlan < ActiveRecord::Base
 			plotter.distance_max = (tour.total_distance + 10.0).to_i
 			plotter.font = File.join(Rails.root, "vendor/font/mikachan-p.ttf")
 
-			# 全体画像の生成
-			FileUtils.mkdir_p(File.dirname(plan.altitude_graph_path))
-			plotter.plot(tour, plan.altitude_graph_path)
-
 			# PDF の生成
 			FileUtils.mkdir_p(File.dirname(plan.pdf_path))
 			tour.routes.each.with_index do |r, i|
@@ -276,6 +274,14 @@ class TourPlan < ActiveRecord::Base
 			Dir.glob(File.join(File.dirname(html_path), "*.png")) do |path|
 				File.delete(path)
 			end
+
+			# 全体画像の生成
+			ExclusionArea.all.each do |area|
+				tour.delete_by_distance(area.point, area.distance)
+			end
+
+			FileUtils.mkdir_p(File.dirname(plan.altitude_graph_path))
+			plotter.plot(tour, plan.altitude_graph_path)
 		end
 	end
 
@@ -291,5 +297,38 @@ class TourPlan < ActiveRecord::Base
 	def pdf_path
 		private_root = File.join(Rails.root, "private")
 		File.join(private_root, "tour_plan/pdf/#{id}.pdf")
+	end
+
+	def to_tour(is_public_data)
+		tour = BTM::Tour.new
+		tour.start_date = self.start_time
+		tour.name = self.name
+
+		tour_plan_routes.each do |route|
+			tour.routes << BTM::Route.new
+			tour.routes.last.path_list << BTM::Path.new
+
+			line = nil
+			if is_public_data
+				line = route.public_line
+			else
+				line = route.private_line
+			end
+
+			line.points.each do |p|
+				pt = BTM::Point.new(p.y, p.x)
+				tour.routes.last.path_list.last.steps << pt
+			end
+		end
+
+		tour.set_start_end
+		tour
+	end
+
+	def to_gpx(is_public_data)
+		tour = self.to_tour(is_public_data)
+		io = StringIO.new("", "w")
+		BTM::GpxStream.write_routes_to_stream(io, tour)
+		io.string
 	end
 end
