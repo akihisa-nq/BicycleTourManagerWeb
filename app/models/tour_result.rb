@@ -230,9 +230,11 @@ class TourResult < ActiveRecord::Base
 		if need_update_graph
 			tour = self.to_tour(is_public_data, :graph)
 
+			min, max = *tour.elevation_minmax
+
 			plotter = BTM::AltitudePloter.new("gnuplot", File.join(Rails.root, "tmp"))
-			plotter.elevation_max = 1100
-			plotter.elevation_min = -100
+			plotter.elevation_min = (min / 100) * 100 - 100
+			plotter.elevation_max = [plotter.elevation_min + 1000, ((max - 1) / 100 + 1) * 100].max + 100
 			plotter.distance_max = (tour.total_distance + 10.0).to_i
 			plotter.font = File.join(Rails.root, "vendor/font/mikachan-p.ttf")
 

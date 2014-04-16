@@ -262,8 +262,6 @@ class TourPlan < ActiveRecord::Base
 
 			# 画像の生成
 			plotter = BTM::AltitudePloter.new("gnuplot", File.join(Rails.root, "tmp"))
-			plotter.elevation_max = 1100
-			plotter.elevation_min = -100
 			plotter.font = File.join(Rails.root, "vendor/font/mikachan-p.ttf")
 
 			# PDF の生成
@@ -271,7 +269,10 @@ class TourPlan < ActiveRecord::Base
 			FileUtils.mkdir_p(File.dirname(plan.public_pdf_path))
 
 			tour.routes.each.with_index do |r, i|
-				plotter.distance_max = 120.0
+				min, max = *r.elevation_minmax
+				plotter.elevation_min = (min / 100) * 100 - 100
+				plotter.elevation_max = [plotter.elevation_min + 1000, ((max - 1) / 100 + 1) * 100].max + 100
+				plotter.distance_max = 120.0 * (plotter.elevation_max - plotter.elevation_min - 200.0) / 1000.0
 				plotter.plot(r, File.join(File.dirname(plan.pdf_path), "PC#{i+1}.png"))
 			end
 
@@ -299,8 +300,12 @@ class TourPlan < ActiveRecord::Base
 				tour.delete_by_distance(area.point, area.distance)
 			end
 
+			min, max = *tour.elevation_minmax
+
 			FileUtils.mkdir_p(File.dirname(plan.altitude_graph_path))
 			plotter.distance_max = (tour.total_distance + 10.0).to_i
+			plotter.elevation_min = (min / 100) * 100 - 100
+			plotter.elevation_max = [plotter.elevation_min + 1000, ((max - 1) / 100 + 1) * 100].max + 100
 			plotter.plot(tour, plan.altitude_graph_path)
 		end
 	end
