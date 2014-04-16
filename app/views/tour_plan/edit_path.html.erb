@@ -29,6 +29,10 @@
               <td></td>
             </tr>
             <tr>
+              <td colspan="2"><%= collection_select(:tour_plan, :resource_set_id, ResourceSet.all, :id, :name) %></td>
+              <td></td>
+            </tr>
+            <tr>
               <td class="btmw-time"><%= time_select(:tour_plan, :start_time) %></td>
               <td><%= time_zone_select(:tour_plan, :time_zone) %></td>
               <td></td>

@@ -12,6 +12,18 @@ BicycleTourManagerWeb::Application.routes.draw do
   delete "/exclusion_area/:id/destroy", to: "summary#destroy_exclusion_area"
   post "/exclusion_area/update", to: "summary#update_exclusion_area"
 
+  post "/resource_sets/resources/update", to: "summary#update_resources"
+  delete "/resource_sets/resources/:id/destroy", to: "summary#destroy_resource"
+
+  post "/resource_sets/devicess/update", to: "summary#update_devices"
+  delete "/resource_sets/devices/:id/destroy", to: "summary#destroy_device"
+
+  delete "/resource_sets/:set_id/resource_entries/:id/destroy", to: "summary#destroy_resource_entry"
+  delete "/resource_sets/:set_id/device_entries/:id/destroy", to: "summary#destroy_device_entry"
+  post "/resource_sets/create", to: "summary#create_resource_set"
+  get "/resource_sets/edit", to: "summary#edit_resource_set"
+  post "/resource_sets/:id/update", to: "summary#update_resource_set"
+
   get "/tour_result", to: "tour_result#index"
   get "/tour_result/page/:page", to: "tour_result#index"
   post "/tour_result/create", to: "tour_result#create"

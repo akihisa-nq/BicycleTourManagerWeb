@@ -10,7 +10,7 @@ class TourPlanController < ApplicationController
 	end
 
 	def create
-		attr_plan = params[:tour_plan].permit(:name, :time_zone)
+		attr_plan = params[:tour_plan].permit(:name, :time_zone, :resource_set_id)
 		attr_plan[:start_time] = Time.new(
 			2000, 1, 1,
 			params[:tour_plan]["start_time(4i)"].to_i,
@@ -64,7 +64,7 @@ class TourPlanController < ApplicationController
 	end
 
 	def update_path
-		attr_plan = params[:tour_plan].permit(:name, :time_zone)
+		attr_plan = params[:tour_plan].permit(:name, :time_zone, :resource_set_id)
 		attr_plan[:start_time] = Time.new(
 			2000, 1, 1,
 			params[:tour_plan]["start_time(4i)"].to_i,

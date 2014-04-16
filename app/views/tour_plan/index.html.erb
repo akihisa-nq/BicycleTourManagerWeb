@@ -20,6 +20,10 @@
 		<div class="medium-9 columns"><%= text_field(:tour_plan, :name) %></div>
 	</div>
 	<div class="row">
+		<div class="medium-3 columns">リソース:</div>
+		<div class="medium-9 columns"><%= collection_select(:tour_plan, :resource_set_id, ResourceSet.all, :id, :name) %></div>
+	</div>
+	<div class="row">
 		<div class="medium-3 columns">タイムゾーン:</div>
 		<div class="medium-9 columns"><%= time_zone_select(:tour_plan, :time_zone, nil, default: "Tokyo") %></div>
 	</div>

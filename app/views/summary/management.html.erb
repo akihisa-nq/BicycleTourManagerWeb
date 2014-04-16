@@ -31,81 +31,24 @@ function CancelEditColumn()
         <% if can?(:edit, ExclusionArea) %>
         <dd class="active"><a href="#exclusion">除外区域</a></dd>
         <% end %>
+        <% if can?(:edit, Resource) %>
+        <dd><a href="#resource">リソース</a></dd>
+        <% end %>
         <% if can?(:edit, User) %>
         <dd><a href="#user">ユーザー</a></dd>
         <% end %>
       </dl>
 
       <div class="tabs-content">
-        <% active = true %>
+        <% @active = true %>
         <% if can?(:edit, ExclusionArea) %>
-        <div class="content <% if active %>active<% end %>" id="exclusion">
-          <% active = false %>
-          <table>
-            <thead>
-              <th>緯度</th>
-              <th>経度</th>
-              <th>距離</th>
-              <th>管理</th>
-            </thead>
-            <tbody>
-              <% @areas.each do |area| %>
-              <tr>
-                <td id="data_<%= area.id %>_lon"><%= area.point.y %></td>
-                <td id="data_<%= area.id %>_lat"><%= area.point.x %></td>
-                <td id="data_<%= area.id %>_distance"><%= area.distance %></td>
-                <td>
-                  <ul class="button-group round" id="menu_<%= area.id %>">
-                    <li><a href="javascript:EditColumn(<%= area.id %>);" class="tiny button">編集</a></li>
-                    <li><%= link_to("削除", {action: :destroy_exclusion_area, id: area.id}, confirm: "削除しますか?", method: :delete, class: "tiny button") %></li>
-                  </ul>
-                </td>
-              </tr>
-              <% end %>
-            </tbody>
-          </table>
-
-          <%= form_tag({action: :create_exclusion_area}, id: "form_create") do %>
-            <div class="row">
-              <%= render partial: "form_exclusion_area", locals: { prefix: "" } %>
-              <div class="medium-8 columns push-4">
-                <%= submit_tag("追加", class: "button") %>
-              </div>
-            </div>
-          <% end %>
-
-          <%= form_tag({action: :update_exclusion_area}, id: "form_update", style: "display:none") do %>
-            <div class="row">
-              <%= render partial: "form_exclusion_area", locals: { prefix: "update_" } %>
-              <div class="medium-8 columns push-4">
-                <%= hidden_field(:update_exclusion_area, :id) %>
-                <%= submit_tag("編集", class: "button") %>
-                <a href="javascript:CancelEditColumn();">キャンセル</a>
-              </div>
-            </div>
-          <% end %>
-        </div>
+        <%= render(partial: "management_tab_exclusion_area") %>
+        <% end %>
+        <% if can?(:edit, Resource) %>
+        <%= render(partial: "management_tab_resource") %>
         <% end %>
         <% if can?(:edit, User) %>
-        <div class="content <% if active %>active<% end %>" id="user">
-          <% active = false %>
-          <%= form_tag(action: :edit_user) do %>
-          <table>
-              <tr>
-                  <th>ユーザー</th>
-                  <th>ロール</th>
-              </tr>
-          <% @users.each do |user| %>
-              <% @user = user %>
-              <tr>
-                  <td><%= user.email %></td>
-                  <td><%= text_field("user[]", "role") %></td>
-              </tr>
-          <% end %>
-          </table>
-          <%= submit_tag("更新") %>
-          <% end %>
-        </div>
+        <%= render(partial: "management_tab_user") %>
         <% end %>
       </div>
     </div>

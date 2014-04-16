@@ -11,11 +11,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140416153858) do
+ActiveRecord::Schema.define(version: 20140417025013) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "postgis"
+
+  create_table "device_entries", force: true do |t|
+    t.integer "resource_set_id"
+    t.integer "device_id"
+    t.string  "purpose"
+  end
+
+  create_table "devices", force: true do |t|
+    t.string  "name"
+    t.integer "resource_id"
+    t.integer "interval"
+  end
 
   create_table "exclusion_areas", force: true do |t|
     t.float   "distance"
@@ -42,6 +54,22 @@ ActiveRecord::Schema.define(version: 20140416153858) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.spatial  "path",           limit: {:srid=>4326, :type=>"line_string"}
+  end
+
+  create_table "resource_entries", force: true do |t|
+    t.integer "resource_set_id"
+    t.integer "resource_id"
+    t.integer "amount"
+    t.integer "buffer"
+    t.integer "recovery_interval"
+  end
+
+  create_table "resource_sets", force: true do |t|
+    t.string "name"
+  end
+
+  create_table "resources", force: true do |t|
+    t.string "name"
   end
 
   create_table "result_points", force: true do |t|
@@ -103,6 +131,7 @@ ActiveRecord::Schema.define(version: 20140416153858) do
     t.string   "time_zone"
     t.time     "start_time"
     t.integer  "elevation"
+    t.integer  "resource_set_id"
   end
 
   create_table "tour_results", force: true do |t|

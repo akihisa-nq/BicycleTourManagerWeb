@@ -4,6 +4,7 @@ require "bicycle_tour_manager"
 
 class TourPlan < ActiveRecord::Base
 	has_many :tour_plan_routes
+	has_one :resource_set
 
 	def self.list_all(user, page)
 		if user.can? :edit, TourPlan
