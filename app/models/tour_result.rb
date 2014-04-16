@@ -231,6 +231,8 @@ class TourResult < ActiveRecord::Base
 			tour = self.to_tour(is_public_data, :graph)
 
 			min, max = *tour.elevation_minmax
+			min ||= 0
+			max ||= 1000
 
 			plotter = BTM::AltitudePloter.new("gnuplot", File.join(Rails.root, "tmp"))
 			plotter.elevation_min = (min / 100) * 100 - 100

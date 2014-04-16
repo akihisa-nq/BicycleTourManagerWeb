@@ -171,142 +171,151 @@ class TourPlan < ActiveRecord::Base
 		end
 	end
 
-	def self.geneate_with_auth(user, id)
-		if user.can?(:edit, TourPlan)
-			plan = TourPlan.find(id)
+	def self.generate(id)
+		plan = TourPlan.find(id)
 
-			parser = BTM::GoogleMapUriParser.new(TourPlanCache)
+		parser = BTM::GoogleMapUriParser.new(TourPlanCache)
 
-			tour = BTM::Tour.new
+		tour = BTM::Tour.new
 
-			limit_speed = 15.0
-			target_speed = 15.0
+		limit_speed = 15.0
+		target_speed = 15.0
 
-			plan.tour_plan_routes.each.with_index do |route, i|
-				tour.routes << BTM::Route.new
-				tour.routes.last.index = i + 1
+		plan.tour_plan_routes.each.with_index do |route, i|
+			tour.routes << BTM::Route.new
+			tour.routes.last.index = i + 1
 
-				# URL 解析
-				route.tour_plan_paths.each do |path|
-					next if path.google_map_url.nil? || path.google_map_url.empty?
-					tour.routes.last.path_list.concat(parser.parse_uri(path.google_map_url).path_list)
+			# URL 解析
+			route.tour_plan_paths.each do |path|
+				next if path.google_map_url.nil? || path.google_map_url.empty?
+				tour.routes.last.path_list.concat(parser.parse_uri(path.google_map_url).path_list)
+			end
+
+			# ルート探索
+			tour.routes.last.search_route(TourPlanCache, TourPlanCache)
+
+			# 距離の計算など
+			tour.routes.last.path_list.each do |p|
+				p.check_peak
+				p.check_distance_from_start
+			end
+
+			# ラインの設定
+			steps = tour.routes.last.flatten.map {|s| s.point_geos }
+			route.private_line = BTM.factory.line_string(steps)
+
+			ExclusionArea.all.each do |area|
+				steps.delete_if do |p|
+					pt1 = BTM::Point.new(area.point.y, area.point.x)
+					pt2 = BTM::Point.new(p.y, p.x)
+					pt1.distance(pt2) < area.distance
+				end
+			end
+
+			route.public_line = BTM.factory.line_string(steps)
+
+			route.save!
+
+			# ノード情報の割り当て
+			route.tour_plan_points.each.with_index do |node, i|
+				if node.limit_speed && node.limit_speed > 0.0
+					limit_speed = node.limit_speed
 				end
 
-				# ルート探索
-				tour.routes.last.search_route(TourPlanCache, TourPlanCache)
-
-				# 距離の計算など
-				tour.routes.last.path_list.each do |p|
-					p.check_peak
-					p.check_distance_from_start
+				if node.target_speed && node.target_speed > 0.0
+					target_speed = node.target_speed
 				end
 
-				# ラインの設定
-				steps = tour.routes.last.flatten.map {|s| s.point_geos }
-				route.private_line = BTM.factory.line_string(steps)
+				info = BTM::NodeInfo.new
+				info.text = "★#{i + 1} : " + (node.comment || "") 
+				info.name = node.name
+				info.road = node.road
+				info.orig = node.dir_src
+				info.dest = node.dir_dest
+				info.limit_speed = limit_speed
+				info.target_speed = target_speed
 
 				ExclusionArea.all.each do |area|
-					steps.delete_if do |p|
-						pt1 = BTM::Point.new(area.point.y, area.point.x)
-						pt2 = BTM::Point.new(p.y, p.x)
-						pt1.distance(pt2) < area.distance
-					end
-				end
-
-				route.public_line = BTM.factory.line_string(steps)
-
-				route.save!
-
-				# ノード情報の割り当て
-				route.tour_plan_points.each.with_index do |node, i|
-					if node.limit_speed && node.limit_speed > 0.0
-						limit_speed = node.limit_speed
-					end
-
-					if node.target_speed && node.target_speed > 0.0
-						target_speed = node.target_speed
-					end
-
-					info = BTM::NodeInfo.new
-					info.text = "★#{i + 1} : " + (node.comment || "") 
-					info.name = node.name
-					info.road = node.road
-					info.orig = node.dir_src
-					info.dest = node.dir_dest
-					info.limit_speed = limit_speed
-					info.target_speed = target_speed
-
-					ExclusionArea.all.each do |area|
-						pt1 = BTM::Point.new(area.point.y, area.point.x)
-						pt2 = BTM::Point.new(node.point.y, node.point.x)
-						if pt1.distance(pt2) < area.distance
-							info.hide = true
-							break
-						end
-					end
-
-					if node.rest_time
-						info.rest_time = (node.rest_time * 3600).to_i
-					end
-
-					if i < tour.routes.last.path_list.count
-						tour.routes.last.path_list[i].steps[0].info = info
-					else
-						tour.routes.last.path_list.last.steps[-1].info = info
+					pt1 = BTM::Point.new(area.point.y, area.point.x)
+					pt2 = BTM::Point.new(node.point.y, node.point.x)
+					if pt1.distance(pt2) < area.distance
+						info.hide = true
 						break
 					end
 				end
+
+				if node.rest_time
+					info.rest_time = (node.rest_time * 3600).to_i
+				end
+
+				if i < tour.routes.last.path_list.count
+					tour.routes.last.path_list[i].steps[0].info = info
+				else
+					tour.routes.last.path_list.last.steps[-1].info = info
+					break
+				end
 			end
+		end
 
-			tour.set_start_end
+		tour.set_start_end
 
-			# 画像の生成
-			plotter = BTM::AltitudePloter.new("gnuplot", File.join(Rails.root, "tmp"))
-			plotter.font = File.join(Rails.root, "vendor/font/mikachan-p.ttf")
+		# 画像の生成
+		plotter = BTM::AltitudePloter.new("gnuplot", File.join(Rails.root, "tmp"))
+		plotter.font = File.join(Rails.root, "vendor/font/mikachan-p.ttf")
 
-			# PDF の生成
-			FileUtils.mkdir_p(File.dirname(plan.pdf_path))
-			FileUtils.mkdir_p(File.dirname(plan.public_pdf_path))
+		# PDF の生成
+		FileUtils.mkdir_p(File.dirname(plan.pdf_path))
+		FileUtils.mkdir_p(File.dirname(plan.public_pdf_path))
 
-			tour.routes.each.with_index do |r, i|
-				min, max = *r.elevation_minmax
-				plotter.elevation_min = (min / 100) * 100 - 100
-				plotter.elevation_max = [plotter.elevation_min + 1000, ((max - 1) / 100 + 1) * 100].max + 100
-				plotter.distance_max = 120.0 * (plotter.elevation_max - plotter.elevation_min - 200.0) / 1000.0
-				plotter.plot(r, File.join(File.dirname(plan.pdf_path), "PC#{i+1}.png"))
-			end
+		tour.routes.each.with_index do |r, i|
+			min, max = *r.elevation_minmax
+			min ||= 0
+			max ||= 1000
 
-			html_path = plan.pdf_path.sub(/\.pdf$/, ".html")
-			renderer = BTM::PlanHtmlRenderer.new(enable_hide: false)
-
-			renderer.render(tour, html_path)
-			system("wkhtmltopdf -s A5 -O Landscape -L 4mm -R 4mm -T 4mm  #{html_path} #{plan.pdf_path}")
-
-			renderer.option[:enable_hide] = true
-			renderer.render(tour, html_path)
-			system("wkhtmltopdf -s A5 -O Landscape -L 4mm -R 4mm -T 4mm  #{html_path} #{plan.public_pdf_path}")
-
-			File.delete(html_path)
-			Dir.glob(File.join(File.dirname(html_path), "*.png")) do |path|
-				File.delete(path)
-			end
-
-			# 獲得標高の保存
-			plan.elevation = tour.total_elevation
-			plan.save!
-
-			# 全体画像の生成
-			ExclusionArea.all.each do |area|
-				tour.delete_by_distance(area.point, area.distance)
-			end
-
-			min, max = *tour.elevation_minmax
-
-			FileUtils.mkdir_p(File.dirname(plan.altitude_graph_path))
-			plotter.distance_max = (tour.total_distance + 10.0).to_i
 			plotter.elevation_min = (min / 100) * 100 - 100
 			plotter.elevation_max = [plotter.elevation_min + 1000, ((max - 1) / 100 + 1) * 100].max + 100
-			plotter.plot(tour, plan.altitude_graph_path)
+			plotter.distance_max = 120.0 * (plotter.elevation_max - plotter.elevation_min - 200.0) / 1000.0
+			plotter.plot(r, File.join(File.dirname(plan.pdf_path), "PC#{i+1}.png"))
+		end
+
+		html_path = plan.pdf_path.sub(/\.pdf$/, ".html")
+		renderer = BTM::PlanHtmlRenderer.new(enable_hide: false)
+
+		renderer.render(tour, html_path)
+		system("wkhtmltopdf -s A5 -O Landscape -L 4mm -R 4mm -T 4mm  #{html_path} #{plan.pdf_path}")
+
+		renderer.option[:enable_hide] = true
+		renderer.render(tour, html_path)
+		system("wkhtmltopdf -s A5 -O Landscape -L 4mm -R 4mm -T 4mm  #{html_path} #{plan.public_pdf_path}")
+
+		File.delete(html_path)
+		Dir.glob(File.join(File.dirname(html_path), "*.png")) do |path|
+			File.delete(path)
+		end
+
+		# 獲得標高の保存
+		plan.elevation = tour.total_elevation
+		plan.save!
+
+		# 全体画像の生成
+		ExclusionArea.all.each do |area|
+			tour.delete_by_distance(area.point, area.distance)
+		end
+
+		min, max = *tour.elevation_minmax
+		min ||= 0
+		max ||= 1000
+
+		FileUtils.mkdir_p(File.dirname(plan.altitude_graph_path))
+		plotter.distance_max = (tour.total_distance + 10.0).to_i
+		plotter.elevation_min = (min / 100) * 100 - 100
+		plotter.elevation_max = [plotter.elevation_min + 1000, ((max - 1) / 100 + 1) * 100].max + 100
+		plotter.plot(tour, plan.altitude_graph_path)
+	end
+
+	def self.geneate_with_auth(user, id)
+		if user.can?(:edit, TourPlan)
+			generate(user, id)
 		end
 	end
 
