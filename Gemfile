@@ -21,7 +21,6 @@ gem "ffi-geos"
 gem "exifr"
 gem "bicycle_tour_manager", :git => "git@github.com:akihisa-nq/BicycleTourManager.git"
 
-gem "tzinfo-data"
 gem "i18n_generators"
 gem "uglifier"
 gem "activerecord-postgresql-adapter"

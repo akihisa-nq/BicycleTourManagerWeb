@@ -81,6 +81,19 @@
               <% end %>
             </div>
 		    <div class="medium-3 columns">
+				<table>
+					<tbody>
+						<tr>
+							<th>距離 (公開)</th><td><%= tour.distance(true) %> km</td>
+						</tr>
+						<tr>
+							<th>距離 (予定)</th><td><%= tour.distance(false) %> km</td>
+						</tr>
+						<tr>
+							<th>獲得標高</th><td><%= tour.elevation.to_i %> m ぐらい</td>
+						</tr>
+					</tbody>
+				</table>
             </div>
 		  </div>
 		</div>

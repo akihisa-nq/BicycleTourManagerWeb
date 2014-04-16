@@ -83,6 +83,9 @@
 						<tr>
 							<th>距離 (実走)</th><td><%= tour.distance(false) %> km</td>
 						</tr>
+						<tr>
+							<th>獲得標高</th><td><%= tour.elevation(false).to_i %> m ぐらい</td>
+						</tr>
 						<% if tour.tour_images.count > 0 %>
 						<tr>
 							<th>写真</th><td><%= tour.tour_images.count %>枚</td>

@@ -271,16 +271,16 @@ SELECT ST_Length(t.path, false) as length FROM
 		ret.to_i / 1000
 	end
 
-	def time_zone
-		'Tokyo'
-	end
-
 	def start_time_on_local
 		start_time.in_time_zone(time_zone)
 	end
 
 	def finish_time_on_local
 		finish_time.in_time_zone(time_zone)
+	end
+
+	def elevation(is_public_data)
+		to_tour(is_public_data, :graph).total_elevation
 	end
 
 	attr_accessor :need_update_graph

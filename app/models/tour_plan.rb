@@ -290,6 +290,10 @@ class TourPlan < ActiveRecord::Base
 				File.delete(path)
 			end
 
+			# 獲得標高の保存
+			plan.elevation = tour.total_elevation
+			plan.save!
+
 			# 全体画像の生成
 			ExclusionArea.all.each do |area|
 				tour.delete_by_distance(area.point, area.distance)
@@ -355,5 +359,14 @@ class TourPlan < ActiveRecord::Base
 		io = StringIO.new("", "w")
 		BTM::GpxStream.write_routes_to_stream(io, tour)
 		io.string
+	end
+
+	def distance(is_public_data)
+		column_name = is_public_data ? "public_line" : "private_line"
+		ret = TourPlan.find_by_sql([<<-EOS, id])[0].length
+SELECT ST_Length(t.path, false) as length FROM
+	(SELECT ST_Collect(#{column_name}) AS path FROM tour_plan_routes WHERE tour_plan_id = ?) as t
+		EOS
+		ret.to_i / 1000
 	end
 end
