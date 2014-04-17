@@ -5,15 +5,8 @@ class ManagementController < ApplicationController
 		@users = User.all
 		@areas = ExclusionArea.all_with_auth(current_user_or_guest)
 
-		@resources = Resource.all
-		@devices = Device.all
 		@resource_sets = ResourceSet.all
-
-		if params.include?(:resource_set_id)
-			@set = ResourceSet.find(params[:set_id])
-		elsif @resource_sets.count > 0
-			@set = @resource_sets[0]
-		end
+		fetch_all
 	end
 
 	def edit_user
@@ -38,10 +31,47 @@ class ManagementController < ApplicationController
 		redirect_to(action: :management)
 	end
 
+	def destroy_resource
+		Resource.where(["id = ?", params[:id]]).delete_all
+
+		fetch_all
+		headers["Content-Type"] = "text/javascript"
+		render(action: :update_resources)
+	end
+
+	def update_resources
+		attr = params[:res_new].permit(:name)
+		unless attr[:name].empty?
+			Resource.create(attr)
+		end
+
+		fetch_all
+		headers["Content-Type"] = "text/javascript"
+	end
+
+	def destroy_device
+		Device.where(["id = ?", params[:id]]).delete_all
+
+		fetch_all
+		headers["Content-Type"] = "text/javascript"
+		render(action: :update_devices)
+	end
+
+	def update_devices
+		attr = params[:dev_new].permit(:name, :resource_id, :interval)
+		unless attr[:name].empty? && attr[:resource_id].empty? && attr[:interval].empty?
+			Device.create(attr)
+		end
+
+		fetch_all
+		headers["Content-Type"] = "text/javascript"
+	end
+
 	def create_resource_set
 		attr = params[:set_new].permit(:name)
 		@set = ResourceSet.create(attr)
 
+		@resource_sets = ResourceSet.all
 		@resources = Resource.all
 		@devices = Device.all
 
@@ -50,9 +80,35 @@ class ManagementController < ApplicationController
 	end
 
 	def edit_resource_set
-		@set = ResourceSet.find(params[:set][:id])
+		if params[:delete]
+			ResourceSet.where(["id = ?", params[:set][:id]]).delete_all
+			fetch_all
+		else
+			@set = ResourceSet.find(params[:set][:id])
+			@resources = Resource.all
+			@devices = Device.all
+		end
+
+		@resource_sets = ResourceSet.all
+
+		headers["Content-Type"] = "text/javascript"
+	end
+
+	private
+
+	def res_set_find_specified_or_first
+		if params.include?(:resource_set_id)
+			ResourceSet.find(params[:resource_set_id])
+		end
+
+		if @set.nil? && ResourceSet.count > 0
+			@set = ResourceSet.first
+		end
+	end
+
+	def fetch_all
 		@resources = Resource.all
 		@devices = Device.all
-		headers["Content-Type"] = "text/javascript"
+		@set = res_set_find_specified_or_first
 	end
 end

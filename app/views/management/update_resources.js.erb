@@ -1,0 +1,15 @@
+$("#resources").html("<%=j render(partial: "content_resources") %>");
+
+var list = "<%=j options_from_collection_for_select(@resources, :id, :name) %>";
+
+<% @devices.each do |dev| %>
+$("#dev_<%= dev.id %>_resource_id").html(list);
+<% end %>
+$("#dev_new_resource_id").html(list);
+
+<% if @set %>
+<% @set.resource_entries.each do |entry| %>
+$("#res_entry_<%= entry.id %>_resource_id").html(list);
+<% end %>
+$("#res_entry_new_resource_id").html(list);
+<% end %>

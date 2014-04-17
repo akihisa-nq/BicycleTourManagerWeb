@@ -1,1 +1,2 @@
 $("#resource_set_edit").html("<%=j render(partial: "form_resource_set") %>");
+$("#set_id").html("<%=j options_from_collection_for_select(@resource_sets, :id, :name) %>");

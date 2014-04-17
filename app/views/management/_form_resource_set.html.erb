@@ -1,3 +1,4 @@
+<% if @set %>
 <%= form_tag(action: :update_resource_set, id: @set) do %>
 
   <h3>編集:</h3>
@@ -19,7 +20,7 @@
 		  <td><%= text_field("res_entry[]", :amount) %></td>
 		  <td><%= text_field("res_entry[]", :buffer) %></td>
 		  <td><%= text_field("res_entry[]", :interval) %></td>
-		  <td><%= link_to("削除", {action: :destroy_resource_entry, id: @res_entry, set_id: @set}, method: :delete) %></td>
+		  <td><%= link_to("削除", {action: :destroy_resource_entry, id: @res_entry, resource_set_id: @set}, remote: true, method: :delete) %></td>
 		</tr>
       <% end %>
 	    <tr>
@@ -43,7 +44,7 @@
 	    <tr>
 		  <td><%= text_field("dev_entry[]", :purpose) %></td>
 		  <td><%= collection_select("dev_entry[]", :device_id, @devices, :id, :name) %></td>
-		  <td><%= link_to("削除", {action: :destroy_device_entry, id: @dev_entry, set_id: @set}, method: :delete) %></td>
+		  <td><%= link_to("削除", {action: :destroy_device_entry, id: @dev_entry, resource_set_id: @set}, method: :delete) %></td>
 		</tr>
       <% end %>
 	    <tr>
@@ -56,4 +57,5 @@
 
   <%= submit_tag("リソース セットの更新", class: "button") %>
 
+<% end %>
 <% end %>

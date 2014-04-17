@@ -1,0 +1,10 @@
+$("#devices").html("<%=j render(partial: "content_devices") %>");
+
+var list = "<%=j options_from_collection_for_select(@devices, :id, :name) %>";
+
+<% if @set %>
+<% @set.device_entries.each do |entry| %>
+$("#dev_entry_<%= entry.id %>_device_id").html(list);
+<% end %>
+$("#dev_entry_new_device_id").html(list);
+<% end %>

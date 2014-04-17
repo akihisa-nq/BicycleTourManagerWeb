@@ -1,0 +1,10 @@
+<% @resources.each do |res|; @res = res %>
+<tr>
+    <td><%= text_field("res[]", "name") %></td>
+    <td><%= link_to("削除", {action: :destroy_resource, id: @res, resource_set_id: @set}, remote: true, method: :delete) %></td>
+</tr>
+<% end %>
+<tr>
+    <td><%= text_field("res_new", "name") %></td>
+    <td></td>
+</tr>

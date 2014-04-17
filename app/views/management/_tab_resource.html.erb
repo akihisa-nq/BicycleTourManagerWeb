@@ -1,28 +1,19 @@
 <div class="content <% if @active %>active<% end %>" id="resource">
   <% @active = false %>
-  <%= form_tag(action: :update_resources) do %>
+  <%= form_tag({action: :update_resources, resource_set_id: @set}, remote: true) do %>
   <table style="width:100%;">
       <thead>
           <th>名前</th>
           <th>管理</th>
       </thead>
-      <tbody>
-        <% @resources.each do |res|; @res = res %>
-        <tr>
-            <td><%= text_field("res[]", "name") %></td>
-		    <td><%= link_to("削除", {action: :destroy_resource, id: @res}, method: :delete) %></td>
-        </tr>
-        <% end %>
-        <tr>
-            <td><%= text_field("res_new", "name") %></td>
-		    <td></td>
-        </tr>
+      <tbody id="resources">
+	      <%= render(partial: "content_resources") %>
       </tbody>
   </table>
   <%= submit_tag("リソースの更新", class: "button") %>
   <% end %>
 
-  <%= form_tag(action: :update_devices) do %>
+  <%= form_tag({action: :update_devices, resource_set_id: @set}, remote: true) do %>
   <table style="width:100%;">
       <thead>
           <th>名前</th>
@@ -30,21 +21,8 @@
           <th>使用可能時間</th>
           <th>管理</th>
       </thead>
-      <% @devices.each do |dev|; @dev = dev %>
-      <tbody>
-        <tr>
-            <td><%= text_field("dev[]", "name") %></td>
-            <td><%= collection_select("dev[]", :resource_id, @resources, :id, :name) %></td>
-            <td><%= text_field("dev[]", "interval") %></td>
-		    <td><%= link_to("削除", {action: :destroy_device, id: @dev}, method: :delete) %></td>
-        </tr>
-        <% end %>
-        <tr>
-            <td><%= text_field("dev_new", "name") %></td>
-            <td><%= collection_select("dev_new", :resource_id, @resources, :id, :name) %></td>
-            <td><%= text_field("dev_new", "interval") %></td>
-		    <td></td>
-        </tr>
+      <tbody id="devices">
+	      <%= render(partial: "content_devices") %>
        </tbody>
   </table>
   <%= submit_tag("デバイスの更新", class: "button") %>
@@ -57,6 +35,7 @@
         </div>
         <div class="columns medium-4">
             <%= submit_tag("編集", class: "button") %>
+            <%= submit_tag("削除", class: "button", name: "delete") %>
         </div>
     </div>
   <% end %>
@@ -73,8 +52,6 @@
   <% end %>
 
   <div id="resource_set_edit">
-  <% if @set %>
   <%= render(partial: "form_resource_set") %>
-  <% end %>
   </div>
 </div>
