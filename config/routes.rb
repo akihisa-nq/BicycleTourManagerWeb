@@ -5,24 +5,26 @@ BicycleTourManagerWeb::Application.routes.draw do
 
   get "/", to: "summary#index"
   get "/login", to: "summary#login"
-  post "/edit_user", to: "summary#edit_user"
-  get "/management", to: "summary#management"
 
-  post "/exclusion_area/create", to: "summary#create_exclusion_area"
-  delete "/exclusion_area/:id/destroy", to: "summary#destroy_exclusion_area"
-  post "/exclusion_area/update", to: "summary#update_exclusion_area"
+  get "/management", to: "management#index"
 
-  post "/resource_sets/resources/update", to: "summary#update_resources"
-  delete "/resource_sets/resources/:id/destroy", to: "summary#destroy_resource"
+  post "/management/users/edit", to: "management#edit_user"
 
-  post "/resource_sets/devicess/update", to: "summary#update_devices"
-  delete "/resource_sets/devices/:id/destroy", to: "summary#destroy_device"
+  post "/exclusion_area/create", to: "management#create_exclusion_area"
+  delete "/exclusion_area/:id/destroy", to: "management#destroy_exclusion_area"
+  post "/exclusion_area/update", to: "management#update_exclusion_area"
 
-  delete "/resource_sets/:set_id/resource_entries/:id/destroy", to: "summary#destroy_resource_entry"
-  delete "/resource_sets/:set_id/device_entries/:id/destroy", to: "summary#destroy_device_entry"
-  post "/resource_sets/create", to: "summary#create_resource_set"
-  get "/resource_sets/edit", to: "summary#edit_resource_set"
-  post "/resource_sets/:id/update", to: "summary#update_resource_set"
+  post "/resource_sets/resources/update", to: "management#update_resources"
+  delete "/resource_sets/resources/:id/destroy", to: "management#destroy_resource"
+
+  post "/resource_sets/devicess/update", to: "management#update_devices"
+  delete "/resource_sets/devices/:id/destroy", to: "management#destroy_device"
+
+  delete "/resource_sets/:set_id/resource_entries/:id/destroy", to: "management#destroy_resource_entry"
+  delete "/resource_sets/:set_id/device_entries/:id/destroy", to: "management#destroy_device_entry"
+  post "/resource_sets/create", to: "management#create_resource_set"
+  get "/resource_sets/edit", to: "management#edit_resource_set"
+  post "/resource_sets/:id/update", to: "management#update_resource_set"
 
   get "/tour_result", to: "tour_result#index"
   get "/tour_result/page/:page", to: "tour_result#index"

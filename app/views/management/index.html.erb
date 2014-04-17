@@ -42,13 +42,13 @@ function CancelEditColumn()
       <div class="tabs-content">
         <% @active = true %>
         <% if can?(:edit, ExclusionArea) %>
-        <%= render(partial: "management_tab_exclusion_area") %>
+        <%= render(partial: "tab_exclusion_area") %>
         <% end %>
         <% if can?(:edit, Resource) %>
-        <%= render(partial: "management_tab_resource") %>
+        <%= render(partial: "tab_resource") %>
         <% end %>
         <% if can?(:edit, User) %>
-        <%= render(partial: "management_tab_user") %>
+        <%= render(partial: "tab_user") %>
         <% end %>
       </div>
     </div>

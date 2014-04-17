@@ -1,6 +1,6 @@
 <% if user_signed_in? %>
 <ul id="user" data-dropdown-content class="f-dropdown">
-<li><%= link_to "管理", controller: "/summary", action: :management, id: nil %></li>
+<li><%= link_to "管理", controller: "/management", action: :index, id: nil %></li>
 <li><%= link_to 'プロフィールを編集', edit_user_registration_path %></li>
 <li><%= link_to "ログアウト", destroy_user_session_path, method: :delete %></li>
 </ul>
