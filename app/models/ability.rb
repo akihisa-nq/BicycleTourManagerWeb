@@ -13,7 +13,7 @@ class Ability
 			can :manage, TourResult
 			can :manage, TourPlan
 			can :manage, ExclusionArea
-			can :manage, Resource
+			can :manage, ResourceSet
 			can :read, :all
 		end
 

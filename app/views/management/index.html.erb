@@ -31,7 +31,7 @@ function CancelEditColumn()
         <% if can?(:edit, ExclusionArea) %>
         <dd class="active"><a href="#exclusion">除外区域</a></dd>
         <% end %>
-        <% if can?(:edit, Resource) %>
+        <% if can?(:edit, ResourceSet) %>
         <dd><a href="#resource">リソース</a></dd>
         <% end %>
         <% if can?(:edit, User) %>
@@ -44,7 +44,7 @@ function CancelEditColumn()
         <% if can?(:edit, ExclusionArea) %>
         <%= render(partial: "tab_exclusion_area") %>
         <% end %>
-        <% if can?(:edit, Resource) %>
+        <% if can?(:edit, ResourceSet) %>
         <%= render(partial: "tab_resource") %>
         <% end %>
         <% if can?(:edit, User) %>

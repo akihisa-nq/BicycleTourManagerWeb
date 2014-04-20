@@ -5,8 +5,7 @@ class ManagementController < ApplicationController
 		@users = User.all
 		@areas = ExclusionArea.all_with_auth(current_user_or_guest)
 
-		@resource_sets = ResourceSet.all
-		fetch_all
+		fetch_all_with_set
 	end
 
 	def edit_user
@@ -32,7 +31,7 @@ class ManagementController < ApplicationController
 	end
 
 	def destroy_resource
-		Resource.where(["id = ?", params[:id]]).delete_all
+		Resource.destroy_with_auth(current_user_or_guest, params[:id])
 
 		fetch_all
 		headers["Content-Type"] = "text/javascript"
@@ -41,16 +40,14 @@ class ManagementController < ApplicationController
 
 	def update_resources
 		attr = params[:res_new].permit(:name)
-		unless attr[:name].empty?
-			Resource.create(attr)
-		end
+		Resource.create_with_auth(current_user_or_guest, attr)
 
 		fetch_all
 		headers["Content-Type"] = "text/javascript"
 	end
 
 	def destroy_device
-		Device.where(["id = ?", params[:id]]).delete_all
+		Device.destroy_with_auth(current_user_or_guest, params[:id])
 
 		fetch_all
 		headers["Content-Type"] = "text/javascript"
@@ -59,9 +56,7 @@ class ManagementController < ApplicationController
 
 	def update_devices
 		attr = params[:dev_new].permit(:name, :resource_id, :interval)
-		unless attr[:name].empty? && attr[:resource_id].empty? && attr[:interval].empty?
-			Device.create(attr)
-		end
+		Device.create_with_auth(current_user_or_guest, attr)
 
 		fetch_all
 		headers["Content-Type"] = "text/javascript"
@@ -69,11 +64,9 @@ class ManagementController < ApplicationController
 
 	def create_resource_set
 		attr = params[:set_new].permit(:name)
-		@set = ResourceSet.create(attr)
+		@set = ResourceSet.create_with_auth(current_user_or_guest, attr)
 
-		@resource_sets = ResourceSet.all
-		@resources = Resource.all
-		@devices = Device.all
+		fetch_all_with_set
 
 		headers["Content-Type"] = "text/javascript"
 		render(action: :edit_resource_set)
@@ -81,15 +74,12 @@ class ManagementController < ApplicationController
 
 	def edit_resource_set
 		if params[:delete]
-			ResourceSet.where(["id = ?", params[:set][:id]]).delete_all
-			fetch_all
+			ResourceSet.destroy_with_auth(current_user_or_guest, params[:set][:id])
 		else
-			@set = ResourceSet.find(params[:set][:id])
-			@resources = Resource.all
-			@devices = Device.all
+			@set = ResourceSet.edit_with_auth(current_user_or_guest, params[:set][:id])
 		end
 
-		@resource_sets = ResourceSet.all
+		fetch_all_with_set
 
 		headers["Content-Type"] = "text/javascript"
 	end
@@ -97,18 +87,23 @@ class ManagementController < ApplicationController
 	private
 
 	def res_set_find_specified_or_first
-		if params.include?(:resource_set_id)
-			ResourceSet.find(params[:resource_set_id])
+		if @set.nil? && params.include?(:resource_set_id)
+			@set = ResourceSet.edit_with_auth(current_user_or_guest, params[:resource_set_id])
 		end
 
-		if @set.nil? && ResourceSet.count > 0
-			@set = ResourceSet.first
+		if @set.nil?
+			@set = ResourceSet.first_with_auth(current_user_or_guest)
 		end
 	end
 
 	def fetch_all
-		@resources = Resource.all
-		@devices = Device.all
-		@set = res_set_find_specified_or_first
+		@resources = Resource.all_with_auth(current_user_or_guest)
+		@devices = Device.all_with_auth(current_user_or_guest)
+		res_set_find_specified_or_first
+	end
+
+	def fetch_all_with_set
+		@resource_sets = ResourceSet.all_with_auth(current_user_or_guest)
+		fetch_all
 	end
 end
