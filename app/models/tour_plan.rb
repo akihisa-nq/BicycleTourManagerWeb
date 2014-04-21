@@ -324,7 +324,7 @@ class TourPlan < ActiveRecord::Base
 			max ||= 1000
 
 			plotter.elevation_min = (min / 100) * 100 - 100
-			plotter.elevation_max = [plotter.elevation_min + 1000, ((max - 1) / 100 + 1) * 100].max + 100
+			plotter.elevation_max = [plotter.elevation_min + 1100, ((max - 1) / 100 + 1) * 100].max + 100
 			plotter.distance_max = 120.0 * (plotter.elevation_max - plotter.elevation_min - 200.0) / 1000.0
 			plotter.plot(r, File.join(File.dirname(plan.pdf_path), "PC#{i+1}.png"))
 		end
@@ -369,7 +369,7 @@ class TourPlan < ActiveRecord::Base
 		FileUtils.mkdir_p(File.dirname(plan.altitude_graph_path))
 		plotter.distance_max = (tour.total_distance + 10.0).to_i
 		plotter.elevation_min = (min / 100) * 100 - 100
-		plotter.elevation_max = [plotter.elevation_min + 1000, ((max - 1) / 100 + 1) * 100].max + 100
+		plotter.elevation_max = [plotter.elevation_min + 1100, ((max - 1) / 100 + 1) * 100].max + 100
 		plotter.plot(tour, plan.altitude_graph_path)
 	end
 
