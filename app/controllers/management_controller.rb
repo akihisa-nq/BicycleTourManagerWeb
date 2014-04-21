@@ -55,7 +55,7 @@ class ManagementController < ApplicationController
 	end
 
 	def update_devices
-		attr = params[:dev_new].permit(:name, :resource_id, :interval)
+		attr = params[:dev_new].permit(:name, :resource_id, :interval, :consumption)
 		Device.create_with_auth(current_user_or_guest, attr)
 
 		fetch_all

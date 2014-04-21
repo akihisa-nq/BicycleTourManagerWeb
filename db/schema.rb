@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140417025013) do
+ActiveRecord::Schema.define(version: 20140421150003) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -27,6 +27,7 @@ ActiveRecord::Schema.define(version: 20140417025013) do
     t.string  "name"
     t.integer "resource_id"
     t.integer "interval"
+    t.integer "consumption"
   end
 
   create_table "exclusion_areas", force: true do |t|

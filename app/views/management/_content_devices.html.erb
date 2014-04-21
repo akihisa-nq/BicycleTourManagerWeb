@@ -2,6 +2,7 @@
 <tr>
     <td><%= text_field("dev[]", "name") %></td>
     <td><%= collection_select("dev[]", :resource_id, @resources, :id, :name) %></td>
+    <td><%= text_field("dev[]", "consumption") %></td>
     <td><%= text_field("dev[]", "interval") %></td>
     <td><%= link_to("削除", {action: :destroy_device, id: @dev, resource_set_id: @set}, remote: true, method: :delete) %></td>
 </tr>
@@ -9,6 +10,7 @@
 <tr>
     <td><%= text_field("dev_new", "name") %></td>
     <td><%= collection_select("dev_new", :resource_id, @resources, :id, :name) %></td>
+    <td><%= text_field("dev_new", "consumption") %></td>
     <td><%= text_field("dev_new", "interval") %></td>
     <td></td>
 </tr>
