@@ -59,6 +59,25 @@ class TourPlanPoint < ActiveRecord::Base
 		attr[:direction] = dir
 	end
 
+	def exclude?
+		@exclude unless @exclude.nil?
+
+		ExclusionArea.all.each do |area|
+			pt1 = BTM::Point.new(point.y, point.x)
+			pt2 = BTM::Point.new(area.point.y, area.point.x)
+
+			if pt1.distance(pt2) < area.distance
+				@exclude = true
+				return true
+			end
+		end
+
+		@exclude = false
+		return false
+	end
+
+	attr_accessor :tmp_info
+
 	private
 
 	def parse_direction

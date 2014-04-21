@@ -3,7 +3,7 @@
 require "bicycle_tour_manager"
 
 class TourPlan < ActiveRecord::Base
-	has_many :tour_plan_routes
+	has_many :tour_plan_routes, -> { order("position ASC") }
 	belongs_to :resource_set
 
 	def self.list_all(user, page)
@@ -277,9 +277,11 @@ class TourPlan < ActiveRecord::Base
 				end
 
 				if i < tour.routes.last.path_list.count
-					tour.routes.last.path_list[i].steps[0].info = info
+					node.tmp_info = tour.routes.last.path_list[i].steps[0]
+					node.tmp_info.info = info
 				else
-					tour.routes.last.path_list.last.steps[-1].info = info
+					node.tmp_info = tour.routes.last.path_list.last.steps[-1]
+					node.tmp_info.info = info
 					break
 				end
 			end
@@ -345,6 +347,15 @@ class TourPlan < ActiveRecord::Base
 		# 獲得標高の保存
 		plan.elevation = tour.total_elevation
 		plan.save!
+
+		# 各ノードの情報の保存
+		plan.tour_plan_routes.each do |route|
+			route.tour_plan_points.each do |pt|
+				pt.target_time = pt.tmp_info.time_target
+				pt.limit_time = pt.tmp_info.time
+				pt.save!
+			end
+		end
 
 		# 全体画像の生成
 		ExclusionArea.all.each do |area|
