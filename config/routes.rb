@@ -20,8 +20,8 @@ BicycleTourManagerWeb::Application.routes.draw do
   post "/resource_sets/devicess/update", to: "management#update_devices"
   delete "/resource_sets/devices/:id/destroy", to: "management#destroy_device"
 
-  delete "/resource_sets/:set_id/resource_entries/:id/destroy", to: "management#destroy_resource_entry"
-  delete "/resource_sets/:set_id/device_entries/:id/destroy", to: "management#destroy_device_entry"
+  delete "/resource_sets/:resource_set_id/resource_entries/:id/destroy", to: "management#destroy_resource_entry"
+  delete "/resource_sets/:resource_set_id/device_entries/:id/destroy", to: "management#destroy_device_entry"
   post "/resource_sets/create", to: "management#create_resource_set"
   get "/resource_sets/edit", to: "management#edit_resource_set"
   post "/resource_sets/:id/update", to: "management#update_resource_set"

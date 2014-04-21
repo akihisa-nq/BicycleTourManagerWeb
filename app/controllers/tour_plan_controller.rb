@@ -76,8 +76,8 @@ class TourPlanController < ApplicationController
 			current_user_or_guest,
 			params[:id],
 			attr_plan,
-			params[:route],
-			params[:path],
+			params[:route] || [],
+			params[:path] || [],
 			)
 
 		attr = params[:route_new].permit(:name, :google_map_url)
@@ -107,7 +107,7 @@ class TourPlanController < ApplicationController
 	end
 
 	def update_node
-		TourPlan.update_point_with_auth(current_user_or_guest, params[:node])
+		TourPlan.update_point_with_auth(current_user_or_guest, params[:node] || [])
 		redirect_to( action: :edit_node, id: params[:id], page: params[:page] )
 	end
 end

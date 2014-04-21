@@ -42,7 +42,7 @@ class ManagementController < ApplicationController
 		attr = params[:res_new].permit(:name)
 		Resource.create_with_auth(current_user_or_guest, attr)
 
-		params[:res].each do |id, attr|
+		(params[:res] || []).each do |id, attr|
 			Resource.update_with_auth(current_user_or_guest, id, attr)
 		end
 
@@ -62,7 +62,7 @@ class ManagementController < ApplicationController
 		attr = params[:dev_new].permit(:name, :resource_id, :interval, :consumption)
 		Device.create_with_auth(current_user_or_guest, attr)
 
-		params[:dev].each do |id, attr|
+		(params[:dev] || []).each do |id, attr|
 			Device.update_with_auth(current_user_or_guest, id, attr)
 		end
 
@@ -90,6 +90,38 @@ class ManagementController < ApplicationController
 		fetch_all_with_set
 
 		headers["Content-Type"] = "text/javascript"
+	end
+
+	def update_resource_set
+		ResourceSet.update_with_auth(
+			current_user_or_guest,
+			params[:id],
+			params[:set].permit(:name),
+			params[:res_entry] || [],
+			params[:res_entry_new].permit(:resource_id, :amount, :buffer, :recovery_interval),
+			params[:dev_entry] || [],
+			params[:dev_entry_new].permit(:purpose, :device_id)
+			)
+		@set = ResourceSet.edit_with_auth(current_user_or_guest, params[:id])
+		fetch_all_with_set
+		headers["Content-Type"] = "text/javascript"
+		render(action: :edit_resource_set)
+	end
+
+	def destroy_resource_entry
+		ResourceEntry.destroy_with_auth(current_user_or_guest, params[:id])
+
+		fetch_all_with_set
+		headers["Content-Type"] = "text/javascript"
+		render(action: :edit_resource_set)
+	end
+
+	def destroy_device_entry
+		DeviceEntry.destroy_with_auth(current_user_or_guest, params[:id])
+
+		fetch_all_with_set
+		headers["Content-Type"] = "text/javascript"
+		render(action: :edit_resource_set)
 	end
 
 	private
