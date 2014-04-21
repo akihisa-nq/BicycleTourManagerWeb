@@ -93,14 +93,37 @@ class ManagementController < ApplicationController
 	end
 
 	def update_resource_set
+		dev_entries = (params[:dev_entry] || []).each do |key, i|
+				i[:start_time] = Time.new(
+					2000, 1, 1,
+					i["start_time(4i)"].to_i,
+					i["start_time(5i)"].to_i,
+					0, 0
+					)
+				5.times do |t|
+					i.delete("start_time(#{t + 1}i)")
+				end
+			end
+
+		dev_new = params[:dev_entry_new].permit(:purpose, :device_id)
+		dev_new[:start_time] = dev_new[:start_time] = Time.new(
+			2000, 1, 1,
+			dev_new["start_time(4i)"].to_i,
+			dev_new["start_time(5i)"].to_i,
+			0, 0
+			)
+		5.times do |t|
+			dev_new.delete("start_time(#{t + 1}i)")
+		end
+
 		ResourceSet.update_with_auth(
 			current_user_or_guest,
 			params[:id],
 			params[:set].permit(:name),
 			params[:res_entry] || [],
 			params[:res_entry_new].permit(:resource_id, :amount, :buffer, :recovery_interval),
-			params[:dev_entry] || [],
-			params[:dev_entry_new].permit(:purpose, :device_id)
+			dev_entries,
+			dev_new
 			)
 		@set = ResourceSet.edit_with_auth(current_user_or_guest, params[:id])
 		fetch_all_with_set

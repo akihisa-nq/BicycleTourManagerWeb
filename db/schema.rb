@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140421150003) do
+ActiveRecord::Schema.define(version: 20140422033529) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -21,6 +21,7 @@ ActiveRecord::Schema.define(version: 20140421150003) do
     t.integer "resource_set_id"
     t.integer "device_id"
     t.string  "purpose"
+    t.time    "start_time"
   end
 
   create_table "devices", force: true do |t|

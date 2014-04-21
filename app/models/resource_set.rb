@@ -40,7 +40,10 @@ class ResourceSet < ActiveRecord::Base
 				ResourceEntry.where(["id = ?", id]).update_all(attr)
 			end
 
-			unless res_add[:amount].empty? && res_add[:buffer].empty? && res_add[:recovery_interval].empty?
+			unless res_add[:amount].empty? \
+				&& res_add[:buffer].empty? \
+				&& res_add[:recovery_interval].empty?
+			then
 				res_entry_new = ResourceEntry.new(res_add)
 				res_entry_new.resource_set_id = id
 				res_entry_new.save!

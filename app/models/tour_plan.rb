@@ -23,9 +23,35 @@ class TourPlan < ActiveRecord::Base
 		end
 	end
 
+	def self.time_utc(tz_name, time)
+		time = ActiveSupport::TimeZone.find_tzinfo(tz_name).local_to_utc(time)
+		Time.new(2000, 1, 1, time.hour, time.min, 0, 0)
+	end
+
+	def self.time_local(tz_name, time)
+		time = ActiveSupport::TimeZone.find_tzinfo(tz_name).utc_to_local(time)
+		Time.new(2000, 1, 1, time.hour, time.min, 0, 0)
+	end
+
+	def plan_time_utc(time)
+		TourPlan.time_utc(time_zone, time)
+	end
+
+	def plan_time_local(time)
+		TourPlan.time_local(time_zone, time)
+	end
+
+	def start_time_utc
+		plan_time_utc(start_time)
+	end
+
+	def start_time_local
+		plan_time_local(start_time)
+	end
+
 	def self.create_with_auth(user, attr_plan, attr_path)
 		if user.can? :edit, TourPlan
-			attr_plan[:start_time] = ActiveSupport::TimeZone.find_tzinfo(attr_plan[:time_zone]).local_to_utc(attr_plan[:start_time])
+			attr_plan[:start_time] = time_utc(attr_plan[:time_zone], attr_plan[:start_time])
 
 			plan = TourPlan.new(attr_plan)
 			plan.tour_plan_routes.build(name: attr_plan[:name])
@@ -49,7 +75,7 @@ class TourPlan < ActiveRecord::Base
 	def self.edit_route_with_auth(user, id)
 		if user.can? :edit, TourPlan
 			plan = TourPlan.find(id)
-			plan.start_time = ActiveSupport::TimeZone.find_tzinfo(plan.time_zone).utc_to_local(plan.start_time)
+			plan.start_time = plan.start_time_local
 			plan
 		else
 			nil
@@ -72,7 +98,7 @@ class TourPlan < ActiveRecord::Base
 		end
 
 		if plan
-			plan.start_time = ActiveSupport::TimeZone.find_tzinfo(plan.time_zone).utc_to_local(plan.start_time)
+			plan.start_time = plan.start_time_local
 		end
 
 		plan
@@ -80,7 +106,7 @@ class TourPlan < ActiveRecord::Base
 
 	def self.update_route_with_auth(user, id, attr, routes, paths)
 		if user.can?(:edit, TourPlan)
-			attr[:start_time] = ActiveSupport::TimeZone.find_tzinfo(attr[:time_zone]).local_to_utc(attr[:start_time])
+			attr[:start_time] = time_utc(attr[:time_zone], attr[:start_time])
 			TourPlan.where(["id = ?", id]).update_all(attr)
 
 			routes.each do |key, value|
@@ -178,6 +204,7 @@ class TourPlan < ActiveRecord::Base
 		parser = BTM::GoogleMapUriParser.new(TourPlanCache)
 
 		tour = BTM::Tour.new
+		tour.start_date = plan.start_time_local
 
 		limit_speed = 15.0
 		target_speed = 15.0
@@ -272,8 +299,8 @@ class TourPlan < ActiveRecord::Base
 
 			plan.resource_set.device_entries.each do |dev|
 				tour.schedule << BTM::Schedule.new(
-					"#{dev.device.name} #{dev.purpose}",
-					tour.start_date,
+					"#{dev.device.name} #{dev.purpose} チャージ",
+					dev.start_time,
 					dev.device.interval,
 					dev.device.resource.name,
 					dev.device.consumption
@@ -366,7 +393,7 @@ class TourPlan < ActiveRecord::Base
 
 	def to_tour(is_public_data)
 		tour = BTM::Tour.new
-		tour.start_date = self.start_time
+		tour.start_date = self.start_time_local
 		tour.name = self.name
 
 		tour_plan_routes.each do |route|
