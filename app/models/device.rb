@@ -1,5 +1,5 @@
 class Device < ActiveRecord::Base
-	has_one :resource
+	belongs_to :resource
 
 	def self.destroy_with_auth(user, id)
 		if user.can?(:delete, ResourceSet)

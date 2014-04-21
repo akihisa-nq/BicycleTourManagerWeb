@@ -4,7 +4,7 @@ require "bicycle_tour_manager"
 
 class TourPlan < ActiveRecord::Base
 	has_many :tour_plan_routes
-	has_one :resource_set
+	belongs_to :resource_set
 
 	def self.list_all(user, page)
 		if user.can? :edit, TourPlan
@@ -260,6 +260,27 @@ class TourPlan < ActiveRecord::Base
 
 		tour.set_start_end
 
+		if plan.resource_set
+			plan.resource_set.resource_entries.each do |res|
+				tour.resources << BTM::Resource.new(
+					res.resource.name,
+					res.amount,
+					res.recovery_interval * 3600,
+					res.buffer
+					)
+			end
+
+			plan.resource_set.device_entries.each do |dev|
+				tour.schedule << BTM::Schedule.new(
+					"#{dev.device.name} #{dev.purpose}",
+					tour.start_date,
+					dev.device.interval,
+					dev.device.resource.name,
+					dev.device.consumption
+					)
+			end
+		end
+
 		# 画像の生成
 		plotter = BTM::AltitudePloter.new("gnuplot", File.join(Rails.root, "tmp"))
 		plotter.font = File.join(Rails.root, "vendor/font/mikachan-p.ttf")
@@ -316,7 +337,7 @@ class TourPlan < ActiveRecord::Base
 
 	def self.geneate_with_auth(user, id)
 		if user.can?(:edit, TourPlan)
-			generate(user, id)
+			generate(id)
 		end
 	end
 
