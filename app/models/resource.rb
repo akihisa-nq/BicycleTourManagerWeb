@@ -18,4 +18,10 @@ class Resource < ActiveRecord::Base
 			Resource.all
 		end
 	end
+
+	def self.update_with_auth(user, id, attr)
+		if user.can?(:edit, ResourceSet)
+			Resource.where(["id = ?", id]).update_all(attr)
+		end
+	end
 end

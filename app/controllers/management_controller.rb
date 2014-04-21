@@ -42,6 +42,10 @@ class ManagementController < ApplicationController
 		attr = params[:res_new].permit(:name)
 		Resource.create_with_auth(current_user_or_guest, attr)
 
+		params[:res].each do |id, attr|
+			Resource.update_with_auth(current_user_or_guest, id, attr)
+		end
+
 		fetch_all
 		headers["Content-Type"] = "text/javascript"
 	end
@@ -57,6 +61,10 @@ class ManagementController < ApplicationController
 	def update_devices
 		attr = params[:dev_new].permit(:name, :resource_id, :interval, :consumption)
 		Device.create_with_auth(current_user_or_guest, attr)
+
+		params[:dev].each do |id, attr|
+			Device.update_with_auth(current_user_or_guest, id, attr)
+		end
 
 		fetch_all
 		headers["Content-Type"] = "text/javascript"
