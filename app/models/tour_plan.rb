@@ -329,14 +329,6 @@ class TourPlan < ActiveRecord::Base
 			plotter.plot(r, File.join(File.dirname(plan.pdf_path), "PC#{i+1}.png"))
 		end
 
-		tour.routes.each do |path|
-			path.path_list.each do |path|
-				path.steps.each do |s|
-					p s.distance_from_start
-				end
-			end
-		end
-
 		html_path = plan.pdf_path.sub(/\.pdf$/, ".html")
 		renderer = BTM::PlanHtmlRenderer.new(enable_hide: false)
 
