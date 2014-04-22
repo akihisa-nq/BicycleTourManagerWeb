@@ -52,6 +52,8 @@ class TourPlanController < ApplicationController
 	end
 
 	def toggle_visible
+		TourPlan.toggle_visible(current_user_or_guest, params[:id])
+		redirect_to(action: :index, id: nil, page: TourPlan.page_for(current_user_or_guest, params[:id]), anchor: "tour_item_#{params[:id]}")
 	end
 
 	def generate

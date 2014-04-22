@@ -443,4 +443,10 @@ SELECT ST_Length(t.path, false) as length FROM
 		EOS
 		ret.to_i / 1000
 	end
+
+	def self.toggle_visible(user, id)
+		if user.can? :edit, TourPlan
+			TourPlan.where(["id = ?", id]).update_all("published = CASE WHEN published = TRUE THEN FALSE ELSE TRUE END")
+		end
+	end
 end

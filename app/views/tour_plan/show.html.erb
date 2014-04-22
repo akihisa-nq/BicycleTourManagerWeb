@@ -101,7 +101,7 @@
 <% end %>
 
 <% content_for :menus do %>
-<li class="active"><%= link_to("戻る", action: :index, page: TourPlan.page_for(current_user || User.new, @tour_plan.id)) %></li>
+<li class="active"><%= link_to("戻る", action: :index, page: TourPlan.page_for(current_user || User.new, @tour_plan.id), anchor: "tour_tem_#{@tour_plan.id}") %></li>
 <% end %>
 
 <% content_for :manage do %>

@@ -51,7 +51,7 @@
 		</div>
 
 		<% @tour_plans.each do |tour| %>
-		<div class="btmw-tour-plan-item">
+		<div class="btmw-tour-plan-item" id="tour_item_<%= tour.id %>">
           <div class="row">
 		    <div class="medium-9 columns">
               <div><%= tour.created_at.strftime("%Y/%m/%d") %></div>

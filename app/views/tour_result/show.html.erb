@@ -142,7 +142,7 @@
 <% end %>
 
 <% content_for :menus do %>
-<li class="active"><%= link_to("戻る", action: :index, page: TourResult.page_for(current_user || User.new, @tour_result.id)) %></li>
+	<li class="active"><%= link_to("戻る", action: :index, page: TourResult.page_for(current_user || User.new, @tour_result.id), anchor: "tour_item_#{@tour_result.id}") %></li>
 <% end %>
 
 <% content_for :manage do %>
