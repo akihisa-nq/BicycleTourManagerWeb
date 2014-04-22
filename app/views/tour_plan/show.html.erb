@@ -33,7 +33,8 @@
      function CreatePoint(id, lat, lon, html) {
          window.marker[id] = new google.maps.Marker({
              position: new google.maps.LatLng(lat,lon),
-             map: window.map
+             map: window.map,
+			 icon: "<%=j path_to_image("/mile_stone.png") %>"
          });
 
          window.info_window[id] = new google.maps.InfoWindow({
