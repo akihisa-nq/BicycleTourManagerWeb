@@ -303,7 +303,7 @@ class TourPlan < ActiveRecord::Base
 				tour.schedule << BTM::Schedule.new(
 					"#{dev.device.name} #{dev.purpose} 交換",
 					dev.use_on_start ? tour.start_date : dev.start_time,
-					dev.device.interval,
+					dev.device.interval * 3600,
 					dev.device.resource.name,
 					dev.device.consumption
 					)
