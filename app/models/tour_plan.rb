@@ -301,7 +301,7 @@ class TourPlan < ActiveRecord::Base
 
 			plan.resource_set.device_entries.each do |dev|
 				tour.schedule << BTM::Schedule.new(
-					"#{dev.device.name} #{dev.purpose} チャージ",
+					"#{dev.device.name} #{dev.purpose} 交換",
 					dev.start_time,
 					dev.device.interval,
 					dev.device.resource.name,
