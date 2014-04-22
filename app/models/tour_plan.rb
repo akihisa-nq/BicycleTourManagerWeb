@@ -333,11 +333,11 @@ class TourPlan < ActiveRecord::Base
 		renderer = BTM::PlanHtmlRenderer.new(enable_hide: false)
 
 		renderer.render(tour, html_path)
-		system("wkhtmltopdf -s A5 -O Landscape -L 4mm -R 4mm -T 4mm  #{html_path} #{plan.pdf_path}")
+		system("wkhtmltopdf --disable-smart-shrinking -s A5 -O Landscape -L 4mm -R 4mm -T 4mm  #{html_path} #{plan.pdf_path}")
 
 		renderer.option[:enable_hide] = true
 		renderer.render(tour, html_path)
-		system("wkhtmltopdf -s A5 -O Landscape -L 4mm -R 4mm -T 4mm  #{html_path} #{plan.public_pdf_path}")
+		system("wkhtmltopdf --disable-smart-shrinking -s A5 -O Landscape -L 4mm -R 4mm -T 4mm  #{html_path} #{plan.public_pdf_path}")
 
 		File.delete(html_path)
 		Dir.glob(File.join(File.dirname(html_path), "*.png")) do |path|
