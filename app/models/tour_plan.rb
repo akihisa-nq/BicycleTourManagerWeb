@@ -223,12 +223,6 @@ class TourPlan < ActiveRecord::Base
 			# ルート探索
 			tour.routes.last.search_route(TourPlanCache, TourPlanCache)
 
-			# 距離の計算など
-			tour.routes.last.path_list.each do |p|
-				p.check_peak
-				p.check_distance_from_start
-			end
-
 			# ラインの設定
 			steps = tour.routes.last.flatten.map {|s| s.point_geos }
 			route.private_line = BTM.factory.line_string(steps)
@@ -288,7 +282,12 @@ class TourPlan < ActiveRecord::Base
 			end
 		end
 
+		# 開始点と終了点の設定
 		tour.set_start_end
+
+		# 獲得標高の保存
+		plan.elevation = tour.total_elevation
+		plan.save!
 
 		if plan.resource_set
 			plan.resource_set.resource_entries.each do |res|
@@ -330,6 +329,14 @@ class TourPlan < ActiveRecord::Base
 			plotter.plot(r, File.join(File.dirname(plan.pdf_path), "PC#{i+1}.png"))
 		end
 
+		tour.routes.each do |path|
+			path.path_list.each do |path|
+				path.steps.each do |s|
+					p s.distance_from_start
+				end
+			end
+		end
+
 		html_path = plan.pdf_path.sub(/\.pdf$/, ".html")
 		renderer = BTM::PlanHtmlRenderer.new(enable_hide: false)
 
@@ -345,15 +352,13 @@ class TourPlan < ActiveRecord::Base
 			File.delete(path)
 		end
 
-		# 獲得標高の保存
-		plan.elevation = tour.total_elevation
-		plan.save!
-
 		# 各ノードの情報の保存
 		plan.tour_plan_routes.each do |route|
 			route.tour_plan_points.each do |pt|
 				pt.target_time = pt.tmp_info.time_target
 				pt.limit_time = pt.tmp_info.time
+				pt.distance = pt.tmp_info.distance_from_start
+				pt.elevation = pt.tmp_info.ele
 				pt.save!
 			end
 		end

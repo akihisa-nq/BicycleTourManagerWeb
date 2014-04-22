@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140422150431) do
+ActiveRecord::Schema.define(version: 20140422160048) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -115,6 +115,8 @@ ActiveRecord::Schema.define(version: 20140422150431) do
     t.spatial  "point",              limit: {:srid=>4326, :type=>"point"}
     t.datetime "target_time"
     t.datetime "limit_time"
+    t.integer  "distance"
+    t.integer  "elevation"
   end
 
   create_table "tour_plan_routes", force: true do |t|
