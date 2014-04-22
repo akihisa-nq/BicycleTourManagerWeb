@@ -268,7 +268,7 @@ class TourPlan < ActiveRecord::Base
 				end
 
 				if node.rest_time
-					info.rest_time = (node.rest_time * 3600).to_i
+					info.rest_time = node.rest_time
 				end
 
 				if i < tour.routes.last.path_list.count
