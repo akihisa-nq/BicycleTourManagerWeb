@@ -10,6 +10,7 @@ class TourResult < ActiveRecord::Base
 	has_many :tour_images, -> { order("shot_on ASC") }
 	belongs_to :tour_plan
 
+	before_save -> { update_elevation }
 	after_save -> { plot_altitude_graph(true) }
 
 	def self.list_all(user, page)
@@ -38,13 +39,14 @@ class TourResult < ActiveRecord::Base
 		tour_result.finish_time = tour.routes[-1].path_list[-1].steps[-1].time
 
 		# 非公開
+		offset = 0.0
 		tour.routes.each do |r|
 			r.path_list.each do |p|
 				pri_route = tour_result.private_result_routes.build
 
 				logger.debug("check peak")
-				p.check_peak
-				p.check_distance_from_start
+				p.check_peak(offset)
+				offset = p.steps.last.distance_from_start
 
 				logger.debug("check steps")
 				line_points = []
@@ -88,18 +90,21 @@ class TourResult < ActiveRecord::Base
 			end
 		end
 
+		tour.elevation = tour.total_elevation
+
 		# 公開
 		ExclusionArea.all.each do |area|
 			tour.delete_by_distance(area.point, area.distance)
 		end
 
+		offset = 0.0
 		tour.routes.each do |r|
 			r.path_list.each do |p|
 				pub_route = tour_result.public_result_routes.build
 
 				logger.debug("check peak")
-				p.check_peak
-				p.check_distance_from_start
+				p.check_peak(offset)
+				offset = p.steps.last.distance_from_start
 
 				logger.debug("check steps")
 				line_points = []
@@ -227,6 +232,10 @@ class TourResult < ActiveRecord::Base
 		io.string
 	end
 
+	def update_elevation
+		self.elevation = to_tour(false, :graph).total_elevation
+	end
+
 	def plot_altitude_graph(is_public_data)
 		if need_update_graph
 			tour = self.to_tour(is_public_data, :graph)
@@ -243,6 +252,8 @@ class TourResult < ActiveRecord::Base
 
 			FileUtils.mkdir_p(File.dirname(altitude_graph_path))
 			plotter.plot(tour, altitude_graph_path)
+
+			need_update_graph = false
 		end
 	end
 
@@ -282,10 +293,6 @@ SELECT ST_Length(t.path, false) as length FROM
 
 	def finish_time_on_local
 		finish_time.in_time_zone(time_zone)
-	end
-
-	def elevation(is_public_data)
-		to_tour(is_public_data, :graph).total_elevation
 	end
 
 	attr_accessor :need_update_graph
