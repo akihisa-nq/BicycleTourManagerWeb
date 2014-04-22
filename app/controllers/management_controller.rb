@@ -106,15 +106,12 @@ class ManagementController < ApplicationController
 			end
 
 		dev_new = params[:dev_entry_new].permit(:purpose, :device_id)
-		dev_new[:start_time] = dev_new[:start_time] = Time.new(
+		dev_new[:start_time] = Time.new(
 			2000, 1, 1,
-			dev_new["start_time(4i)"].to_i,
-			dev_new["start_time(5i)"].to_i,
+			params[:dev_entry_new]["start_time(4i)"].to_i,
+			params[:dev_entry_new]["start_time(5i)"].to_i,
 			0, 0
 			)
-		5.times do |t|
-			dev_new.delete("start_time(#{t + 1}i)")
-		end
 
 		ResourceSet.update_with_auth(
 			current_user_or_guest,
