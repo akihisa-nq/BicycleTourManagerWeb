@@ -12,24 +12,7 @@
 <% end %>
 <% end %>
 
-<% if can? :edit, TourResult %>
-<div class="reveal-modal" data-reveal id="edit_menu">
-	<%= form_tag({action: :create}, multipart: true) do %>
-	<div class="row">
-		<div class="medium-3 columns">GPX ファイル:</div>
-		<div class="medium-9 columns"><%= file_field(:tour_result, :gpx_file) %></div>
-	</div>
-	<div class="row">
-		<div class="medium-3 columns">タイムゾーン:</div>
-		<div class="medium-9 columns"><%= time_zone_select(:tour_result, :time_zone, nil, default: "Tokyo") %></div>
-	</div>
-	<div class="row">
-		<div class="medium-9 columns push-3"><%= submit_tag("送信", class: "button") %></div>
-	</div>
-	<% end %>
-	<a class="close-reveal-modal">&#215;</a>
-</div>
-<% end %>
+<%= render( partial: "form_upload" ) %>
 
 <div class="btmw-tour-result-list">
   <div class="row">
@@ -86,6 +69,11 @@
 						<tr>
 							<th>獲得標高</th><td><%= tour.elevation(false).to_i %> m ぐらい</td>
 						</tr>
+						<% if tour.tour_plan && (can?(:edit, TourPlan) || tour.tour_plan.published) %>
+						<tr>
+							<th>計画ルート</th><td><%= link_to(tour.tour_plan.name, controller: :tour_plan, action: :show, id: tour.tour_plan ) %></td>
+						</tr>
+						<% end %>
 						<% if tour.tour_images.count > 0 %>
 						<tr>
 							<th>写真</th><td><%= tour.tour_images.count %>枚</td>

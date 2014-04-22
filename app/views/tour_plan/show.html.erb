@@ -98,13 +98,29 @@
      $(document).on('ready page:load', ShowViewer);
  //]]>
 </script>
+
+<%= render(partial: "tour_result/form_upload") %>
+
+<ul id="results" data-dropdown-content class="f-dropdown">
+<% @tour_plan.tour_results.each do |result| %>
+<% if can?(:edit, TourResult) || result.published then; @has_result = true %>
+<li><%= link_to("#{result.start_time.strftime("%Y/%M/%d")} #{result.name}", controller: :tour_result, action: :show, id: result) %></li>
+<% end %>
+<% end %>
+</ul>
 <% end %>
 
 <% content_for :menus do %>
 <li class="active"><%= link_to("戻る", action: :index, page: TourPlan.page_for(current_user || User.new, @tour_plan.id), anchor: "tour_tem_#{@tour_plan.id}") %></li>
+<% if @has_result %>
+<li class="active"><a href="#" data-dropdown="results">結果</a></li>
+<% end %>
 <% end %>
 
 <% content_for :manage do %>
+<% if can? :edit, TourResult %>
+<li><a href="#" data-reveal-id="edit_menu">結果をアップロード</a></li>
+<% end %>
 <li class="active"><a href="<%= path_to_image(@tour_plan.public_pdf_url) %>">PDF で計画を表示</a></li>
 <% if can? :edit, TourPlan %>
 <li class="active"><%= link_to("非公開 PDF の表示", { action: :show_pdf, id: @tour_plan }, target: "_blank") %></li>

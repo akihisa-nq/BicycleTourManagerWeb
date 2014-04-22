@@ -21,7 +21,7 @@ class Samples::Set
 
 		Dir.glob(File.join(File.dirname(__FILE__), "gpx/*.gpx")) do |file|
 			puts file
-			tour = ::TourResult.load(File.open(file, "r:utf-8"), "Tokyo")
+			tour = ::TourResult.load(File.open(file, "r:utf-8"), time_zone: "Tokyo")
 
 			if File.basename(file) == "track_9.gpx"
 				Dir.glob(File.join(File.dirname(__FILE__), "images/*.JPG")) do |img|
@@ -37,7 +37,7 @@ class Samples::Set
 		dir_base = ENV["TOURS_DIR"]
 		Dir.glob("#{dir_base.gsub("\\", "/")}/**/*.gpx") do |gpx|
 			puts gpx
-			tour = ::TourResult.load(File.open(gpx, "r:utf-8"), "Tokyo")
+			tour = ::TourResult.load(File.open(gpx, "r:utf-8"), time_zone: "Tokyo")
 
 			if Dir.exist?(File.join(File.dirname(gpx), "images"))
 				Dir.glob(File.join(File.dirname(gpx), "images/*.JPG")) do |img|

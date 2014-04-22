@@ -8,6 +8,7 @@ class TourResult < ActiveRecord::Base
 	has_many :public_result_routes, -> { order("position ASC") }
 	has_many :private_result_routes, -> { order("position ASC") }
 	has_many :tour_images, -> { order("shot_on ASC") }
+	belongs_to :tour_plan
 
 	after_save -> { plot_altitude_graph(true) }
 
@@ -28,7 +29,7 @@ class TourResult < ActiveRecord::Base
 		end
 	end
 
-	def self.load(stream, time_zone)
+	def self.load(stream, attr)
 		tour = BTM::GpxStream.read_from_stream(stream)
 
 		tour_result = TourResult.new
@@ -142,14 +143,14 @@ class TourResult < ActiveRecord::Base
 			end
 		end
 
-		tour_result.time_zone = time_zone
+		tour_result.update_attributes(attr)
 
 		tour_result
 	end
 
-	def self.load_and_save(user, gpx_file, time_zone)
+	def self.load_and_save(user, gpx_file, attr)
 		if user.can? :edit, TourResult
-			tour_result = self.load(gpx_file, time_zone)
+			tour_result = self.load(gpx_file, attr)
 			tour_result.need_update_graph = true
 			tour_result.published = false
 			tour_result.save!

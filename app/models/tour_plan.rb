@@ -4,6 +4,7 @@ require "bicycle_tour_manager"
 
 class TourPlan < ActiveRecord::Base
 	has_many :tour_plan_routes, -> { order("position ASC") }
+	has_many :tour_results, -> { order("start_time DESC") }
 	belongs_to :resource_set
 
 	def self.list_all(user, page)
