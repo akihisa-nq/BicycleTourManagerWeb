@@ -105,7 +105,7 @@ class ManagementController < ApplicationController
 				end
 			end
 
-		dev_new = params[:dev_entry_new].permit(:purpose, :device_id)
+		dev_new = params[:dev_entry_new].permit(:purpose, :device_id, :use_on_start)
 		dev_new[:start_time] = Time.new(
 			2000, 1, 1,
 			params[:dev_entry_new]["start_time(4i)"].to_i,

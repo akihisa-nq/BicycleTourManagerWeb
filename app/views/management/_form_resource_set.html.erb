@@ -38,6 +38,7 @@
           <th>目的</th>
           <th>デバイス</th>
           <th>カウント開始</th>
+          <th>スタートと同時に使用</th>
           <th>管理</th>
       </thead>
       <tbody>
@@ -46,6 +47,7 @@
 		  <td><%= text_field("dev_entry[]", :purpose) %></td>
 		  <td><%= collection_select("dev_entry[]", :device_id, @devices, :id, :name) %></td>
           <td class="btmw-time"><%= time_select("dev_entry[]", :start_time) %></td>
+		  <td><%= check_box("dev_entry[]", :use_on_start) %></td>
 		  <td><%= link_to("削除", {action: :destroy_device_entry, id: @dev_entry, resource_set_id: @set}, remote: true, method: :delete) %></td>
 		</tr>
       <% end %>
@@ -53,6 +55,7 @@
 		  <td><%= text_field("dev_entry_new", :purpose) %></td>
 		  <td><%= collection_select("dev_entry_new", :device_id, @devices, :id, :name) %></td>
           <td class="btmw-time"><%= time_select("dev_entry_new", :start_time) %></td>
+		  <td><%= check_box("dev_entry_new", :use_on_start) %></td>
 		  <td></td>
 		</tr>
       </tbody>
