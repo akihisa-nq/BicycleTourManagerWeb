@@ -318,29 +318,26 @@ class TourPlan < ActiveRecord::Base
 		FileUtils.mkdir_p(File.dirname(plan.pdf_path))
 		FileUtils.mkdir_p(File.dirname(plan.public_pdf_path))
 
-		tour.routes.each.with_index do |r, i|
-			min, max = *r.elevation_minmax
-			min ||= 0
-			max ||= 1000
-
-			plotter.elevation_min = (min / 100) * 100 - 100
-			plotter.elevation_max = [plotter.elevation_min + 1100, ((max - 1) / 100 + 1) * 100].max + 100
-			plotter.distance_max = 150.0 * (plotter.elevation_max - plotter.elevation_min - 200.0) / 1000.0
-			plotter.plot(r, File.join(File.dirname(plan.pdf_path), "PC#{i+1}.png"))
-		end
+		# plotter.distance_max = 150.0
+		plotter.distance_max = 75.0
+		plotter.label = false
 
 		html_path = plan.pdf_path.sub(/\.pdf$/, ".html")
 		renderer = BTM::PlanHtmlRenderer.new(
+			plotter,
 			enable_hide: false,
-			scale: (plan.planning_sheet_scale || 0.8)
+			scale: (plan.planning_sheet_scale || 0.8),
+			format: :half
 			)
 
 		renderer.render(tour, html_path)
-		system("wkhtmltopdf --disable-smart-shrinking -s A5 -O Landscape -L 4mm -R 4mm -T 4mm -B 0mm #{html_path} #{plan.pdf_path}")
+		# system("wkhtmltopdf --disable-smart-shrinking -s A5 -O Landscape -L 4mm -R 4mm -T 4mm -B 0mm #{html_path} #{plan.pdf_path}")
+		system("wkhtmltopdf --disable-smart-shrinking -s A6 -L 4mm -R 4mm -T 4mm -B 0mm #{html_path} #{plan.pdf_path}")
 
 		renderer.option[:enable_hide] = true
 		renderer.render(tour, html_path)
-		system("wkhtmltopdf --disable-smart-shrinking -s A5 -O Landscape -L 4mm -R 4mm -T 4mm -B 0mm #{html_path} #{plan.public_pdf_path}")
+		# system("wkhtmltopdf --disable-smart-shrinking -s A5 -O Landscape -L 4mm -R 4mm -T 4mm -B 0mm #{html_path} #{plan.public_pdf_path}")
+		system("wkhtmltopdf --disable-smart-shrinking -s A6 -L 4mm -R 4mm -T 4mm -B 0mm #{html_path} #{plan.public_pdf_path}")
 
 		File.delete(html_path)
 		Dir.glob(File.join(File.dirname(html_path), "*.png")) do |path|
@@ -371,6 +368,7 @@ class TourPlan < ActiveRecord::Base
 		plotter.distance_max = (tour.total_distance + 10.0).to_i
 		plotter.elevation_min = (min / 100) * 100 - 100
 		plotter.elevation_max = [plotter.elevation_min + 1100, ((max - 1) / 100 + 1) * 100].max + 100
+		plotter.label = true
 		plotter.plot(tour, plan.altitude_graph_path)
 	end
 
