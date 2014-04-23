@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140423112218) do
+ActiveRecord::Schema.define(version: 20140423154924) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -137,6 +137,7 @@ ActiveRecord::Schema.define(version: 20140423112218) do
     t.time     "start_time"
     t.integer  "elevation"
     t.integer  "resource_set_id"
+    t.float    "planning_sheet_scale"
   end
 
   create_table "tour_results", force: true do |t|

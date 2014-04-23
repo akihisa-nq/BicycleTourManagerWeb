@@ -330,7 +330,10 @@ class TourPlan < ActiveRecord::Base
 		end
 
 		html_path = plan.pdf_path.sub(/\.pdf$/, ".html")
-		renderer = BTM::PlanHtmlRenderer.new(enable_hide: false, scale: 0.5)
+		renderer = BTM::PlanHtmlRenderer.new(
+			enable_hide: false,
+			scale: (plan.planning_sheet_scale || 0.8)
+			)
 
 		renderer.render(tour, html_path)
 		system("wkhtmltopdf --disable-smart-shrinking -s A5 -O Landscape -L 4mm -R 4mm -T 4mm -B 0mm #{html_path} #{plan.pdf_path}")

@@ -25,19 +25,27 @@
           </thead>
           <tbody>
             <tr>
+              <th>計画名</th>
               <td colspan="2"><%= text_field(:tour_plan, :name) %></td>
               <td></td>
             </tr>
             <tr>
+              <th>リソース セット</th>
               <td colspan="2"><%= collection_select(:tour_plan, :resource_set_id, ResourceSet.all, :id, :name) %></td>
               <td></td>
             </tr>
             <tr>
+              <th>工程表 文字スケール</th>
+              <td colspan="2"><%= text_field(:tour_plan, :planning_sheet_scale) %></td>
+              <td></td>
+            </tr>
+            <tr>
+              <th>開始時刻</th>
               <td class="btmw-time"><%= time_select(:tour_plan, :start_time) %></td>
               <td><%= time_zone_select(:tour_plan, :time_zone) %></td>
               <td></td>
             </tr>
-			<% @tour_plan.tour_plan_routes.each do |route|; @route = route %>
+            <% @tour_plan.tour_plan_routes.each do |route|; @route = route %>
             <% @route.tour_plan_paths.each.with_index do |path, i|; @path = path %>
             <tr>
               <% if i == 0 %>
@@ -45,7 +53,7 @@
               <% else %>
               <td></td>
               <% end %>
-              <td><%= text_field("path[]", :google_map_url) %></td>
+              <td colspan="2"><%= text_field("path[]", :google_map_url) %></td>
               <td>
                 <ul class="button-group round">
                   <li><a href="<%= @path.google_map_url %>" class="tiny button" target="_blank">表示</a></li>
@@ -56,13 +64,13 @@
             <% @path = nil; end %>
             <tr>
               <td></td>
-              <td><%= text_field("path_new[#{@route.id}]", :google_map_url) %></td>
+              <td colspan="2"><%= text_field("path_new[#{@route.id}]", :google_map_url) %></td>
               <td></td>
             </tr>
             <% @route = nil; end %>
             <tr>
               <td><%= text_field(:route_new, :name) %></td>
-              <td><%= text_field(:route_new, :google_map_url) %></td>
+              <td colspan="2"><%= text_field(:route_new, :google_map_url) %></td>
               <td></td>
             </tr>
           </tbody>
