@@ -96,7 +96,7 @@
 						<tr>
 							<th>獲得標高</th><td><%= tour.elevation.to_i %> m ぐらい</td>
 						</tr>
-						<% num = can?(:edit, TourResult) ? tour.tour_results.count : tour.tour_results.count_if {|r| r.published }; if num > 0 %>
+						<% num = can?(:edit, TourResult) ? tour.tour_results.count : tour.tour_results.where("published = 'true'").count; if num > 0 %>
 						<tr>
 							<th>走行記録</th><td><%= num %> 回</td>
 						</tr>
