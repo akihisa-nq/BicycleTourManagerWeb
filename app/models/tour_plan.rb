@@ -319,7 +319,7 @@ class TourPlan < ActiveRecord::Base
 		FileUtils.mkdir_p(File.dirname(plan.public_pdf_path))
 
 		# plotter.distance_max = 150.0
-		plotter.distance_max = 75.0
+		plotter.distance_max = 100.0
 		plotter.label = false
 
 		html_path = plan.pdf_path.sub(/\.pdf$/, ".html")
@@ -365,6 +365,8 @@ class TourPlan < ActiveRecord::Base
 		max ||= 1000
 
 		FileUtils.mkdir_p(File.dirname(plan.altitude_graph_path))
+		plotter.distance_offset = 0.0
+		plotter.waypoint_offset = 0
 		plotter.distance_max = (tour.total_distance + 10.0).to_i
 		plotter.elevation_min = (min / 100) * 100 - 100
 		plotter.elevation_max = [plotter.elevation_min + 1100, ((max - 1) / 100 + 1) * 100].max + 100
