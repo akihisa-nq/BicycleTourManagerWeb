@@ -48,7 +48,7 @@ class TourPlanController < ApplicationController
 	def show_pdf
 		tour_plan = TourPlan.edit_route_with_auth(current_user_or_guest, params[:id])
 		headers["Content-Type"] = "application/pdf"
-		render(:text => File.open(tour_plan.pdf_path, "rb") {|f| f.read }, :layout => false)
+		render(:text => File.open(tour_plan.pdf_path(params[:half] == "true"), "rb") {|f| f.read }, :layout => false)
 	end
 
 	def toggle_visible

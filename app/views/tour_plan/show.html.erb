@@ -109,6 +109,18 @@
 <% end %>
 <% end %>
 </ul>
+
+<% if can? :edit, TourPlan %>
+<ul id="pdf" data-dropdown-content class="f-dropdown">
+<li><%= link_to("A5", { action: :show_pdf, id: @tour_plan }, target: "_blank") %></li>
+<li><%= link_to("A6", { action: :show_pdf, id: @tour_plan, half: "true" }, target: "_blank") %></li>
+</ul>
+<% end %>
+
+<ul id="public_pdf" data-dropdown-content class="f-dropdown">
+<li><a href="<%= path_to_image(@tour_plan.public_pdf_url(false)) %>">A5</a></li>
+<li><a href="<%= path_to_image(@tour_plan.public_pdf_url(true)) %>">A6</a></li>
+</ul>
 <% end %>
 
 <% content_for :menus do %>
@@ -122,9 +134,9 @@
 <% if can? :edit, TourResult %>
 <li><a href="#" data-reveal-id="edit_menu">結果をアップロード</a></li>
 <% end %>
-<li class="active"><a href="<%= path_to_image(@tour_plan.public_pdf_url) %>">PDF で計画を表示</a></li>
+<li class="active"><a href="#" data-dropdown="public_pdf">PDF で計画を表示</a></li>
 <% if can? :edit, TourPlan %>
-<li class="active"><%= link_to("非公開 PDF の表示", { action: :show_pdf, id: @tour_plan }, target: "_blank") %></li>
+<li class="active"><a href="#" data-dropdown="pdf">非公開 PDF のダウンロード</a></li>
 <li class="active"><%= link_to("GPX のダウンロード", { action: :show_private_gpx, id: @tour_plan }) %></li>
 <li class="active"><%= link_to(@tour_plan.published ? "非公開" : "公開", {action: :toggle_visible, id: @tour_plan}, method: :post) %></li>
 <% end %>
