@@ -90,7 +90,7 @@ class TourResult < ActiveRecord::Base
 			end
 		end
 
-		tour.elevation = tour.total_elevation
+		tour_result.elevation = tour.total_elevation
 
 		# 公開
 		ExclusionArea.all.each do |area|
