@@ -45,8 +45,10 @@ class TourResult < ActiveRecord::Base
 				pri_route = tour_result.private_result_routes.build
 
 				logger.debug("check peak")
-				p.check_peak(offset)
+				p.check_distance_from_start(offset)
 				offset = p.steps.last.distance_from_start
+
+				BTM::Path.check_peak(p.steps)
 
 				logger.debug("check steps")
 				line_points = []
@@ -103,8 +105,10 @@ class TourResult < ActiveRecord::Base
 				pub_route = tour_result.public_result_routes.build
 
 				logger.debug("check peak")
-				p.check_peak(offset)
+				p.check_distance_from_start(offset)
 				offset = p.steps.last.distance_from_start
+
+				BTM::Path.check_peak(p.steps)
 
 				logger.debug("check steps")
 				line_points = []
