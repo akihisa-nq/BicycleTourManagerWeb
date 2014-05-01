@@ -282,8 +282,9 @@ class TourPlan < ActiveRecord::Base
 			end
 		end
 
-		# 開始点と終了点の設定
+		# 付加情報の設定
 		tour.set_start_end
+		tour.check_distance_from_start
 
 		# 獲得標高の保存
 		plan.elevation = tour.total_elevation
