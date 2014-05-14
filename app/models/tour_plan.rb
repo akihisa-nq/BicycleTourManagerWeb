@@ -163,7 +163,8 @@ class TourPlan < ActiveRecord::Base
 
 					btmw_route = parser.parse_uri(path.google_map_url)
 
-					btmw_route.path_list.each do |btmw_path|
+					btmw_route.path_list.each.with_index do |btmw_path, i|
+						next if route.tour_plan_points.count > 0 && i == 0
 						route.tour_plan_points.create(point: btmw_path.start.point_geos)
 					end
 
