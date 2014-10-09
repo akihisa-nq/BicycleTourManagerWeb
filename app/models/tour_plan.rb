@@ -383,6 +383,8 @@ class TourPlan < ActiveRecord::Base
 		# 各ノードの情報の保存
 		plan.tour_plan_routes.each do |route|
 			route.tour_plan_points.each do |pt|
+				next unless pt.tmp_info
+
 				pt.target_time = pt.tmp_info.time_target
 				pt.limit_time = pt.tmp_info.time
 				pt.distance = pt.tmp_info.distance_from_start
