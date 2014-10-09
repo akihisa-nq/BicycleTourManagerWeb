@@ -360,7 +360,13 @@ class TourPlan < ActiveRecord::Base
 			end
 
 			renderer.option[:enable_hide] = true
-			renderer.render(tour, html_path)
+	
+			begin
+				renderer.render(tour, html_path)
+			rescue => e
+				logger.fatal(e.backtrace.join("\n"))
+				return
+			end
 
 			if half
 				system("wkhtmltopdf --disable-smart-shrinking -s A6 -L 4mm -R 4mm -T 4mm -B 0mm #{html_path} #{plan.public_pdf_path(half)}")
