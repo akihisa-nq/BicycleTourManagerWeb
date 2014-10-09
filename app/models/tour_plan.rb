@@ -294,7 +294,12 @@ class TourPlan < ActiveRecord::Base
 
 		# 付加情報の設定
 		tour.set_start_end
-		tour.check_distance_from_start
+		begin
+			tour.check_distance_from_start
+		rescue => e
+			logger.fatal(e.backtrace.join("\n"))
+			return
+		end
 
 		# 獲得標高の保存
 		plan.elevation = tour.total_elevation
