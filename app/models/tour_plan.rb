@@ -222,7 +222,12 @@ class TourPlan < ActiveRecord::Base
 			end
 
 			# ルート探索
-			tour.routes.last.search_route(TourPlanCache, TourPlanCache)
+			begin
+				tour.routes.last.search_route(TourPlanCache, TourPlanCache)
+			rescue => e
+				logger.fatal(e.backtrace.join("\n"))
+				return
+			end
 
 			# ラインの設定
 			steps = tour.routes.last.flatten.map {|s| s.point_geos }
