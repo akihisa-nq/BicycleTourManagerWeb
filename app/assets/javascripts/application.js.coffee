@@ -1,6 +1,6 @@
 #= require jquery
 #= require jquery_ujs
-#= require jquery.ui.all
+#= require jquery-ui
 #= require foundation
 #= require jquery-layout
 #= require_tree .
