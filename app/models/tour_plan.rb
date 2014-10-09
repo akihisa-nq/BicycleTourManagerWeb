@@ -279,10 +279,14 @@ class TourPlan < ActiveRecord::Base
 
 				if i < tour.routes.last.path_list.count
 					node.tmp_info = tour.routes.last.path_list[i].steps[0]
-					node.tmp_info.info = info
+					if node.tmp_info
+						node.tmp_info.info = info
+					end
 				else
 					node.tmp_info = tour.routes.last.path_list.last.steps[-1]
-					node.tmp_info.info = info
+					if node.tmp_info
+						node.tmp_info.info = info
+					end
 					break
 				end
 			end
