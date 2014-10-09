@@ -230,7 +230,12 @@ class TourPlan < ActiveRecord::Base
 			end
 
 			# ラインの設定
-			steps = tour.routes.last.flatten.map {|s| s.point_geos }
+			begin
+				steps = tour.routes.last.flatten.map {|s| s.point_geos }
+			rescue => e
+				logger.fatal(e.backtrace.join("\n"))
+				return
+			end
 			route.private_line = BTM.factory.line_string(steps)
 
 			ExclusionArea.all.each do |area|
