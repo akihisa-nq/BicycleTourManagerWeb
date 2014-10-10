@@ -225,7 +225,7 @@ class TourPlan < ActiveRecord::Base
 			begin
 				tour.routes.last.search_route(TourPlanCache, TourPlanCache)
 			rescue => e
-				logger.fatal(e.backtrace.join("\n"))
+				logger.fatal(e.inspect)
 				return
 			end
 
@@ -233,7 +233,7 @@ class TourPlan < ActiveRecord::Base
 			begin
 				steps = tour.routes.last.flatten.map {|s| s.point_geos }
 			rescue => e
-				logger.fatal(e.backtrace.join("\n"))
+				logger.fatal(e.inspect)
 				return
 			end
 			route.private_line = BTM.factory.line_string(steps)
@@ -302,7 +302,7 @@ class TourPlan < ActiveRecord::Base
 		begin
 			tour.check_distance_from_start
 		rescue => e
-			logger.fatal(e.backtrace.join("\n"))
+			logger.fatal(e.inspect)
 			return
 		end
 
@@ -354,7 +354,7 @@ class TourPlan < ActiveRecord::Base
 			begin
 				renderer.render(tour, html_path)
 			rescue => e
-				logger.fatal(e.backtrace.join("\n"))
+				logger.fatal(e.inspect)
 				return
 			end
 
@@ -369,7 +369,7 @@ class TourPlan < ActiveRecord::Base
 			begin
 				renderer.render(tour, html_path)
 			rescue => e
-				logger.fatal(e.backtrace.join("\n"))
+				logger.fatal(e.inspect)
 				return
 			end
 
