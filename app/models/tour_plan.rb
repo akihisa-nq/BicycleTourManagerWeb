@@ -457,6 +457,7 @@ class TourPlan < ActiveRecord::Base
 
 		tour_plan_routes.each do |route|
 			tour.routes << BTM::Route.new
+			tour.routes.last.index = tour.routes.count
 			tour.routes.last.path_list << BTM::Path.new
 
 			line = nil
