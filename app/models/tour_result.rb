@@ -208,6 +208,7 @@ class TourResult < ActiveRecord::Base
 		list.each do |r|
 			tour.routes << BTM::Route.new
 			tour.routes.last.path_list << BTM::Path.new
+			tour.routes.last.index = tour.routes.count
 
 			case kind
 			when :route
@@ -215,6 +216,7 @@ class TourResult < ActiveRecord::Base
 					pt = BTM::Point.new(p.y, p.x)
 					tour.routes.last.path_list.last.steps << pt
 				end
+				tour.routes.last.path_list.last.way_points << r.path.points[0]
 
 			when :graph
 				r.result_points.each do |p|
@@ -222,7 +224,15 @@ class TourResult < ActiveRecord::Base
 					pt.time = p.time
 					tour.routes.last.path_list.last.steps << pt
 				end
+				tour.routes.last.path_list.last.way_points << r.result_points[0]
 			end
+		end
+
+		case kind
+		when :route
+			tour.routes.last.path_list.last.way_points << list.last.path.points.last
+		when :graph
+			tour.routes.last.path_list.last.way_points << list.last.result_points.last
 		end
 
 		tour.set_start_end

@@ -460,6 +460,11 @@ class TourPlan < ActiveRecord::Base
 			tour.routes.last.index = tour.routes.count
 			tour.routes.last.path_list << BTM::Path.new
 
+			route.tour_plan_points.each do |node|
+				wpt = BTM::Point.new(node.point.y, node.point.x)
+				tour.routes.last.path_list.last.way_points << wpt
+			end
+
 			line = nil
 			if is_public_data
 				line = route.public_line
