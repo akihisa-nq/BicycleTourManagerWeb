@@ -336,53 +336,43 @@ class TourPlan < ActiveRecord::Base
 		plotter.font = File.join(Rails.root, "vendor/font/mikachan-p.ttf")
 
 		# PDF の生成
-		[true, false].each do |half|
-			FileUtils.mkdir_p(File.dirname(plan.pdf_path(half)))
-			FileUtils.mkdir_p(File.dirname(plan.public_pdf_path(half)))
+		FileUtils.mkdir_p(File.dirname(plan.pdf_path()))
+		FileUtils.mkdir_p(File.dirname(plan.public_pdf_path()))
 
-			plotter.distance_max = half ? 100.0 : 160.0
-			plotter.label = false
+		plotter.distance_max = 160.0
+		plotter.label = false
 
-			html_path = plan.pdf_path(half).sub(/\.pdf$/, ".html")
-			renderer = BTM::PlanHtmlRenderer.new(
-				plotter,
-				enable_hide: false,
-				scale: (plan.planning_sheet_scale || 0.8),
-				format: (half ? :half : :standard)
-				)
+		html_path = plan.pdf_path().sub(/\.pdf$/, ".html")
+		renderer = BTM::PlanHtmlRenderer.new(
+			plotter,
+			enable_hide: false,
+			scale: (plan.planning_sheet_scale || 0.8)
+			)
 
-			begin
-				renderer.render(tour, html_path)
-			rescue => e
-				logger.fatal(e.inspect)
-				return
-			end
+		begin
+			renderer.render(tour, html_path)
+		rescue => e
+			logger.fatal(e.inspect)
+			logger.fatal(e.backtrace)
+			return
+		end
 
-			if half
-				system("wkhtmltopdf --disable-smart-shrinking -s A6 -L 4mm -R 4mm -T 4mm -B 0mm #{html_path} #{plan.pdf_path(half)}")
-			else
-				system("wkhtmltopdf --disable-smart-shrinking -s A5 -O Landscape -L 4mm -R 4mm -T 4mm -B 0mm #{html_path} #{plan.pdf_path(half)}")
-			end
+		system("wkhtmltopdf --disable-smart-shrinking -s A4 -O Landscape -L 0mm -R 0mm -T 4mm -B 0mm #{html_path} #{plan.pdf_path()}")
 
-			renderer.option[:enable_hide] = true
+		renderer.option[:enable_hide] = true
 	
-			begin
-				renderer.render(tour, html_path)
-			rescue => e
-				logger.fatal(e.inspect)
-				return
-			end
+		begin
+			renderer.render(tour, html_path)
+		rescue => e
+			logger.fatal(e.inspect)
+			return
+		end
 
-			if half
-				system("wkhtmltopdf --disable-smart-shrinking -s A6 -L 4mm -R 4mm -T 4mm -B 0mm #{html_path} #{plan.public_pdf_path(half)}")
-			else
-				system("wkhtmltopdf --disable-smart-shrinking -s A5 -O Landscape -L 4mm -R 4mm -T 4mm -B 0mm #{html_path} #{plan.public_pdf_path(half)}")
-			end
+		system("wkhtmltopdf --disable-smart-shrinking -s A4 -O Landscape -L 0mm -R 0mm -T 4mm -B 0mm #{html_path} #{plan.public_pdf_path()}")
 
-			File.delete(html_path)
-			Dir.glob(File.join(File.dirname(html_path), "*.png")) do |path|
-				File.delete(path)
-			end
+		# File.delete(html_path)
+		Dir.glob(File.join(File.dirname(html_path), "*.png")) do |path|
+			File.delete(path)
 		end
 
 		# 各ノードの情報の保存
@@ -432,22 +422,22 @@ class TourPlan < ActiveRecord::Base
 		"/generated/tour_plan/altitude_graph/#{id}.png"
 	end
 
-	def pdf_name(half)
-		name = id.to_s + (half ? "_half" : "") + ".pdf"
+	def pdf_name()
+		name = id.to_s + ".pdf"
 	end
 
-	def pdf_path(half)
+	def pdf_path()
 		private_root = File.join(Rails.root, "private")
-		File.join(private_root, "tour_plan/pdf/#{pdf_name(half)}")
+		File.join(private_root, "tour_plan/pdf/#{pdf_name()}")
 	end
 
-	def public_pdf_url(half)
-		"/generated/tour_plan/pdf/#{pdf_name(half)}"
+	def public_pdf_url()
+		"/generated/tour_plan/pdf/#{pdf_name()}"
 	end
 
-	def public_pdf_path(half)
+	def public_pdf_path()
 		public_root = File.join(Rails.root, "public")
-		File.join(public_root, public_pdf_url(half))
+		File.join(public_root, public_pdf_url())
 	end
 
 	def to_tour(is_public_data)

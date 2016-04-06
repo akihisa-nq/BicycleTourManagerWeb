@@ -112,14 +112,12 @@
 
 <% if can? :edit, TourPlan %>
 <ul id="pdf" data-dropdown-content class="f-dropdown">
-<li><%= link_to("A5", { action: :show_pdf, id: @tour_plan }, target: "_blank") %></li>
-<li><%= link_to("A6", { action: :show_pdf, id: @tour_plan, half: "true" }, target: "_blank") %></li>
+<li><%= link_to("A7", { action: :show_pdf, id: @tour_plan }, target: "_blank") %></li>
 </ul>
 <% end %>
 
 <ul id="public_pdf" data-dropdown-content class="f-dropdown">
-<li><a href="<%= path_to_image(@tour_plan.public_pdf_url(false)) %>">A5</a></li>
-<li><a href="<%= path_to_image(@tour_plan.public_pdf_url(true)) %>">A6</a></li>
+<li><a href="<%= path_to_image(@tour_plan.public_pdf_url()) %>">A7</a></li>
 </ul>
 <% end %>
 
