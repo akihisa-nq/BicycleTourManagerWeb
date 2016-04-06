@@ -31,6 +31,7 @@ gem "jquery-ui-rails"
 gem "jquery-turbolinks"
 gem "sass-rails", '~> 4.0.0', '>= 4.0.2'
 gem "coffee-rails"
+gem 'coffee-script-source', '= 1.8.0'
 gem "turbolinks"
 gem "devise"
 gem "cancan"
@@ -41,5 +42,7 @@ gem "will_paginate", :git => %Q|https://github.com/mislav/will_paginate.git|
 
 gem "jquery-layout-rails"
 gem "modernizr-rails"
-gem "foundation-rails"
+gem "foundation-rails", "= 5.4.5.0"
 gem "will_paginate-foundation"
+
+gem "rgeo", "= 0.3.20"

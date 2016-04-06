@@ -3,5 +3,7 @@ vendor/bundle
 log/*.log
 tmp
 setup.bat
+public/assets
 public/generated
 private
+cacert.pem
