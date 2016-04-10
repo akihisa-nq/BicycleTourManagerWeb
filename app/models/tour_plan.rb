@@ -370,7 +370,7 @@ class TourPlan < ActiveRecord::Base
 
 		system("wkhtmltopdf --disable-smart-shrinking -s A4 -O Landscape -L 0mm -R 0mm -T 4mm -B 0mm #{html_path} #{plan.public_pdf_path()}")
 
-		# File.delete(html_path)
+		File.delete(html_path)
 		Dir.glob(File.join(File.dirname(html_path), "*.png")) do |path|
 			File.delete(path)
 		end
