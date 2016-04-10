@@ -357,7 +357,7 @@ class TourPlan < ActiveRecord::Base
 			return
 		end
 
-		system("wkhtmltopdf --disable-smart-shrinking -s A4 -O Landscape -L 0mm -R 0mm -T 4mm -B 0mm #{html_path} #{plan.pdf_path()}")
+		system("wkhtmltopdf --disable-smart-shrinking -s A4 -O Landscape -L 30mm -R 30mm -T 4mm -B 4mm #{html_path} #{plan.pdf_path()}")
 
 		renderer.option[:enable_hide] = true
 	
@@ -368,7 +368,7 @@ class TourPlan < ActiveRecord::Base
 			return
 		end
 
-		system("wkhtmltopdf --disable-smart-shrinking -s A4 -O Landscape -L 0mm -R 0mm -T 4mm -B 0mm #{html_path} #{plan.public_pdf_path()}")
+		system("wkhtmltopdf --disable-smart-shrinking -s A4 -O Landscape -L 30mm -R 30mm -T 4mm -B 4mm #{html_path} #{plan.public_pdf_path()}")
 
 		File.delete(html_path)
 		Dir.glob(File.join(File.dirname(html_path), "*.png")) do |path|
