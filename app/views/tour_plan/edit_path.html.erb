@@ -57,7 +57,7 @@
               <td>
                 <ul class="button-group round">
                   <li><a href="<%= @path.google_map_url %>" class="tiny button" target="_blank">表示</a></li>
-                  <li><%= link_to("削除", {action: :destroy_path, tour_plan_id: @tour_plan.id, id: @path}, method: :delete, class: "tiny button") %></li>
+                  <li><%= link_to("削除", {action: :destroy_path, tour_plan_id: @tour_plan.id, id: @path}, method: :delete, data: { confirm: "削除しますか?" }, class: "tiny button") %></li>
                 </ul>
               </td>
             </tr>
