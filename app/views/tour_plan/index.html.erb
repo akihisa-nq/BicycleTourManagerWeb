@@ -74,13 +74,12 @@
                 <li><%= link_to("パスの編集", action: :edit_path, id: tour) %></li>
                 <li><%= link_to("ノードの編集", action: :edit_node, id: tour) %></li>
                 <li><%= link_to("生成", { action: :generate, id: tour }, method: :post) %></li>
-                <li><%= link_to("PDF の表示 (A5)", { action: :show_pdf, id: tour }, target: "_blank") %></li>
-                <li><%= link_to("PDF の表示 (A6)", { action: :show_pdf, id: tour, half: "true" }, target: "_blank") %></li>
+                <li><%= link_to("PDF の表示", { action: :show_pdf, id: tour }, target: "_blank") %></li>
 				<li><%= link_to("GPX のダウンロード", { action: :show_private_gpx, id: tour }) %></li>
                 <li><%= link_to(tour.published ? "非公開" : "公開", {action: :toggle_visible, id: tour}, method: :post) %></li>
                 <% end %>
                 <% if can? :delete, TourPlan %>
-                <li><%= link_to("削除", {action: :destroy, id: tour}, method: :delete, confirm: "削除しますか?") %></li>
+				<li><%= link_to("削除", {action: :destroy, id: tour}, method: :delete, data: { confirm: "削除しますか?" }) %></li>
                 <% end %>
               </ul>
               <% end %>

@@ -16,7 +16,7 @@
         <td>
           <ul class="button-group round" id="menu_<%= area.id %>">
             <li><a href="javascript:EditColumn(<%= area.id %>);" class="tiny button">編集</a></li>
-            <li><%= link_to("削除", {action: :destroy_exclusion_area, id: area.id}, confirm: "削除しますか?", method: :delete, class: "tiny button") %></li>
+			<li><%= link_to("削除", {action: :destroy_exclusion_area, id: area.id}, data: { confirm: "削除しますか?" }, method: :delete, class: "tiny button") %></li>
           </ul>
         </td>
       </tr>

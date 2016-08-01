@@ -131,7 +131,7 @@
 <% @tour_result.tour_images.each.with_index do |img, i| %>
 <ul id="manage_<%= img.id %>" data-dropdown-content class="f-dropdown">
   <% if can?(:delete, TourResult) %>
-  <li><%= link_to("削除", {action: :destroy_image, id: @tour_result, image_id: img}, method: :delete, confirm: "削除しますか?") %></li>
+  <li><%= link_to("削除", {action: :destroy_image, id: @tour_result, image_id: img}, method: :delete, data: { confirm: "削除しますか?" }) %></li>
   <% end %>
   <% if can?(:edit, TourResult) %>
   <li><a href="javascript:editText(<%= img.id %>);">テキストの編集</a></li>
@@ -156,7 +156,7 @@
 <li class="active"><%= link_to(@tour_result.published ? "非公開" : "公開", {action: :toggle_visible, id: @tour_result}, method: :post) %></li>
 <% end %>
 <% if can? :delete, TourResult %>
-<li class="active"><%= link_to("削除", {action: :destroy, id: @tour_result}, method: :delete, confirm: "削除しますか?") %></li>
+<li class="active"><%= link_to("削除", {action: :destroy, id: @tour_result}, method: :delete, data: { confirm: "削除しますか?" }) %></li>
 <% end %>
 <% end %>
 

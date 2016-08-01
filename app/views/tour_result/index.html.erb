@@ -49,7 +49,7 @@
               <% if can?(:delete, TourResult) || can?(:edit, TourResult) %>
 			  <ul id="manage_<%= tour.id %>" data-dropdown-content class="f-dropdown">
                 <% if can? :delete, TourResult %>
-                <li><%= link_to("削除", {action: :destroy, id: tour}, method: :delete, confirm: "削除しますか?") %></li>
+				<li><%= link_to("削除", {action: :destroy, id: tour}, method: :delete, data: { confirm: "削除しますか?" }) %></li>
                 <% end %>
                 <% if can? :edit, TourResult %>
                 <li><%= link_to(tour.published ? "非公開" : "公開", {action: :toggle_visible, id: tour}, method: :post) %></li>

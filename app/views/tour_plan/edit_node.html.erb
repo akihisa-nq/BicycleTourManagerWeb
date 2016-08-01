@@ -10,7 +10,7 @@
 
 <% content_for(:manage) do %>
 <% if can? :delete, TourPlan %>
-<li class="active"><%= link_to("削除", {action: :destroy, id: @tour_route.tour_plan.id}, method: :delete, confirm: "削除しますか?") %></li>
+<li class="active"><%= link_to("削除", {action: :destroy, id: @tour_route.tour_plan.id}, method: :delete, data: { confirm: "削除しますか?" }) %></li>
 <% end %>
 <% end %>
 
