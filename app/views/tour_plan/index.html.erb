@@ -73,7 +73,8 @@
                 <% if can? :edit, TourPlan %>
                 <li><%= link_to("パスの編集", action: :edit_path, id: tour) %></li>
                 <li><%= link_to("ノードの編集", action: :edit_node, id: tour) %></li>
-                <li><%= link_to("生成", { action: :generate, id: tour }, method: :post) %></li>
+                <li><%= link_to("簡易生成", { action: :generate, id: tour, make_pdf: 0 }, method: :post) %></li>
+                <li><%= link_to("生成", { action: :generate, id: tour, make_pdf: 1 }, method: :post) %></li>
                 <li><%= link_to("PDF の表示", { action: :show_pdf, id: tour }, target: "_blank") %></li>
 				<li><%= link_to("GPX のダウンロード", { action: :show_private_gpx, id: tour }) %></li>
                 <li><%= link_to(tour.published ? "非公開" : "公開", {action: :toggle_visible, id: tour}, method: :post) %></li>

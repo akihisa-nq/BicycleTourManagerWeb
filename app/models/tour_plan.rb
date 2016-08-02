@@ -201,7 +201,7 @@ class TourPlan < ActiveRecord::Base
 	end
 
 	class TourPlanGenerator
-		def initialize(id)
+		def initialize(id, make_pdf)
 			@plan = TourPlan.find(id)
 			@parser = BTM::GoogleMapUriParser.new(TourPlanCache)
 			@tour = BTM::Tour.new
@@ -213,7 +213,7 @@ class TourPlan < ActiveRecord::Base
 			@plotter.label = false
 
 			@renderer = BTM::PlanHtmlRenderer.new(
-				@plotter,
+				make_pdf ? @plotter : nil,
 				enable_hide: false,
 				scale: (@plan.planning_sheet_scale || 0.8)
 				)
@@ -432,17 +432,22 @@ class TourPlan < ActiveRecord::Base
 		end
 	end
 
-	def self.generate(id)
+	def self.generate(id, make_pdf)
 		begin
-			generator = TourPlanGenerator.new(id)
+			generator = TourPlanGenerator.new(id, make_pdf)
 			generator.setup_plan
 			generator.calculate_additional_info
 			generator.calculate_resource_management
 
 			generator.generate_html(false)
-			generator.generate_pdf(false)
+			if make_pdf
+				generator.generate_pdf(false)
+			end
+
 			generator.generate_html(true)
-			generator.generate_pdf(true)
+			if make_pdf
+				generator.generate_pdf(true)
+			end
 
 			generator.cleanup
 			generator.save_node_infos
@@ -453,9 +458,9 @@ class TourPlan < ActiveRecord::Base
 		end
 	end
 
-	def self.geneate_with_auth(user, id)
+	def self.geneate_with_auth(user, id, make_pdf)
 		if user.can?(:edit, TourPlan)
-			generate(id)
+			generate(id, make_pdf)
 		end
 	end
 

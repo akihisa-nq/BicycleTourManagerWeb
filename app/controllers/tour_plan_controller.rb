@@ -57,7 +57,7 @@ class TourPlanController < ApplicationController
 	end
 
 	def generate
-		TourPlan.geneate_with_auth(current_user_or_guest, params[:id])
+		TourPlan.geneate_with_auth(current_user_or_guest, params[:id], params[:make_pdf] == "1")
 		redirect_to( action: :show, id: params[:id])
 	end
 
