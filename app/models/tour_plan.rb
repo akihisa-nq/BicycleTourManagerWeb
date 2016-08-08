@@ -74,38 +74,38 @@ class TourPlanGenerator
 					target_speed = node.target_speed
 				end
 
-				info = BTM::NodeInfo.new
-				info.text = "★#{i + 1} : " + (node.comment || "") 
-				info.name = node.name
-				info.road = node.road
-				info.orig = node.dir_src
-				info.dest = node.dir_dest
-				info.limit_speed = limit_speed
-				info.target_speed = target_speed
-
-				ExclusionArea.all.each do |area|
-					pt1 = BTM::Point.new(area.point.y, area.point.x)
-					pt2 = BTM::Point.new(node.point.y, node.point.x)
-					if pt1.distance(pt2) < area.distance
-						info.hide = true
-						break
-					end
-				end
-
-				if node.rest_time
-					info.rest_time = node.rest_time
-				end
-
-				if i < @tour.routes.last.path_list.count
-					node.tmp_info = @tour.routes.last.path_list[i].steps[0]
-					if node.tmp_info
-						node.tmp_info.info = info
-					end
+				if i == 0
+					node.tmp_info = @tour.routes.last.path_list[0].start
 				else
-					node.tmp_info = @tour.routes.last.path_list.last.steps[-1]
-					if node.tmp_info
-						node.tmp_info.info = info
+					node.tmp_info = @tour.routes.last.path_list[i - 1].end
+				end
+
+				if node.tmp_info
+					info = node.tmp_info.info
+
+					info.text = "★#{i + 1} : " + (node.comment || "") 
+					info.name = node.name
+					info.road = node.road
+					info.orig = node.dir_src
+					info.dest = node.dir_dest
+					info.limit_speed = limit_speed
+					info.target_speed = target_speed
+
+					ExclusionArea.all.each do |area|
+						pt1 = BTM::Point.new(area.point.y, area.point.x)
+						pt2 = BTM::Point.new(node.point.y, node.point.x)
+						if pt1.distance(pt2) < area.distance
+							info.hide = true
+							break
+						end
 					end
+
+					if node.rest_time
+						info.rest_time = node.rest_time
+					end
+				end
+
+				if i >= @tour.routes.last.path_list.count
 					break
 				end
 			end
@@ -434,7 +434,7 @@ class TourPlan < ActiveRecord::Base
 
 	def self.generate(id, make_pdf)
 		begin
-			generator = TourPlanGenerator.new(id)
+			generator = TourPlanGenerator.new(id, make_pdf)
 			generator.setup_plan
 			generator.calculate_additional_info
 			generator.calculate_resource_management
