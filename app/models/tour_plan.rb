@@ -2,6 +2,238 @@
 
 require "bicycle_tour_manager"
 
+class TourPlanGenerator
+	def initialize(id, make_pdf)
+		@plan = TourPlan.find(id)
+		@parser = BTM::GoogleMapUriParser.new(TourPlanCache)
+		@tour = BTM::Tour.new
+		@tour.start_date = @plan.start_time_local
+
+		@plotter = BTM::AltitudePloter.new("gnuplot", File.join(Rails.root, "tmp"))
+		@plotter.font = File.join(Rails.root, "vendor/font/mikachan-p.ttf")
+		@plotter.distance_max = 160.0
+		@plotter.label = false
+
+		@renderer = BTM::PlanHtmlRenderer.new(
+			make_pdf ? @plotter : nil,
+			enable_hide: false,
+			scale: (@plan.planning_sheet_scale || 0.8)
+			)
+	end
+
+	def setup_plan
+		limit_speed = 15.0
+		target_speed = 15.0
+
+		@plan.tour_plan_routes.each.with_index do |route, i|
+			@tour.routes << BTM::Route.new
+			@tour.routes.last.index = i + 1
+
+			# URL 解析
+			route.tour_plan_paths.each do |path|
+				next if path.google_map_url.nil? || path.google_map_url.empty?
+				@tour.routes.last.path_list.concat(@parser.parse_uri(path.google_map_url).path_list)
+			end
+
+			# ルート探索
+			begin
+				@tour.routes.last.search_route(TourPlanCache, TourPlanCache)
+			rescue => e
+				TourPlan::logger.fatal(e.inspect)
+				raise e
+			end
+
+			# ラインの設定
+			begin
+				steps = @tour.routes.last.flatten.map {|s| s.point_geos }
+			rescue => e
+				TourPlan::logger.fatal(e.inspect)
+				raise e
+			end
+			route.private_line = BTM.factory.line_string(steps)
+
+			ExclusionArea.all.each do |area|
+				steps.delete_if do |p|
+					pt1 = BTM::Point.new(area.point.y, area.point.x)
+					pt2 = BTM::Point.new(p.y, p.x)
+					pt1.distance(pt2) < area.distance
+				end
+			end
+
+			route.public_line = BTM.factory.line_string(steps)
+
+			route.save!
+
+			# ノード情報の割り当て
+			route.tour_plan_points.each.with_index do |node, i|
+				if node.limit_speed && node.limit_speed > 0.0
+					limit_speed = node.limit_speed
+				end
+
+				if node.target_speed && node.target_speed > 0.0
+					target_speed = node.target_speed
+				end
+
+				info = BTM::NodeInfo.new
+				info.text = "★#{i + 1} : " + (node.comment || "") 
+				info.name = node.name
+				info.road = node.road
+				info.orig = node.dir_src
+				info.dest = node.dir_dest
+				info.limit_speed = limit_speed
+				info.target_speed = target_speed
+
+				ExclusionArea.all.each do |area|
+					pt1 = BTM::Point.new(area.point.y, area.point.x)
+					pt2 = BTM::Point.new(node.point.y, node.point.x)
+					if pt1.distance(pt2) < area.distance
+						info.hide = true
+						break
+					end
+				end
+
+				if node.rest_time
+					info.rest_time = node.rest_time
+				end
+
+				if i < @tour.routes.last.path_list.count
+					node.tmp_info = @tour.routes.last.path_list[i].steps[0]
+					if node.tmp_info
+						node.tmp_info.info = info
+					end
+				else
+					node.tmp_info = @tour.routes.last.path_list.last.steps[-1]
+					if node.tmp_info
+						node.tmp_info.info = info
+					end
+					break
+				end
+			end
+		end
+	end
+
+	def calculate_additional_info
+		# 付加情報の設定
+		@tour.set_start_end
+		begin
+			@tour.check_distance_from_start
+		rescue => e
+			TourPlan::logger.fatal(e.inspect)
+			return
+		end
+
+		# 獲得標高の保存
+		@plan.elevation = @tour.total_elevation
+		@plan.save!
+	end
+
+	def calculate_resource_management
+		if @plan.resource_set
+			@plan.resource_set.resource_entries.each do |res|
+				@tour.resources << BTM::Resource.new(
+					res.resource.name,
+					res.amount,
+					res.recovery_interval * 3600,
+					res.buffer
+					)
+			end
+
+			@plan.resource_set.device_entries.each do |dev|
+				@tour.schedule << BTM::Schedule.new(
+					"#{dev.device.name} #{dev.purpose} 交換",
+					dev.use_on_start ? @tour.start_date : dev.start_time,
+					dev.device.interval * 3600,
+					dev.device.resource.name,
+					dev.device.consumption
+					)
+			end
+		end
+	end
+
+	def generate_html(public_pdf)
+		pdf_path = nil
+		if public_pdf
+			pdf_path = @plan.public_pdf_path()
+			@renderer.option[:enable_hide] = true
+		else
+			pdf_path = @plan.pdf_path()
+			@renderer.option[:enable_hide] = false
+		end
+
+		html_path = pdf_path.sub(/\.pdf$/, ".html")
+
+		begin
+			@renderer.render(@tour, html_path)
+		rescue => e
+			TourPlan::logger.fatal(e.inspect)
+			TourPlan::logger.fatal(e.backtrace)
+			raise e
+		end
+	end
+
+	def generate_pdf(public_pdf)
+		pdf_path = nil
+		if public_pdf
+			pdf_path = @plan.public_pdf_path()
+		else
+			pdf_path = @plan.pdf_path()
+		end
+
+		html_path = @plan.pdf_path().sub(/\.pdf$/, ".html")
+
+		# PDF の生成
+		FileUtils.mkdir_p(File.dirname(pdf_path))
+		system("wkhtmltopdf --disable-smart-shrinking -s A4 -O Landscape -L 25mm -R 25mm -T 4mm -B 4mm #{html_path} #{pdf_path}")
+	end
+
+	def cleanup
+		html_path = @plan.pdf_path().sub(/\.pdf$/, ".html")
+		File.delete(html_path)
+
+		html_path = @plan.public_pdf_path().sub(/\.pdf$/, ".html")
+		File.delete(html_path)
+
+		Dir.glob(File.join(File.dirname(html_path), "*.png")) do |path|
+			File.delete(path)
+		end
+	end
+
+	def save_node_infos
+		# 各ノードの情報の保存
+		@plan.tour_plan_routes.each do |route|
+			route.tour_plan_points.each do |pt|
+				next unless pt.tmp_info
+
+				pt.target_time = pt.tmp_info.time_target
+				pt.limit_time = pt.tmp_info.time
+				pt.distance = pt.tmp_info.distance_from_start
+				pt.elevation = pt.tmp_info.ele
+				pt.save!
+			end
+		end
+	end
+
+	def plot_whole_altitude_image
+		# 全体画像の生成
+		ExclusionArea.all.each do |area|
+			@tour.delete_by_distance(area.point, area.distance)
+		end
+
+		min, max = *@tour.elevation_minmax
+		min ||= 0
+		max ||= 1000
+
+		FileUtils.mkdir_p(File.dirname(@plan.altitude_graph_path))
+		@plotter.distance_offset = 0.0
+		@plotter.waypoint_offset = 0
+		@plotter.distance_max = (@tour.total_distance + 10.0).to_i
+		@plotter.elevation_min = (min / 100) * 100 - 100
+		@plotter.elevation_max = [@plotter.elevation_min + 1100, ((max - 1) / 100 + 1) * 100].max + 100
+		@plotter.label = true
+		@plotter.plot(@tour, @plan.altitude_graph_path)
+	end
+end
+
 class TourPlan < ActiveRecord::Base
 	has_many :tour_plan_routes, -> { order("position ASC") }
 	has_many :tour_results, -> { order("start_time DESC") }
@@ -200,241 +432,9 @@ class TourPlan < ActiveRecord::Base
 		end
 	end
 
-	class TourPlanGenerator
-		def initialize(id, make_pdf)
-			@plan = TourPlan.find(id)
-			@parser = BTM::GoogleMapUriParser.new(TourPlanCache)
-			@tour = BTM::Tour.new
-			@tour.start_date = @plan.start_time_local
-
-			@plotter = BTM::AltitudePloter.new("gnuplot", File.join(Rails.root, "tmp"))
-			@plotter.font = File.join(Rails.root, "vendor/font/mikachan-p.ttf")
-			@plotter.distance_max = 160.0
-			@plotter.label = false
-
-			@renderer = BTM::PlanHtmlRenderer.new(
-				make_pdf ? @plotter : nil,
-				enable_hide: false,
-				scale: (@plan.planning_sheet_scale || 0.8)
-				)
-		end
-
-		def setup_plan
-			limit_speed = 15.0
-			target_speed = 15.0
-
-			@plan.tour_plan_routes.each.with_index do |route, i|
-				@tour.routes << BTM::Route.new
-				@tour.routes.last.index = i + 1
-
-				# URL 解析
-				route.tour_plan_paths.each do |path|
-					next if path.google_map_url.nil? || path.google_map_url.empty?
-					@tour.routes.last.path_list.concat(@parser.parse_uri(path.google_map_url).path_list)
-				end
-
-				# ルート探索
-				begin
-					@tour.routes.last.search_route(TourPlanCache, TourPlanCache)
-				rescue => e
-					TourPlan::logger.fatal(e.inspect)
-					raise e
-				end
-
-				# ラインの設定
-				begin
-					steps = @tour.routes.last.flatten.map {|s| s.point_geos }
-				rescue => e
-					TourPlan::logger.fatal(e.inspect)
-					raise e
-				end
-				route.private_line = BTM.factory.line_string(steps)
-
-				ExclusionArea.all.each do |area|
-					steps.delete_if do |p|
-						pt1 = BTM::Point.new(area.point.y, area.point.x)
-						pt2 = BTM::Point.new(p.y, p.x)
-						pt1.distance(pt2) < area.distance
-					end
-				end
-
-				route.public_line = BTM.factory.line_string(steps)
-
-				route.save!
-
-				# ノード情報の割り当て
-				route.tour_plan_points.each.with_index do |node, i|
-					if node.limit_speed && node.limit_speed > 0.0
-						limit_speed = node.limit_speed
-					end
-
-					if node.target_speed && node.target_speed > 0.0
-						target_speed = node.target_speed
-					end
-
-					info = BTM::NodeInfo.new
-					info.text = "★#{i + 1} : " + (node.comment || "") 
-					info.name = node.name
-					info.road = node.road
-					info.orig = node.dir_src
-					info.dest = node.dir_dest
-					info.limit_speed = limit_speed
-					info.target_speed = target_speed
-
-					ExclusionArea.all.each do |area|
-						pt1 = BTM::Point.new(area.point.y, area.point.x)
-						pt2 = BTM::Point.new(node.point.y, node.point.x)
-						if pt1.distance(pt2) < area.distance
-							info.hide = true
-							break
-						end
-					end
-
-					if node.rest_time
-						info.rest_time = node.rest_time
-					end
-
-					if i < @tour.routes.last.path_list.count
-						node.tmp_info = @tour.routes.last.path_list[i].steps[0]
-						if node.tmp_info
-							node.tmp_info.info = info
-						end
-					else
-						node.tmp_info = @tour.routes.last.path_list.last.steps[-1]
-						if node.tmp_info
-							node.tmp_info.info = info
-						end
-						break
-					end
-				end
-			end
-		end
-
-		def calculate_additional_info
-			# 付加情報の設定
-			@tour.set_start_end
-			begin
-				@tour.check_distance_from_start
-			rescue => e
-				TourPlan::logger.fatal(e.inspect)
-				return
-			end
-
-			# 獲得標高の保存
-			@plan.elevation = @tour.total_elevation
-			@plan.save!
-		end
-
-		def calculate_resource_management
-			if @plan.resource_set
-				@plan.resource_set.resource_entries.each do |res|
-					@tour.resources << BTM::Resource.new(
-						res.resource.name,
-						res.amount,
-						res.recovery_interval * 3600,
-						res.buffer
-						)
-				end
-
-				@plan.resource_set.device_entries.each do |dev|
-					@tour.schedule << BTM::Schedule.new(
-						"#{dev.device.name} #{dev.purpose} 交換",
-						dev.use_on_start ? @tour.start_date : dev.start_time,
-						dev.device.interval * 3600,
-						dev.device.resource.name,
-						dev.device.consumption
-						)
-				end
-			end
-		end
-
-		def generate_html(public_pdf)
-			pdf_path = nil
-			if public_pdf
-				pdf_path = @plan.public_pdf_path()
-				@renderer.option[:enable_hide] = true
-			else
-				pdf_path = @plan.pdf_path()
-				@renderer.option[:enable_hide] = false
-			end
-
-			html_path = pdf_path.sub(/\.pdf$/, ".html")
-
-			begin
-				@renderer.render(@tour, html_path)
-			rescue => e
-				TourPlan::logger.fatal(e.inspect)
-				TourPlan::logger.fatal(e.backtrace)
-				raise e
-			end
-		end
-
-		def generate_pdf(public_pdf)
-			pdf_path = nil
-			if public_pdf
-				pdf_path = @plan.public_pdf_path()
-			else
-				pdf_path = @plan.pdf_path()
-			end
-
-			html_path = @plan.pdf_path().sub(/\.pdf$/, ".html")
-
-			# PDF の生成
-			FileUtils.mkdir_p(File.dirname(pdf_path))
-			system("wkhtmltopdf --disable-smart-shrinking -s A4 -O Landscape -L 25mm -R 25mm -T 4mm -B 4mm #{html_path} #{pdf_path}")
-		end
-
-		def cleanup
-			html_path = @plan.pdf_path().sub(/\.pdf$/, ".html")
-			File.delete(html_path)
-
-			html_path = @plan.public_pdf_path().sub(/\.pdf$/, ".html")
-			File.delete(html_path)
-
-			Dir.glob(File.join(File.dirname(html_path), "*.png")) do |path|
-				File.delete(path)
-			end
-		end
-
-		def save_node_infos
-			# 各ノードの情報の保存
-			@plan.tour_plan_routes.each do |route|
-				route.tour_plan_points.each do |pt|
-					next unless pt.tmp_info
-
-					pt.target_time = pt.tmp_info.time_target
-					pt.limit_time = pt.tmp_info.time
-					pt.distance = pt.tmp_info.distance_from_start
-					pt.elevation = pt.tmp_info.ele
-					pt.save!
-				end
-			end
-		end
-
-		def plot_whole_altitude_image
-			# 全体画像の生成
-			ExclusionArea.all.each do |area|
-				@tour.delete_by_distance(area.point, area.distance)
-			end
-
-			min, max = *@tour.elevation_minmax
-			min ||= 0
-			max ||= 1000
-
-			FileUtils.mkdir_p(File.dirname(@plan.altitude_graph_path))
-			@plotter.distance_offset = 0.0
-			@plotter.waypoint_offset = 0
-			@plotter.distance_max = (@tour.total_distance + 10.0).to_i
-			@plotter.elevation_min = (min / 100) * 100 - 100
-			@plotter.elevation_max = [@plotter.elevation_min + 1100, ((max - 1) / 100 + 1) * 100].max + 100
-			@plotter.label = true
-			@plotter.plot(@tour, @plan.altitude_graph_path)
-		end
-	end
-
 	def self.generate(id, make_pdf)
 		begin
-			generator = TourPlanGenerator.new(id, make_pdf)
+			generator = TourPlanGenerator.new(id)
 			generator.setup_plan
 			generator.calculate_additional_info
 			generator.calculate_resource_management
