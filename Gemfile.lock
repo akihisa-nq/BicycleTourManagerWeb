@@ -9,9 +9,9 @@ GIT
 
 GIT
   remote: https://github.com/amerine/acts_as_tree.git
-  revision: 657bde6e6018bb1db9e1d7cd9d4b92d70942ae66
+  revision: 7a2d305d23d08fe111f5f0ab84626c09becdb7d7
   specs:
-    acts_as_tree (2.4.0)
+    acts_as_tree (2.5.0)
       activerecord (>= 3.0.0)
 
 GIT
@@ -22,7 +22,7 @@ GIT
 
 GIT
   remote: https://github.com/swanandp/acts_as_list.git
-  revision: 3e5a0ad411e72b889b8ef035384c30d2d22f90f9
+  revision: bf928fdd4f7548a0c975c1771e2bfe76de415bf3
   specs:
     acts_as_list (0.7.6)
       activerecord (>= 3.0)
@@ -64,7 +64,7 @@ GEM
     bcrypt (3.1.11-x86-mingw32)
     builder (3.1.4)
     cancan (1.6.10)
-    capybara (2.7.1)
+    capybara (2.8.0)
       addressable
       mime-types (>= 1.16)
       nokogiri (>= 1.3.3)
