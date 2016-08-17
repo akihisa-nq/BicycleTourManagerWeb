@@ -21,6 +21,55 @@ class TourPlanGenerator
 			)
 	end
 
+	def create_nodes
+		points_old = []
+		@plan.tour_plan_routes.each do |route|
+			points_old += route.tour_plan_points
+			route.tour_plan_points.destroy_all
+		end
+
+		@plan.tour_plan_routes.each do |route|
+			route.tour_plan_paths.each do |path|
+				next if path.google_map_url.nil? || path.google_map_url.empty?
+
+				btmw_route = @parser.parse_uri(path.google_map_url)
+
+				btmw_route.path_list.each.with_index do |btmw_path, i|
+					next if route.tour_plan_points.count > 0 && i == 0
+					route.tour_plan_points.create(point: btmw_path.start.point_geos)
+				end
+
+				route.tour_plan_points.create(point: btmw_route.path_list[-1].end.point_geos)
+			end
+		end
+
+		# 既存データの反映
+		old_index = 0
+		@plan.tour_plan_routes.each do |route|
+			route.tour_plan_points.each do |node|
+				old_index_tmp = old_index
+				while old_index_tmp < points_old.count
+					if points_old[old_index_tmp].point == node.point
+						orig = points_old[old_index_tmp]
+						node.name = orig.name
+						node.direction = orig.direction
+						node.comment = orig.comment
+						node.rest_time = orig.rest_time
+						node.target_speed = orig.target_speed
+						node.limit_speed = orig.limit_speed
+						node.save
+
+						old_index = old_index_tmp + 1
+
+						break
+					end
+
+					old_index_tmp += 1
+				end
+			end
+		end
+	end
+
 	def setup_plan
 		limit_speed = 15.0
 		target_speed = 15.0
@@ -380,54 +429,12 @@ class TourPlan < ActiveRecord::Base
 
 	def self.create_points(user, id)
 		if user.can?(:edit, TourPlan)
-			plan = TourPlan.find(id)
-
-			points_old = []
-			plan.tour_plan_routes.each do |route|
-				points_old += route.tour_plan_points
-				route.tour_plan_points.destroy_all
-			end
-
-			parser = BTM::GoogleMapUriParser.new(TourPlanCache)
-			plan.tour_plan_routes.each do |route|
-				route.tour_plan_paths.each do |path|
-					next if path.google_map_url.nil? || path.google_map_url.empty?
-
-					btmw_route = parser.parse_uri(path.google_map_url)
-
-					btmw_route.path_list.each.with_index do |btmw_path, i|
-						next if route.tour_plan_points.count > 0 && i == 0
-						route.tour_plan_points.create(point: btmw_path.start.point_geos)
-					end
-
-					route.tour_plan_points.create(point: btmw_route.path_list[-1].end.point_geos)
-				end
-			end
-
-			# 既存データの反映
-			old_index = 0
-			plan.tour_plan_routes.each do |route|
-				route.tour_plan_points.each do |node|
-					old_index_tmp = old_index
-					while old_index_tmp < points_old.count
-						if points_old[old_index_tmp].point == node.point
-							orig = points_old[old_index_tmp]
-							node.name = orig.name
-							node.direction = orig.direction
-							node.comment = orig.comment
-							node.rest_time = orig.rest_time
-							node.target_speed = orig.target_speed
-							node.limit_speed = orig.limit_speed
-							node.save
-
-							old_index = old_index_tmp + 1
-
-							break
-						end
-
-						old_index_tmp += 1
-					end
-				end
+			begin
+				generator = TourPlanGenerator.new(id, false)
+				generator.create_nodes
+			rescue => e
+				# nothing to do
+				raise e
 			end
 		end
 	end
