@@ -59,6 +59,13 @@ class TourPlanPoint < ActiveRecord::Base
 		attr[:direction] = dir
 	end
 
+	def self.direction_with_node_info(info)
+		dir = info.road.to_a.map {|i| "#{i[0].downcase}:#{j}" }.join(",")
+		dir += "|"
+		dir += "#{info.orig.downcase} > #{info.dest.downcase}"
+		dir
+	end
+
 	def exclude?
 		@exclude unless @exclude.nil?
 

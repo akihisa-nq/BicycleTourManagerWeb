@@ -34,12 +34,29 @@ class TourPlanGenerator
 
 				btmw_route = @parser.parse_uri(path.google_map_url)
 
-				btmw_route.path_list.each.with_index do |btmw_path, i|
-					next if route.tour_plan_points.count > 0 && i == 0
-					route.tour_plan_points.create(point: btmw_path.start.point_geos)
+				begin
+					btmw_route.search_route(TourPlanCache, TourPlanCache)
+				rescue => e
+					TourPlan::logger.fatal(e.inspect)
+					raise e
 				end
 
-				route.tour_plan_points.create(point: btmw_route.path_list[-1].end.point_geos)
+				btmw_route.path_list.each.with_index do |btmw_path, i|
+					next if route.tour_plan_points.count > 0 && i == 0
+
+					btmw_node = btmw_path.start
+
+					node = route.tour_plan_points.create(
+						point: btmw_node.point_geos,
+						direction: TourPlanPoint.direction_with_node_info(btmw_node.info)
+						)
+				end
+
+				btmw_node = btmw_route.path_list[-1].end
+				route.tour_plan_points.create(
+					point: btmw_node.point_geos,
+					direction: TourPlanPoint.direction_with_node_info(btmw_node.info)
+					)
 			end
 		end
 
@@ -52,11 +69,15 @@ class TourPlanGenerator
 					if points_old[old_index_tmp].point == node.point
 						orig = points_old[old_index_tmp]
 						node.name = orig.name
-						node.direction = orig.direction
 						node.comment = orig.comment
 						node.rest_time = orig.rest_time
 						node.target_speed = orig.target_speed
 						node.limit_speed = orig.limit_speed
+
+						unless orig.direction.nil? && orig.direction.empty?
+							node.direction = orig.direction
+						end
+
 						node.save
 
 						old_index = old_index_tmp + 1
