@@ -62,6 +62,26 @@ $(document).on('ready page:load', loadMaps);
                 <td>
                   <div class"map" id="map_<%= @node.id %>" style="width:200px; height:200px;"></div>
                   <a href="https://www.google.co.jp/maps/place/<%= @node.lat %>,<%= @node.lon %>/@<%= @node.lat %>,<%= @node.lon %>,16z" target="_blank">別ウィンドウで表示</a>
+				  <div>
+					  <table>
+						  <tbody>
+							  <tr>
+								  <th>距離</th>
+								  <td><%= @node.distance %> km</td>
+							  </tr>
+							  <tr>
+								  <th>高度</th>
+								  <td><%= @node.elevation %> m</td>
+							  </tr>
+							  <tr>
+								  <td colspan="2">
+									  <%= @node.target_time && @node.target_time.strftime("%e日目 %H:%M") %> ～
+									  <%= @node.limit_time && @node.limit_time.strftime("%e日目 %H:%M") %>
+								  </td>
+							  </tr>
+						  </tbody>
+					  </table>
+				  </div>
                 </td>
                 <td style="vertical-align:top">
                 交差点:

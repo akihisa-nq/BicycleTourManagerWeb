@@ -14,10 +14,13 @@ class TourPlanGenerator
 		@plotter.distance_max = 160.0
 		@plotter.label = false
 
-		@renderer = BTM::PlanHtmlRenderer.new(
-			make_pdf ? @plotter : nil,
+		@option = {
 			enable_hide: false,
 			scale: (@plan.planning_sheet_scale || 0.8)
+		}
+		@renderer = BTM::PlanHtmlRenderer.new(
+			make_pdf ? @plotter : nil,
+			@option
 			)
 	end
 
@@ -197,7 +200,7 @@ class TourPlanGenerator
 		@plan.save!
 	end
 
-	def calculate_resource_management
+	def setup_resource_management
 		if @plan.resource_set
 			@plan.resource_set.resource_entries.each do |res|
 				@tour.resources << BTM::Resource.new(
@@ -216,6 +219,19 @@ class TourPlanGenerator
 					dev.device.resource.name,
 					dev.device.consumption
 					)
+			end
+		end
+	end
+
+	def generate_plan
+		context = BTM::PlanContext.new(@tour, nil, nil, @option)
+		context.each_page do |pc, i, page_max|
+			context.each_node do |node|
+				# noting to do
+			end
+
+			context.update_resource_status do
+				# noting to do
 			end
 		end
 	end
@@ -453,6 +469,11 @@ class TourPlan < ActiveRecord::Base
 			begin
 				generator = TourPlanGenerator.new(id, false)
 				generator.create_nodes
+				generator.setup_plan
+				generator.calculate_additional_info
+				generator.setup_resource_management
+				generator.generate_plan
+				generator.save_node_infos
 			rescue => e
 				# nothing to do
 				raise e
@@ -465,7 +486,7 @@ class TourPlan < ActiveRecord::Base
 			generator = TourPlanGenerator.new(id, make_pdf)
 			generator.setup_plan
 			generator.calculate_additional_info
-			generator.calculate_resource_management
+			generator.setup_resource_management
 
 			generator.generate_html(false)
 			if make_pdf
