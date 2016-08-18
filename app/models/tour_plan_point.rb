@@ -29,6 +29,11 @@ class TourPlanPoint < ActiveRecord::Base
 	def road; parse_direction; @road; end
 
 	def self.pack_direction(attr)
+		if attr[:road_nw].nil?
+			attr[:direction] = ""
+			return
+		end
+
 		dir = []
 		dir << "nw:#{attr[:road_nw]}" unless attr[:road_nw].empty?
 		dir << "n:#{attr[:road_n]}" unless attr[:road_n].empty?

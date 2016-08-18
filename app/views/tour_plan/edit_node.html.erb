@@ -84,6 +84,7 @@ $(document).on('ready page:load', loadMaps);
 				  </div>
                 </td>
                 <td style="vertical-align:top">
+				<% unless @node.pass %>
                 交差点:
                 <table class="btmw-tour-plan-road">
                   <tr>
@@ -138,6 +139,7 @@ $(document).on('ready page:load', loadMaps);
                       </td>
                   </tr>
                 </table><br />
+				<% end %>
                 コメント: <%= text_field("node[]", :comment, style: "width : 80%;") %><br />
                 目標速度: <%= text_field("node[]", :target_speed, style: "width : 15%;") %>
                 制限速度: <%= text_field("node[]", :limit_speed, style: "width : 15%;") %>

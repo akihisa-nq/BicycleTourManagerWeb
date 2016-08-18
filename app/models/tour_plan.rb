@@ -31,12 +31,13 @@ class TourPlanGenerator
 			route.tour_plan_points.destroy_all
 		end
 
+		offset = 0.0
 		@plan.tour_plan_routes.each do |route|
 			route.tour_plan_paths.each do |path|
 				next if path.google_map_url.nil? || path.google_map_url.empty?
 
+				# ルートの探索
 				btmw_route = @parser.parse_uri(path.google_map_url)
-
 				begin
 					btmw_route.search_route(TourPlanCache, TourPlanCache)
 				rescue => e
@@ -44,21 +45,49 @@ class TourPlanGenerator
 					raise e
 				end
 
+				# 距離の算出
+				btmw_route.path_list.each do |btmw_path|
+					btmw_path.set_start_end
+				end
+
+				btmw_route.check_distance_from_start(offset)
+				offset = btmw_route.path_list.last.end.distance_from_start
+
+				# ノードの追加
 				btmw_route.path_list.each.with_index do |btmw_path, i|
 					next if route.tour_plan_points.count > 0 && i == 0
 
 					btmw_node = btmw_path.start
 
+					# 分岐点の追加
 					node = route.tour_plan_points.create(
 						point: btmw_node.point_geos,
 						direction: TourPlanPoint.direction_with_node_info(btmw_node.info)
 						)
+
+					# ピークを通過点として追加する
+					BTM::Path.check_peak(btmw_path.steps)
+
+					if btmw_path.steps.count >= 3
+						btmw_path.steps[1..-1].each do |s|
+							if s.min_max == :mark_min || s.min_max == :mark_max
+								route.tour_plan_points.create(
+									point: s.point_geos,
+									distance: s.distance_from_start,
+									elevation: s.ele,
+									pass: true
+									)
+							end
+						end
+					end
 				end
 
+				# 分岐点の追加
 				btmw_node = btmw_route.path_list[-1].end
 				route.tour_plan_points.create(
 					point: btmw_node.point_geos,
-					direction: TourPlanPoint.direction_with_node_info(btmw_node.info)
+					direction: TourPlanPoint.direction_with_node_info(btmw_node.info),
+					pass: false
 					)
 			end
 		end
@@ -77,7 +106,7 @@ class TourPlanGenerator
 						node.target_speed = orig.target_speed
 						node.limit_speed = orig.limit_speed
 
-						unless orig.direction.nil? && orig.direction.empty?
+						if ! orig.direction.nil? && ! orig.direction.empty?
 							node.direction = orig.direction
 						end
 
@@ -97,6 +126,7 @@ class TourPlanGenerator
 	def setup_plan
 		limit_speed = 15.0
 		target_speed = 15.0
+		offset = 0.0
 
 		@plan.tour_plan_routes.each.with_index do |route, i|
 			@tour.routes << BTM::Route.new
@@ -137,8 +167,17 @@ class TourPlanGenerator
 
 			route.save!
 
+			# 距離の算出
+			@tour.routes.last.path_list.each do |path|
+				path.set_start_end
+			end
+			@tour.routes.last.check_distance_from_start(offset)
+			offset = @tour.routes.last.path_list.last.end.distance_from_start
+
 			# ノード情報の割り当て
-			route.tour_plan_points.each.with_index do |node, i|
+			index = 0
+			way_point_index = 1
+			route.tour_plan_points.each do |node|
 				if node.limit_speed && node.limit_speed > 0.0
 					limit_speed = node.limit_speed
 				end
@@ -147,22 +186,57 @@ class TourPlanGenerator
 					target_speed = node.target_speed
 				end
 
-				if i == 0
-					node.tmp_info = @tour.routes.last.path_list[0].start
+				if node.pass
+					path = @tour.routes.last.path_list[index - 1]
+
+					new_path = BTM::Path.new
+					new_path.start = BTM::Point.new(node.point.y, node.point.x)
+					new_path.start.info = BTM::NodeInfo.new
+					new_path.end = path.end
+					path.end = new_path.start
+
+					node.tmp_info = new_path.start
+
+					TourPlan::logger.info("!! #{node.point.x}, #{node.point.y}, #{node.elevation}")
+
+					peak_index = path.steps.find_index do |s|
+							TourPlan::logger.info("#{s.point_geos.x}, #{s.point_geos.y}, #{s.ele}")
+
+							s.distance_from_start.to_i == node.distance \
+								&& s.point_geos == node.point
+						end
+					new_path.steps.concat(path.steps.slice!((peak_index + 1)..-1))
+					new_path.start.distance_from_start = node.distance
+					new_path.start.ele = node.elevation
+
+					@tour.routes.last.path_list.insert(index, new_path)
+
+					node.tmp_info.info.text = "▲ : " + (node.comment || "") 
+
 				else
-					node.tmp_info = @tour.routes.last.path_list[i - 1].end
+					if index == 0
+						node.tmp_info = @tour.routes.last.path_list[0].start
+					else
+						node.tmp_info = @tour.routes.last.path_list[index - 1].end
+					end
+
+					if node.tmp_info
+						info = node.tmp_info.info
+						info.text = "★#{way_point_index} : " + (node.comment || "") 
+						way_point_index += 1
+					end
 				end
 
 				if node.tmp_info
 					info = node.tmp_info.info
 
-					info.text = "★#{i + 1} : " + (node.comment || "") 
 					info.name = node.name
 					info.road = node.road
 					info.orig = node.dir_src
 					info.dest = node.dir_dest
 					info.limit_speed = limit_speed
 					info.target_speed = target_speed
+					info.pass = node.pass
 
 					ExclusionArea.all.each do |area|
 						pt1 = BTM::Point.new(area.point.y, area.point.x)
@@ -178,23 +252,15 @@ class TourPlanGenerator
 					end
 				end
 
-				if i >= @tour.routes.last.path_list.count
+				if index >= @tour.routes.last.path_list.count
 					break
 				end
+				index += 1
 			end
 		end
 	end
 
 	def calculate_additional_info
-		# 付加情報の設定
-		@tour.set_start_end
-		begin
-			@tour.check_distance_from_start
-		rescue => e
-			TourPlan::logger.fatal(e.inspect)
-			return
-		end
-
 		# 獲得標高の保存
 		@plan.elevation = @tour.total_elevation
 		@plan.save!
