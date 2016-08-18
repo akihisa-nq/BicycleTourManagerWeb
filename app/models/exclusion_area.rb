@@ -2,8 +2,6 @@ class ExclusionArea < ActiveRecord::Base
 	validates :point, presence: true
 	validates :distance, presence: true
 
-	set_rgeo_factory_for_column(:point, RGeo::Geographic.spherical_factory(:srid => 4326))
-
 	def self.all_with_auth(user)
 		if user.can?(:edit, ExclusionArea)
 			ExclusionArea.all

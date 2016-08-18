@@ -368,7 +368,8 @@ class TourPlanGenerator
 	def plot_whole_altitude_image
 		# 全体画像の生成
 		ExclusionArea.all.each do |area|
-			@tour.delete_by_distance(area.point, area.distance)
+			pt = BTM::Point.new(area.point.y, area.point.x)
+			@tour.delete_by_distance(pt, area.distance)
 		end
 
 		min, max = *@tour.elevation_minmax

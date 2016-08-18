@@ -25,16 +25,17 @@ gem "i18n_generators"
 gem "uglifier"
 gem "activerecord-postgresql-adapter"
 gem "activerecord-postgis-adapter"
-gem "rails", '~> 4.0.4', '< 4.1.0'
+gem "rails", '= 4.2.7.1'
 gem "jquery-rails"
 gem "jquery-ui-rails"
 gem "jquery-turbolinks"
-gem "sass-rails", '~> 4.0.0', '>= 4.0.2'
+gem "sass-rails", '= 5.0.6'
 gem "coffee-rails"
 gem 'coffee-script-source', '= 1.8.0'
 gem "turbolinks"
 gem "devise"
 gem "cancan"
+gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
 
 gem "acts_as_tree", :git => %Q|https://github.com/amerine/acts_as_tree.git|
 gem "acts_as_list", :git => %Q|https://github.com/swanandp/acts_as_list.git|
