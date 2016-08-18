@@ -453,6 +453,20 @@ class TourPlan < ActiveRecord::Base
 
 				TourPlanPoint.where(["id = ?", key]).update_all(attr)
 			end
+
+			begin
+				id = TourPlanPoint.find(points.first[0]).tour_plan_route.tour_plan.id
+
+				generator = TourPlanGenerator.new(id, false)
+				generator.setup_plan
+				generator.calculate_additional_info
+				generator.setup_resource_management
+				generator.generate_plan
+				generator.save_node_infos
+			rescue => e
+				# nothing to do
+				raise e
+			end
 		end
 	end
 
