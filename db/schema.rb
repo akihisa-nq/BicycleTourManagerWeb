@@ -11,55 +11,55 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160819054701) do
+ActiveRecord::Schema.define(version: 20160823092938) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "postgis"
 
-  create_table "device_entries", force: true do |t|
+  create_table "device_entries", force: :cascade do |t|
     t.integer "resource_set_id"
     t.integer "device_id"
-    t.string  "purpose"
+    t.string  "purpose",         limit: 255
     t.time    "start_time"
     t.boolean "use_on_start"
   end
 
-  create_table "devices", force: true do |t|
-    t.string  "name"
+  create_table "devices", force: :cascade do |t|
+    t.string  "name",        limit: 255
     t.integer "resource_id"
     t.integer "interval"
     t.integer "consumption"
   end
 
-  create_table "exclusion_areas", force: true do |t|
-    t.float   "distance"
-    t.spatial "point",    limit: {:srid=>4326, :type=>"point"}
+  create_table "exclusion_areas", force: :cascade do |t|
+    t.float    "distance"
+    t.geometry "point",    limit: {:srid=>4326, :type=>"point"}
   end
 
-  create_table "private_result_routes", force: true do |t|
+  create_table "private_result_routes", force: :cascade do |t|
     t.integer  "tour_result_id"
     t.integer  "position"
     t.datetime "start_time"
     t.datetime "finish_time"
-    t.string   "name"
+    t.string   "name",           limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.spatial  "path",           limit: {:srid=>4326, :type=>"line_string"}
+    t.geometry "path",           limit: {:srid=>4326, :type=>"line_string", :has_z=>true}
   end
 
-  create_table "public_result_routes", force: true do |t|
+  create_table "public_result_routes", force: :cascade do |t|
     t.integer  "tour_result_id"
     t.integer  "position"
     t.datetime "start_time"
     t.datetime "finish_time"
-    t.string   "name"
+    t.string   "name",           limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.spatial  "path",           limit: {:srid=>4326, :type=>"line_string"}
+    t.geometry "path",           limit: {:srid=>4326, :type=>"line_string", :has_z=>true}
   end
 
-  create_table "resource_entries", force: true do |t|
+  create_table "resource_entries", force: :cascade do |t|
     t.integer "resource_set_id"
     t.integer "resource_id"
     t.integer "amount"
@@ -67,109 +67,107 @@ ActiveRecord::Schema.define(version: 20160819054701) do
     t.integer "recovery_interval"
   end
 
-  create_table "resource_sets", force: true do |t|
-    t.string "name"
+  create_table "resource_sets", force: :cascade do |t|
+    t.string "name", limit: 255
   end
 
-  create_table "resources", force: true do |t|
-    t.string "name"
+  create_table "resources", force: :cascade do |t|
+    t.string "name", limit: 255
   end
 
-  create_table "result_points", force: true do |t|
-    t.float    "elevation"
+  create_table "result_points", force: :cascade do |t|
     t.float    "speed"
     t.datetime "time"
     t.integer  "public_result_route_id"
     t.integer  "private_result_route_id"
-    t.spatial  "point",                   limit: {:srid=>4326, :type=>"point"}
+    t.geometry "point",                   limit: {:srid=>4326, :type=>"point", :has_z=>true}
   end
 
-  create_table "tour_images", force: true do |t|
+  create_table "tour_images", force: :cascade do |t|
     t.integer  "tour_result_id"
     t.datetime "shot_on"
-    t.string   "text"
+    t.string   "text",           limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "tour_plan_caches", force: true do |t|
-    t.text    "request"
-    t.text    "response"
-    t.spatial "point",    limit: {:srid=>4326, :type=>"point"}
+  create_table "tour_plan_caches", force: :cascade do |t|
+    t.text     "request"
+    t.text     "response"
+    t.geometry "point",    limit: {:srid=>4326, :type=>"point"}
   end
 
-  create_table "tour_plan_paths", force: true do |t|
+  create_table "tour_plan_paths", force: :cascade do |t|
     t.integer "tour_plan_route_id"
     t.text    "google_map_url"
     t.integer "position"
   end
 
-  create_table "tour_plan_points", force: true do |t|
+  create_table "tour_plan_points", force: :cascade do |t|
     t.integer  "tour_plan_route_id"
-    t.string   "name"
-    t.string   "comment"
-    t.string   "direction"
+    t.string   "name",               limit: 255
+    t.string   "comment",            limit: 255
+    t.string   "direction",          limit: 255
     t.float    "rest_time"
     t.float    "target_speed"
     t.float    "limit_speed"
     t.integer  "position"
-    t.spatial  "point",              limit: {:srid=>4326, :type=>"point"}
+    t.geometry "point",              limit: {:srid=>4326, :type=>"point", :has_z=>true}
     t.datetime "target_time"
     t.datetime "limit_time"
     t.integer  "distance"
-    t.integer  "elevation"
     t.boolean  "pass"
   end
 
-  create_table "tour_plan_routes", force: true do |t|
-    t.integer "tour_plan_id"
-    t.string  "name"
-    t.integer "position"
-    t.spatial "public_line",  limit: {:srid=>4326, :type=>"line_string"}
-    t.spatial "private_line", limit: {:srid=>4326, :type=>"line_string"}
+  create_table "tour_plan_routes", force: :cascade do |t|
+    t.integer  "tour_plan_id"
+    t.string   "name",         limit: 255
+    t.integer  "position"
+    t.geometry "public_line",  limit: {:srid=>4326, :type=>"line_string", :has_z=>true}
+    t.geometry "private_line", limit: {:srid=>4326, :type=>"line_string", :has_z=>true}
   end
 
-  create_table "tour_plans", force: true do |t|
-    t.string   "name"
+  create_table "tour_plans", force: :cascade do |t|
+    t.string   "name",                 limit: 255
     t.boolean  "published"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "time_zone"
+    t.string   "time_zone",            limit: 255
     t.time     "start_time"
     t.integer  "elevation"
     t.integer  "resource_set_id"
     t.float    "planning_sheet_scale"
   end
 
-  create_table "tour_results", force: true do |t|
+  create_table "tour_results", force: :cascade do |t|
     t.datetime "start_time"
     t.datetime "finish_time"
-    t.string   "name"
+    t.string   "name",         limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "published"
-    t.string   "time_zone"
+    t.string   "time_zone",    limit: 255
     t.integer  "tour_plan_id"
     t.integer  "elevation"
   end
 
-  create_table "users", force: true do |t|
-    t.string   "email",                  default: "", null: false
-    t.string   "encrypted_password",     default: "", null: false
-    t.string   "reset_password_token"
+  create_table "users", force: :cascade do |t|
+    t.string   "email",                  limit: 255, default: "", null: false
+    t.string   "encrypted_password",     limit: 255, default: "", null: false
+    t.string   "reset_password_token",   limit: 255
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
-    t.integer  "sign_in_count",          default: 0,  null: false
+    t.integer  "sign_in_count",                      default: 0,  null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
-    t.string   "current_sign_in_ip"
-    t.string   "last_sign_in_ip"
-    t.string   "role"
+    t.string   "current_sign_in_ip",     limit: 255
+    t.string   "last_sign_in_ip",        limit: 255
+    t.string   "role",                   limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "users", ["email"], :name => "index_users_on_email", :unique => true
-  add_index "users", ["reset_password_token"], :name => "index_users_on_reset_password_token", :unique => true
+  add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
+  add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
 end

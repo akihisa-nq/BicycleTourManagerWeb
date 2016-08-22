@@ -1,6 +1,6 @@
 GIT
   remote: git@github.com:akihisa-nq/BicycleTourManager.git
-  revision: 54cd3ee9c250cf064a5ed633ff0a6d022110fe17
+  revision: 816a10ec35b68279a382ce0336f7fe41423dc5e2
   specs:
     bicycle_tour_manager (0.0.2)
       nokogiri
