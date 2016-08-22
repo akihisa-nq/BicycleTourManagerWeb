@@ -75,7 +75,6 @@ class TourResult < ActiveRecord::Base
 					if add_point
 						pt = ResultPoint.new
 						pt.point = s.point_geos
-						pt.elevation = s.ele
 						pt.time = s.time.getlocal
 
 						pri_route.result_points << pt
@@ -135,7 +134,6 @@ class TourResult < ActiveRecord::Base
 					if add_point
 						pt = ResultPoint.new
 						pt.point = s.point_geos
-						pt.elevation = s.ele
 						pt.time = s.time.getlocal
 
 						pub_route.result_points << pt
@@ -213,13 +211,13 @@ class TourResult < ActiveRecord::Base
 			case kind
 			when :route
 				r.path.points.each do |p|
-					pt = BTM::Point.new(p.y, p.x)
+					pt = BTM::Point.new(p.y, p.x, p.z)
 					tour.routes.last.path_list.last.steps << pt
 				end
 
 			when :graph
 				r.result_points.each do |p|
-					pt = BTM::Point.new(p.point.y, p.point.x, p.elevation)
+					pt = BTM::Point.new(p.point.y, p.point.x, p.point.z)
 					pt.time = p.time
 					tour.routes.last.path_list.last.steps << pt
 				end

@@ -71,7 +71,7 @@ $(document).on('ready page:load', loadMaps);
 							  </tr>
 							  <tr>
 								  <th>高度</th>
-								  <td><%= @node.elevation %> m</td>
+								  <td><%= @node.point.z.to_i %> m</td>
 							  </tr>
 							  <tr>
 								  <td colspan="2">

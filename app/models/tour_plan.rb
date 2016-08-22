@@ -74,7 +74,6 @@ class TourPlanGenerator
 								route.tour_plan_points.create(
 									point: s.point_geos,
 									distance: s.distance_from_start,
-									elevation: s.ele,
 									pass: true
 									)
 							end
@@ -190,24 +189,24 @@ class TourPlanGenerator
 					path = @tour.routes.last.path_list[index - 1]
 
 					new_path = BTM::Path.new
-					new_path.start = BTM::Point.new(node.point.y, node.point.x)
+					new_path.start = BTM::Point.new(node.point.y, node.point.x, node.point.z)
 					new_path.start.info = BTM::NodeInfo.new
 					new_path.end = path.end
 					path.end = new_path.start
 
 					node.tmp_info = new_path.start
 
-					TourPlan::logger.info("!! #{node.point.x}, #{node.point.y}, #{node.elevation}")
+					TourPlan::logger.info("!! #{node.point.x}, #{node.point.y}, #{node.point.z}")
 
 					peak_index = path.steps.find_index do |s|
-							TourPlan::logger.info("#{s.point_geos.x}, #{s.point_geos.y}, #{s.ele}")
+							TourPlan::logger.info("#{s.point_geos.x}, #{s.point_geos.y}, #{s.point_geos.z}")
 
 							s.distance_from_start.to_i == node.distance \
 								&& s.point_geos == node.point
 						end
 					new_path.steps.concat(path.steps.slice!((peak_index + 1)..-1))
 					new_path.start.distance_from_start = node.distance
-					new_path.start.ele = node.elevation
+					new_path.start.ele = node.point.z
 
 					@tour.routes.last.path_list.insert(index, new_path)
 
@@ -359,7 +358,7 @@ class TourPlanGenerator
 				pt.target_time = pt.tmp_info.time_target
 				pt.limit_time = pt.tmp_info.time
 				pt.distance = pt.tmp_info.distance_from_start
-				pt.elevation = pt.tmp_info.ele
+				pt.point = BTM.factory.point(pt.point.x, pt.point.y, pt.tmp_info.ele)
 				pt.save!
 			end
 		end
@@ -632,7 +631,7 @@ class TourPlan < ActiveRecord::Base
 			tour.routes.last.path_list << BTM::Path.new
 
 			route.tour_plan_points.each do |node|
-				wpt = BTM::Point.new(node.point.y, node.point.x)
+				wpt = BTM::Point.new(node.point.y, node.point.x, node.point.z)
 				tour.routes.last.path_list.last.way_points << wpt
 			end
 
@@ -644,7 +643,7 @@ class TourPlan < ActiveRecord::Base
 			end
 
 			line.points.each do |p|
-				pt = BTM::Point.new(p.y, p.x)
+				pt = BTM::Point.new(p.y, p.x, p.z)
 				tour.routes.last.path_list.last.steps << pt
 			end
 		end
