@@ -153,6 +153,7 @@ class TourPlanGenerator
 				raise e
 			end
 			route.private_line = BTM.factory.line_string(steps)
+			route.private_line_will_change!
 
 			ExclusionArea.all.each do |area|
 				steps.delete_if do |p|
@@ -163,6 +164,7 @@ class TourPlanGenerator
 			end
 
 			route.public_line = BTM.factory.line_string(steps)
+			route.public_line_will_change!
 
 			route.save!
 
