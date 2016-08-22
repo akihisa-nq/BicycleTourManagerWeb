@@ -46,4 +46,4 @@ gem "modernizr-rails"
 gem "foundation-rails", "= 5.4.5.0"
 gem "will_paginate-foundation"
 
-gem "rgeo", "= 0.3.20"
+gem "rgeo"
