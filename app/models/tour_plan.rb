@@ -220,7 +220,7 @@ class TourPlanGenerator
 
 					if node.tmp_info
 						info = node.tmp_info.info
-						info.text = "★#{way_point_index} : " + (node.comment || "") 
+						info.text = "★#{i + 1}-#{way_point_index} : " + (node.comment || "") 
 						way_point_index += 1
 					end
 				end
@@ -376,7 +376,6 @@ class TourPlanGenerator
 
 		FileUtils.mkdir_p(File.dirname(@plan.altitude_graph_path))
 		@plotter.distance_offset = 0.0
-		@plotter.waypoint_offset = 0
 		@plotter.distance_max = (@tour.total_distance + 10.0).to_i
 		@plotter.elevation_min = (min / 100) * 100 - 100
 		@plotter.elevation_max = [@plotter.elevation_min + 1100, ((max - 1) / 100 + 1) * 100].max + 100
@@ -631,6 +630,14 @@ class TourPlan < ActiveRecord::Base
 
 			route.tour_plan_points.each do |node|
 				wpt = BTM::Point.new(node.point.y, node.point.x, node.point.z)
+				wpt.min_max = (node.peak_type.to_sym == :peak_max ? :mark_max : :mark_min)
+				wpt.time_target = node.target_time
+				wpt.time = node.limit_time
+				wpt.distance_from_start = node.distance
+
+				wpt.info = BTM::NodeInfo.new
+				wpt.info.pass = node.pass
+
 				tour.routes.last.path_list.last.way_points << wpt
 			end
 
