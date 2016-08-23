@@ -198,11 +198,7 @@ class TourPlanGenerator
 
 					node.tmp_info = new_path.start
 
-					TourPlan::logger.info("!! #{node.point.x}, #{node.point.y}, #{node.point.z}")
-
 					peak_index = path.steps.find_index do |s|
-							TourPlan::logger.info("#{s.point_geos.x}, #{s.point_geos.y}, #{s.point_geos.z}")
-
 							s.distance_from_start.to_i == node.distance \
 								&& s.point_geos == node.point
 						end
@@ -212,7 +208,7 @@ class TourPlanGenerator
 
 					@tour.routes.last.path_list.insert(index, new_path)
 
-					node.tmp_info.info.text = "▲ : " + (node.comment || "") 
+					node.tmp_info.info.text = "▲ : " + (node.comment || "")
 
 				else
 					if index == 0

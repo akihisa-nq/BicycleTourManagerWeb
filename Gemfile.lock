@@ -1,6 +1,6 @@
 GIT
   remote: git@github.com:akihisa-nq/BicycleTourManager.git
-  revision: db3665bc7479474c9487e0940a00bcec783cad21
+  revision: 753fbe8d0c5bea928f1ea29cb94874fa03856389
   specs:
     bicycle_tour_manager (0.0.2)
       nokogiri
@@ -22,9 +22,9 @@ GIT
 
 GIT
   remote: https://github.com/swanandp/acts_as_list.git
-  revision: 0658fd7bb489cb318f2b90ef171fd145b65feb9b
+  revision: 67a97244f772106e0cf1beb7fe4a3ec4d8e71101
   specs:
-    acts_as_list (0.7.7)
+    acts_as_list (0.8.0)
       activerecord (>= 3.0)
 
 GEM
