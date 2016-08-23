@@ -1,0 +1,20 @@
+<div>
+	<table>
+		<tbody>
+			<tr>
+				<th>距離</th>
+				<td><%= @node.distance %> km</td>
+			</tr>
+			<tr>
+				<th>高度</th>
+				<td><%= @node.point.z.to_i %> m</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<%= @node.target_time && @node.target_time.strftime("%e日目 %H:%M") %> ～
+					<%= @node.limit_time && @node.limit_time.strftime("%e日目 %H:%M") %>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>

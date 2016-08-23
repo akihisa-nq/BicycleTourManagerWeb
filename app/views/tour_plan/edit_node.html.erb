@@ -62,26 +62,9 @@ $(document).on('ready page:load', loadMaps);
                 <td>
                   <div class"map" id="map_<%= @node.id %>" style="width:200px; height:200px;"></div>
                   <a href="https://www.google.co.jp/maps/place/<%= @node.lat %>,<%= @node.lon %>/@<%= @node.lat %>,<%= @node.lon %>,16z" target="_blank">別ウィンドウで表示</a>
-				  <div>
-					  <table>
-						  <tbody>
-							  <tr>
-								  <th>距離</th>
-								  <td><%= @node.distance %> km</td>
-							  </tr>
-							  <tr>
-								  <th>高度</th>
-								  <td><%= @node.point.z.to_i %> m</td>
-							  </tr>
-							  <tr>
-								  <td colspan="2">
-									  <%= @node.target_time && @node.target_time.strftime("%e日目 %H:%M") %> ～
-									  <%= @node.limit_time && @node.limit_time.strftime("%e日目 %H:%M") %>
-								  </td>
-							  </tr>
-						  </tbody>
-					  </table>
-				  </div>
+                  <% unless @node.pass %>
+                  <%= render( partial: "edit_node_info" ) %>
+				  <% end %>
                 </td>
                 <td style="vertical-align:top">
 				<% unless @node.pass %>
@@ -144,6 +127,9 @@ $(document).on('ready page:load', loadMaps);
                 目標速度: <%= text_field("node[]", :target_speed, style: "width : 15%;") %>
                 制限速度: <%= text_field("node[]", :limit_speed, style: "width : 15%;") %>
                 休憩時間: <%= text_field("node[]", :rest_time, style: "width : 15%;") %><br />
+				<% if @node.pass %>
+                <%= render( partial: "edit_node_info" ) %>
+				<% end %>
                 </td>
               </tr>
               <% @node = nil; end %>
