@@ -1,6 +1,18 @@
 <div>
 	<table>
 		<tbody>
+			<% columns = 0 %>
+			<% if @node.pass %>
+			<% columns = 5 %>
+			<tr>
+				<th>距離</th>
+				<td><%= @node.distance %> km</td>
+				<th>高度</th>
+				<td><%= @node.point.z.to_i %> m</td>
+				<th><% if @node.peak_type.to_sym == :peak_max %>ピーク<% else %>ボトム<% end %></th>
+			</tr>
+			<% else %>
+			<% columns = 2 %>
 			<tr>
 				<th>距離</th>
 				<td><%= @node.distance %> km</td>
@@ -9,8 +21,9 @@
 				<th>高度</th>
 				<td><%= @node.point.z.to_i %> m</td>
 			</tr>
+			<% end %>
 			<tr>
-				<td colspan="2">
+				<td colspan="<%= columns %>">
 					<%= @node.target_time && @node.target_time.strftime("%e日目 %H:%M") %> ～
 					<%= @node.limit_time && @node.limit_time.strftime("%e日目 %H:%M") %>
 				</td>

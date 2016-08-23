@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160823092938) do
+ActiveRecord::Schema.define(version: 20160824083423) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -117,6 +117,7 @@ ActiveRecord::Schema.define(version: 20160823092938) do
     t.datetime "limit_time"
     t.integer  "distance"
     t.boolean  "pass"
+    t.integer  "peak_type",          limit: 2,                                           default: 0, null: false
   end
 
   create_table "tour_plan_routes", force: :cascade do |t|

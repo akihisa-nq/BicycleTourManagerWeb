@@ -74,7 +74,8 @@ class TourPlanGenerator
 								route.tour_plan_points.create(
 									point: s.point_geos,
 									distance: s.distance_from_start,
-									pass: true
+									pass: true,
+									peak_type: (s.min_max == :mark_min ? :peak_min : :peak_max)
 									)
 							end
 						end
@@ -208,7 +209,7 @@ class TourPlanGenerator
 
 					@tour.routes.last.path_list.insert(index, new_path)
 
-					node.tmp_info.info.text = "▲ : " + (node.comment || "")
+					node.tmp_info.info.text = (node.peak_type.to_sym == :peak_max ? "▲" : "▼") + " : " + (node.comment || "")
 
 				else
 					if index == 0
