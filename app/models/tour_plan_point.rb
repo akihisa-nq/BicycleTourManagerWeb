@@ -2,6 +2,8 @@ class TourPlanPoint < ActiveRecord::Base
 	belongs_to :tour_plan_route
 	acts_as_list scope: :tour_plan_route
 
+	has_many :tour_plan_up_hills, -> { order("position ASC") }
+
 	enum peak_type: { peak_none: 0, peak_max: 1, peak_min: 2 }
 
 	def lon

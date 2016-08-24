@@ -22,6 +22,17 @@
 				<td><%= @node.point.z.to_i %> m</td>
 			</tr>
 			<% end %>
+			<% if @node.tour_plan_up_hills.count > 0 %>
+			<tr>
+				<td colspan="<%= columns %>">
+					<ul>
+					<% @node.tour_plan_up_hills.each do |up_hill| %>
+						<li><%= "%.1f" % [ up_hill.distance - @node.distance ] %> km 先 <%= "%.1f" % [up_hill.gradient] %>% <%= "%.1f" % [up_hill.length] %> km</li>
+					<% end %>
+					</ul>
+				</td>
+			</tr>
+			<% end %>
 			<tr>
 				<td colspan="<%= columns %>">
 					<%= @node.target_time && @node.target_time.strftime("%e日目 %H:%M") %> ～

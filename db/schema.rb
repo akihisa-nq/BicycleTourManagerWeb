@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160824083423) do
+ActiveRecord::Schema.define(version: 20160825040920) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -126,6 +126,15 @@ ActiveRecord::Schema.define(version: 20160824083423) do
     t.integer  "position"
     t.geometry "public_line",  limit: {:srid=>4326, :type=>"line_string", :has_z=>true}
     t.geometry "private_line", limit: {:srid=>4326, :type=>"line_string", :has_z=>true}
+  end
+
+  create_table "tour_plan_up_hills", force: :cascade do |t|
+    t.geometry "point",              limit: {:srid=>4326, :type=>"point", :has_z=>true}
+    t.integer  "distance"
+    t.float    "length"
+    t.integer  "tour_plan_point_id"
+    t.float    "gradient"
+    t.integer  "position"
   end
 
   create_table "tour_plans", force: :cascade do |t|

@@ -62,14 +62,16 @@ class TourPlanGenerator
 					# 分岐点の追加
 					node = route.tour_plan_points.create(
 						point: btmw_node.point_geos,
+						distance: btmw_node.distance_from_start,
 						direction: TourPlanPoint.direction_with_node_info(btmw_node.info)
 						)
 
 					# ピークを通過点として追加する
 					BTM::Path.check_peak(btmw_path.steps)
+					grad = BTM::Path.check_gradient(btmw_path.steps).select {|g| g.grad >= 3 }
 
 					if btmw_path.steps.count >= 3
-						btmw_path.steps[1..-1].each do |s|
+						btmw_path.steps.each do |s|
 							if s.min_max == :mark_min || s.min_max == :mark_max
 								route.tour_plan_points.create(
 									point: s.point_geos,
@@ -77,6 +79,18 @@ class TourPlanGenerator
 									pass: true,
 									peak_type: (s.min_max == :mark_min ? :peak_min : :peak_max)
 									)
+
+								if s.min_max == :mark_max
+									while grad.length > 0 && grad.first.start.distance_from_start <= s.distance_from_start
+										g = grad.shift
+										route.tour_plan_points[-2].tour_plan_up_hills.create(
+											point: g.start.point_geos,
+											distance: g.start.distance_from_start,
+											length: g.distance,
+											gradient: g.grad
+										)
+									end
+								end
 							end
 						end
 					end
@@ -86,6 +100,7 @@ class TourPlanGenerator
 				btmw_node = btmw_route.path_list[-1].end
 				route.tour_plan_points.create(
 					point: btmw_node.point_geos,
+						distance: btmw_node.distance_from_start,
 					direction: TourPlanPoint.direction_with_node_info(btmw_node.info),
 					pass: false
 					)
