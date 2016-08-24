@@ -313,6 +313,7 @@ class TourPlanGenerator
 		html_path = pdf_path.sub(/\.pdf$/, ".html")
 
 		begin
+			FileUtils.mkdir_p(File.dirname(html_path))
 			@renderer.render(@tour, html_path)
 		rescue => e
 			TourPlan::logger.fatal(e.inspect)
