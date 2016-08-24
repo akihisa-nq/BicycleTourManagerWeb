@@ -9,6 +9,7 @@ group :development, :test do
 	gem "database_cleaner"
 	gem "launchy"
 	gem "selenium-webdriver"
+	gem "thin"
 end
 
 platforms :ruby do
