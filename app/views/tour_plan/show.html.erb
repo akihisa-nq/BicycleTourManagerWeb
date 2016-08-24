@@ -214,6 +214,16 @@
 					   <th>速度</th>
 					   <td><%= limit_speed.to_i %> km/h</td>
 					 </tr>
+					<tr>
+						<th>斜度</th>
+						<td colspan="2">
+							<ul>
+							<% point.tour_plan_up_hills.each do |up_hill| %>
+								<li><%= "%.1f" % [ up_hill.distance - point.distance ] %> km 先 <%= "%.1f" % [up_hill.gradient] %>% <%= "%.1f" % [up_hill.length] %> km</li>
+							<% end %>
+							</ul>
+						</td>
+					</tr>
 					 <tr>
 					   <th>備考</th>
 					   <td colspan="2"><%= point.comment %></td>
