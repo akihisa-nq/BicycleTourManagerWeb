@@ -68,28 +68,28 @@ class TourPlanGenerator
 
 					# ピークを通過点として追加する
 					BTM::Path.check_peak(btmw_path.steps)
-					grad = BTM::Path.check_gradient(btmw_path.steps).select {|g| g.grad >= 3 }
+					grad = BTM::Path.check_gradient(btmw_path.steps).select {|g| g.grad >= 2 }
 
-					if btmw_path.steps.count >= 3
-						btmw_path.steps.each do |s|
-							if s.min_max == :mark_min || s.min_max == :mark_max
+					btmw_path.steps.each.with_index do |s, i|
+						if s.min_max == :mark_min || s.min_max == :mark_max
+							if i > 0 && i != btmw_path.steps.count - 1
 								route.tour_plan_points.create(
 									point: s.point_geos,
 									distance: s.distance_from_start,
 									pass: true,
 									peak_type: (s.min_max == :mark_min ? :peak_min : :peak_max)
 									)
+							end
 
-								if s.min_max == :mark_max
-									while grad.length > 0 && grad.first.start.distance_from_start <= s.distance_from_start
-										g = grad.shift
-										route.tour_plan_points[-2].tour_plan_up_hills.create(
-											point: g.start.point_geos,
-											distance: g.start.distance_from_start,
-											length: g.distance,
-											gradient: g.grad
-										)
-									end
+							if i > 0 && s.min_max == :mark_max
+								while grad.length > 0 && grad.first.start.distance_from_start <= s.distance_from_start
+									g = grad.shift
+									route.tour_plan_points[-2].tour_plan_up_hills.create(
+										point: g.start.point_geos,
+										distance: g.start.distance_from_start,
+										length: g.distance,
+										gradient: g.grad
+									)
 								end
 							end
 						end
