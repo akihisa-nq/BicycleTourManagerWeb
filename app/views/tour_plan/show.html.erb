@@ -24,17 +24,17 @@
 
                  <% i = 0; @tour_plan.tour_plan_routes.each do |route|; route.tour_plan_points.each do |point| %>
 	 		     <% unless point.exclude? %>
-				 CreatePoint(<%= i %>, <%= point.point.y %>, <%= point.point.x %>, $("#marker_<%= i %>").html() );
+				 CreatePoint(<%= i %>, <%= point.point.y %>, <%= point.point.x %>, "<%=j icon_name(point) %>", $("#marker_<%= i %>").html() );
                  <% end; i += 1; end; end %>
              }
          });
      }
 
-     function CreatePoint(id, lat, lon, html) {
+     function CreatePoint(id, lat, lon, icon, html) {
          window.marker[id] = new google.maps.Marker({
              position: new google.maps.LatLng(lat,lon),
              map: window.map,
-			 icon: "<%=j path_to_image("/mile_stone.png") %>"
+			 icon: icon
          });
 
          window.info_window[id] = new google.maps.InfoWindow({
@@ -175,7 +175,7 @@
 			 <% else %>
 			 <td>
 				 <% if point.pass %>
-				 <a href="javascript:FocusPoint(<%= i %>);"><%= point.peak_type.to_sym == :peak_max ? "▲" : "▼" %><%= ri + 1 %>-<%= peak_index %> <%= point.name %></a>
+				 <a href="javascript:FocusPoint(<%= i %>);"><%= peak_type_text(point, ri + 1, peak_index) %> <%= point.name %></a>
 				 <% else %>
 				 <a href="javascript:FocusPoint(<%= i %>);">★<%= ri + 1 %>-<%= pi %> <%= point.name %></a>
 				 <% end %>
@@ -187,7 +187,7 @@
 				   <tbody>
 				     <tr>
 						 <% if point.pass %>
-						 <th colspan="3"><%= point.peak_type.to_sym == :peak_max ? "▲" : "▼" %><%= ri + 1 %>-<%= peak_index %> <%= point.name %></th>
+						 <th colspan="3"><%= peak_type_text(point, ri + 1, peak_index) %> <%= point.name %></th>
 						 <% else %>
 						 <th colspan="3">★<%= ri + 1 %>-<%= pi %> <%= point.name %></th>
 						 <% end %>
