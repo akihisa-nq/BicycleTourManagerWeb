@@ -70,9 +70,20 @@ class TourPlanGenerator
 					BTM::Path.check_peak(btmw_path.steps)
 					grad = BTM::Path.check_gradient(btmw_path.steps).select {|g| g.grad >= 2 }
 
-					btmw_path.steps.each.with_index do |s, i|
+					s = btmw_path.steps.first
+					until s.next_peak.nil?
+						prev = s
+						s = s.next_peak
+
+						# 登り下りが 20.0 切るようなものは除外
+						if (s.ele - prev.ele ).abs < 20.0 \
+							&& (s.next_peak.nil? || (s.ele - s.next_peak.ele).abs < 20.0)
+						then
+							next
+						end
+
 						if s.min_max == :mark_min || s.min_max == :mark_max
-							if i > 0 && i != btmw_path.steps.count - 1
+							unless s.next_peak.nil?
 								route.tour_plan_points.create(
 									point: s.point_geos,
 									distance: s.distance_from_start,
@@ -81,7 +92,7 @@ class TourPlanGenerator
 									)
 							end
 
-							if i > 0 && s.min_max == :mark_max
+							if s.min_max == :mark_max
 								while grad.length > 0 && grad.first.start.distance_from_start <= s.distance_from_start
 									g = grad.shift
 									route.tour_plan_points[-2].tour_plan_up_hills.create(
