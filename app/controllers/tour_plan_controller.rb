@@ -89,7 +89,7 @@ class TourPlanController < ApplicationController
 
 		params[:path_new].each do |key, value|
 			if ! value[:google_map_url].empty?
-				TourPlanPath.create_with_auth(current_user_or_guest, key, value)
+				TourPlanPath.create_with_auth(current_user_or_guest, key, value.permit(:google_map_url))
 			end
 		end
 
