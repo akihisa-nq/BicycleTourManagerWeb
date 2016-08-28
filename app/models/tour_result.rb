@@ -95,7 +95,8 @@ class TourResult < ActiveRecord::Base
 
 		# 公開
 		ExclusionArea.all.each do |area|
-			tour.delete_by_distance(area.point, area.distance)
+			pt = BTM::Point.new(area.point.y, area.point.x)
+			tour.delete_by_distance(pt, area.distance)
 		end
 
 		offset = 0.0
