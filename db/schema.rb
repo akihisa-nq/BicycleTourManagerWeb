@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160825040920) do
+ActiveRecord::Schema.define(version: 20160829054937) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -46,7 +46,12 @@ ActiveRecord::Schema.define(version: 20160825040920) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.geometry "path",           limit: {:srid=>4326, :type=>"line_string", :has_z=>true}
+    t.float    "speed",                                                                    array: true
+    t.datetime "time",                                                                     array: true
   end
+
+  add_index "private_result_routes", ["speed"], name: "index_private_result_routes_on_speed", using: :gin
+  add_index "private_result_routes", ["time"], name: "index_private_result_routes_on_time", using: :gin
 
   create_table "public_result_routes", force: :cascade do |t|
     t.integer  "tour_result_id"
@@ -57,7 +62,12 @@ ActiveRecord::Schema.define(version: 20160825040920) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.geometry "path",           limit: {:srid=>4326, :type=>"line_string", :has_z=>true}
+    t.float    "speed",                                                                    array: true
+    t.datetime "time",                                                                     array: true
   end
+
+  add_index "public_result_routes", ["speed"], name: "index_public_result_routes_on_speed", using: :gin
+  add_index "public_result_routes", ["time"], name: "index_public_result_routes_on_time", using: :gin
 
   create_table "resource_entries", force: :cascade do |t|
     t.integer "resource_set_id"
@@ -73,14 +83,6 @@ ActiveRecord::Schema.define(version: 20160825040920) do
 
   create_table "resources", force: :cascade do |t|
     t.string "name", limit: 255
-  end
-
-  create_table "result_points", force: :cascade do |t|
-    t.float    "speed"
-    t.datetime "time"
-    t.integer  "public_result_route_id"
-    t.integer  "private_result_route_id"
-    t.geometry "point",                   limit: {:srid=>4326, :type=>"point", :has_z=>true}
   end
 
   create_table "tour_images", force: :cascade do |t|

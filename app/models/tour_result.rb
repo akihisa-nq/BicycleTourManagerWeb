@@ -43,6 +43,8 @@ class TourResult < ActiveRecord::Base
 		tour.routes.each do |r|
 			r.path_list.each do |p|
 				pri_route = tour_result.private_result_routes.build
+				pri_route.time = []
+				pri_route.speed = []
 
 				logger.debug("check peak")
 				p.check_distance_from_start(offset)
@@ -52,33 +54,21 @@ class TourResult < ActiveRecord::Base
 
 				logger.debug("check steps")
 				line_points = []
-				prev_line = p.steps.first
 				prev_pt = p.steps.first
 
 				p.steps.each do |s|
-					add_line = false
 					add_point = false
 
 					if s.min_max != nil
-						add_line = true
 						add_point = true
 					else
-						add_line = (prev_line.distance_on_path(s) > 0.05)
-						add_point = (prev_pt.distance_on_path(s) > 0.15)
-					end
-
-					if add_line
-						line_points << s.point_geos
-						prev_line = s
+						add_point = (prev_pt.distance_on_path(s) > 0.05)
 					end
 
 					if add_point
-						pt = ResultPoint.new
-						pt.point = s.point_geos
-						pt.time = s.time.getlocal
-
-						pri_route.result_points << pt
-
+						line_points << s.point_geos
+						pri_route.time << s.time.getlocal
+						pri_route.speed << 0.0
 						prev_pt = s
 					end
 				end
@@ -103,6 +93,8 @@ class TourResult < ActiveRecord::Base
 		tour.routes.each do |r|
 			r.path_list.each do |p|
 				pub_route = tour_result.public_result_routes.build
+				pub_route.time = []
+				pub_route.speed = []
 
 				logger.debug("check peak")
 				p.check_distance_from_start(offset)
@@ -112,33 +104,21 @@ class TourResult < ActiveRecord::Base
 
 				logger.debug("check steps")
 				line_points = []
-				prev_line = p.steps.first
 				prev_pt = p.steps.first
 
 				p.steps.each do |s|
-					add_line = false
 					add_point = false
 
 					if s.min_max != nil
-						add_line = true
 						add_point = true
 					else
-						add_line = (prev_line.distance_on_path(s) > 0.05)
-						add_point = (prev_pt.distance_on_path(s) > 0.15)
-					end
-
-					if add_line
-						line_points << s.point_geos
-						prev_line = s
+						add_point = (prev_pt.distance_on_path(s) > 0.05)
 					end
 
 					if add_point
-						pt = ResultPoint.new
-						pt.point = s.point_geos
-						pt.time = s.time.getlocal
-
-						pub_route.result_points << pt
-
+						line_points << s.point_geos
+						pub_route.time << s.time.getlocal
+						pub_route.speed << 0.0
 						prev_pt = s
 					end
 				end
@@ -217,9 +197,9 @@ class TourResult < ActiveRecord::Base
 				end
 
 			when :graph
-				r.result_points.each do |p|
-					pt = BTM::Point.new(p.point.y, p.point.x, p.point.z)
-					pt.time = p.time
+				r.path.points.each.with_index do |p, i|
+					pt = BTM::Point.new(p.y, p.x, p.z)
+					pt.time = r.time[i]
 					tour.routes.last.path_list.last.steps << pt
 				end
 			end
