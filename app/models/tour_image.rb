@@ -50,15 +50,15 @@ class TourImage < ActiveRecord::Base
 		route = tour_result.public_result_routes.where(["start_time <= ? AND ? <= finish_time", shot_on, shot_on]).first
 		if route
 			i = binary_search_by(route.time, 0, shot_on) {|s| s.time }
-			if route.path.points[i].time == shot_on
-				route.path.points[i].point
-			elsif route.path.points[i].time > shot_on
-				p = route.path.points[i - 1].point
-				n = route.path.points[i].point
+			if route.time[i] == shot_on
+				route.path.points[i]
+			elsif route.time[i] > shot_on
+				p = route.path.points[i - 1]
+				n = route.path.points[i]
 				BTM.factory.point((p.x + p.x) / 2, (p.y + p.y) / 2)
 			else
-				p = route.path.points[i].point
-				n = route.path.points[i + 1].point
+				p = route.path.points[i]
+				n = route.path.points[i + 1]
 				BTM.factory.point((p.x + p.x) / 2, (p.y + p.y) / 2)
 			end
 		else
