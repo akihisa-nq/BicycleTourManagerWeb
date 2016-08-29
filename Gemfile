@@ -35,6 +35,7 @@ gem "coffee-rails"
 gem 'coffee-script-source', '= 1.8.0'
 gem "turbolinks"
 gem "devise"
+gem "doorkeeper"
 gem "cancan"
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
 

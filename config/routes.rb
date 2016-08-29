@@ -1,4 +1,5 @@
 BicycleTourManagerWeb::Application.routes.draw do
+  use_doorkeeper
   root to: "summary#index"
 
   devise_for :users
