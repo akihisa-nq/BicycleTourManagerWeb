@@ -30,13 +30,13 @@ function loadMaps()
 
 	<% if @node.near_line %>
 	{
-		pointarray = []
+		var pointarray = []
 		<% @node.near_line.points.each do |pt| %>
 		pointarray.push(new google.maps.LatLng( <%= pt.y %>, <%= pt.x %> ));
 		<% end %>
 		new google.maps.Polyline({
 			path: pointarray,
-			strokeColor: "#ff00ff",
+			strokeColor: "#0000ff",
 			strokeWeight: 5,
 			map: map
 			});
