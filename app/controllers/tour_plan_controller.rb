@@ -106,6 +106,7 @@ class TourPlanController < ApplicationController
 	def edit_node
 		@tour_routes = TourPlan.edit_point_with_auth(current_user_or_guest, params[:id], params[:page])
 		@tour_route = @tour_routes[0]
+		@tour_route.set_point_lines
 	end
 
 	def update_node

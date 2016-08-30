@@ -92,7 +92,7 @@ class TourPlanPoint < ActiveRecord::Base
 		return false
 	end
 
-	attr_accessor :tmp_info
+	attr_accessor :tmp_info, :near_line
 
 	private
 

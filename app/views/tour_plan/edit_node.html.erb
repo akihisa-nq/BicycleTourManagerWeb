@@ -28,11 +28,28 @@ function loadMaps()
     };
     var map = new google.maps.Map(document.getElementById("map_<%= @node.id %>"), mapOptions);
 
-    var markerOptions = {
-        map: map,
-        position: pos
-    };
-    new google.maps.Marker(markerOptions);
+	<% if @node.near_line %>
+	{
+		pointarray = []
+		<% @node.near_line.points.each do |pt| %>
+		pointarray.push(new google.maps.LatLng( <%= pt.y %>, <%= pt.x %> ));
+		<% end %>
+		new google.maps.Polyline({
+			path: pointarray,
+			strokeColor: "#ff00ff",
+			strokeWeight: 5,
+			map: map
+			});
+	}
+	<% end %>
+
+	{
+		var markerOptions = {
+			map: map,
+			position: pos
+		};
+		new google.maps.Marker(markerOptions);
+	}
     <% end %>
 
     $(document).unbind('ready page:load', loadMaps);
