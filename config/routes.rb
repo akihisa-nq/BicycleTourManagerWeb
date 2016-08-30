@@ -57,4 +57,13 @@ BicycleTourManagerWeb::Application.routes.draw do
   get "/tour_plan/:id/routes/nodes/edit", to: "tour_plan#edit_node"
   post "/tour_plan/:id/routes/nodes/update", to: "tour_plan#update_node"
   delete "/tour_plan/:tour_plan_id/routes/nodes/:id/destroy", to: "tour_plan#destroy_node"
+
+  namespace :api do
+	  resources :exclusion_area, only: [ :show ] do
+		  collection do
+			  get :list
+		  end
+	  end
+  end
 end
+
