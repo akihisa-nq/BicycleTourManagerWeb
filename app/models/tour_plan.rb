@@ -416,6 +416,14 @@ class TourPlan < ActiveRecord::Base
 	has_many :tour_results, -> { order("start_time DESC") }
 	belongs_to :resource_set
 
+	def self.all_with_auth(user, offset, limit)
+		if user.can? :edit, TourPlan
+			TourPlan.order("created_at DESC").offset(offset).limit(limit)
+		else
+			TourPlan.order("created_at DESC").where("published = true").offset(offset).limit(limit)
+		end
+	end
+
 	def self.list_all(user, page)
 		if user.can? :edit, TourPlan
 			TourPlan.paginate(page: page, per_page: 10).order("created_at DESC")

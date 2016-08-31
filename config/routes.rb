@@ -64,6 +64,12 @@ BicycleTourManagerWeb::Application.routes.draw do
 			  get :list
 		  end
 	  end
+
+	  resources :tour_plan, only: [ :show ] do
+		  collection do
+			  get :list
+		  end
+	  end
   end
 end
 
