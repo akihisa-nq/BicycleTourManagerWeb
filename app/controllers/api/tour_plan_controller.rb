@@ -12,6 +12,19 @@ module Api
 			tour_plan = TourPlan
 				.find_with_auth(current_user, params[:id])
 			attrs = filter_attributes_tour_plan(tour_plan.attributes)
+
+			if params["all"] == "1"
+				attrs["routes"] = []
+				tour_plan.tour_plan_routes.each do |route|
+					attrs["routes"] << route.attributes
+					attrs["routes"].last["points"] = []
+
+					route.tour_plan_points.each do |point|
+						attrs["routes"].last["points"] << point.attributes
+					end
+				end
+			end
+
 			render json: attrs.to_json
 		end
 
