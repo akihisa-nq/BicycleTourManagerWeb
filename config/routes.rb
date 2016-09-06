@@ -69,6 +69,8 @@ BicycleTourManagerWeb::Application.routes.draw do
 		  collection do
 			  get :list
 		  end
+
+		  get "schedule"
 	  end
   end
 end

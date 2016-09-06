@@ -28,6 +28,14 @@ module Api
 			render json: attrs.to_json
 		end
 
+		def schedule
+			tour_plan = TourPlan
+				.find_with_auth(current_user, params[:tour_plan_id])
+			attrs = filter_attributes_tour_plan(tour_plan.attributes)
+			attrs[:schedules] = tour_plan.schedules
+			render json: attrs.to_json
+		end
+
 		private
 
 		def filter_attributes_tour_plan(tour_plan)

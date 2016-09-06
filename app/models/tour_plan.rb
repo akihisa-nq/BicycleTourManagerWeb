@@ -293,6 +293,8 @@ class TourPlanGenerator
 	def setup_resource_management
 		if @plan.resource_set
 			@plan.resource_set.resource_entries.each do |res|
+				next if res.resource.nil?
+
 				@tour.resources << BTM::Resource.new(
 					res.resource.name,
 					res.amount,
@@ -302,6 +304,8 @@ class TourPlanGenerator
 			end
 
 			@plan.resource_set.device_entries.each do |dev|
+				next if dev.device.nil?
+
 				@tour.schedule << BTM::Schedule.new(
 					"#{dev.device.name} #{dev.purpose} 交換",
 					dev.use_on_start ? @tour.start_date : dev.start_time,
@@ -314,10 +318,49 @@ class TourPlanGenerator
 	end
 
 	def generate_plan
+		@schedules = { routes: [] }
+		pc_index = 0
+
 		context = BTM::PlanContext.new(@tour, nil, nil, @option)
 		context.each_page do |pc, i, page_max|
+			if pc_index != pc.index
+				@schedules[:routes] << []
+				pc_index = pc.index
+			end
+
 			context.each_node do |node|
-				# noting to do
+				s = {}
+				s[:name] = node.info.name
+				s[:comment] = node.info.text
+				s[:rest_time] = node.info.rest_time
+
+				s[:target_speed] = node.info.target_speed
+				s[:limit_speed] = node.info.limit_speed
+				s[:elevation] = node.ele
+
+				s[:distance_addition] = context.distance_addition
+				s[:target_time_addition]  = context.target_time_addition
+				s[:limit_time_addition]  = context.time_addition
+
+				s[:road_nw] = node.info.road_nw || ""
+				s[:road_n] = node.info.road_n || ""
+				s[:road_ne] = node.info.road_ne || ""
+				s[:road_w] = node.info.road_w || ""
+				s[:road_e] = node.info.road_e || ""
+				s[:road_sw] = node.info.road_sw || ""
+				s[:road_s] = node.info.road_s || ""
+				s[:road_se] = node.info.road_se || ""
+				s[:direction_image] = ""
+
+				s[:pc_total_distance] = context.pc_total_distance
+				s[:total_distance] = node.distance_from_start
+
+				s[:pc_total_target_time] = context.pc.total_target_time
+				s[:pc_total_limit_time] = context.pc.total_time
+
+				s[:pass] = node.info.pass
+
+				@schedules[:routes].last << s
 			end
 
 			context.update_resource_status do
@@ -409,6 +452,8 @@ class TourPlanGenerator
 		@plotter.label = true
 		@plotter.plot(@tour, @plan.altitude_graph_path)
 	end
+
+	attr_reader :schedules
 end
 
 class TourPlan < ActiveRecord::Base
@@ -712,6 +757,20 @@ SELECT ST_Length(t.path, false) as length FROM
 	def self.toggle_visible(user, id)
 		if user.can? :edit, TourPlan
 			TourPlan.where(["id = ?", id]).update_all("published = CASE WHEN published = TRUE THEN FALSE ELSE TRUE END")
+		end
+	end
+
+	def schedules
+		begin
+			generator = TourPlanGenerator.new(self.id, false)
+			generator.setup_plan
+			generator.calculate_additional_info
+			generator.setup_resource_management
+			generator.generate_plan
+			generator.schedules
+		rescue => e
+			# nothing to do
+			raise e
 		end
 	end
 end
