@@ -3,15 +3,14 @@ module Api
 		def list
 			tour_plans = TourPlan
 				.all_with_auth(current_user, params[:offset], params[:limit])
-				.map {|tour_plan| tour_plan.attributes }
-			tour_plans.each { |tour_plan| filter_attributes_tour_plan(tour_plan) }
+				.map {|tour_plan| filter_attributes_tour_plan(tour_plan) }
 			render json: { tour_plans: tour_plans }.to_json
 		end
 
 		def show
 			tour_plan = TourPlan
 				.find_with_auth(current_user, params[:id])
-			attrs = filter_attributes_tour_plan(tour_plan.attributes)
+			attrs = filter_attributes_tour_plan(tour_plan)
 
 			if params["all"] == "1"
 				attrs["routes"] = []
@@ -31,7 +30,7 @@ module Api
 		def schedule
 			tour_plan = TourPlan
 				.find_with_auth(current_user, params[:tour_plan_id])
-			attrs = filter_attributes_tour_plan(tour_plan.attributes)
+			attrs = filter_attributes_tour_plan(tour_plan)
 			attrs[:schedules] = tour_plan.schedules
 			render json: attrs.to_json
 		end
@@ -39,9 +38,11 @@ module Api
 		private
 
 		def filter_attributes_tour_plan(tour_plan)
-			tour_plan["published"] = tour_plan["published"] ? true : false
-			tour_plan.delete("planning_sheet_scale")
-			tour_plan
+			attrs = tour_plan.attributes
+			attrs["published"] = tour_plan["published"] ? true : false
+			attrs.delete("planning_sheet_scale")
+			attrs["distance"] = tour_plan.distance(false)
+			attrs
 		end
 	end
 end
