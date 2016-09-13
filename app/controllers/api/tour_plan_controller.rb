@@ -1,10 +1,12 @@
 module Api
 	class TourPlanController < Api::BaseController
 		def list
+			offset = params[:offset] || 0
+			limit = params[:limit] || 1000
 			tour_plans = TourPlan
-				.all_with_auth(current_user, params[:offset], params[:limit])
+				.all_with_auth(current_user, offset, limit)
 				.map {|tour_plan| filter_attributes_tour_plan(tour_plan) }
-			render json: { tour_plans: tour_plans }.to_json
+			render json: { tour_plans: tour_plans, total_count: TourPlan.count, offset: offset, limit: limit }.to_json
 		end
 
 		def show
@@ -31,7 +33,7 @@ module Api
 			tour_plan = TourPlan
 				.find_with_auth(current_user, params[:tour_plan_id])
 			attrs = filter_attributes_tour_plan(tour_plan)
-			attrs[:schedules] = tour_plan.schedules
+			attrs[:tour_plan_schedules] = tour_plan.schedules
 			render json: attrs.to_json
 		end
 

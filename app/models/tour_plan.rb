@@ -318,20 +318,28 @@ class TourPlanGenerator
 	end
 
 	def generate_plan
-		@schedules = { routes: [] }
+		@schedules = { tour_plan_schedule_routes: [] }
 		pc_index = 0
+		pt_index = 0
 
 		context = BTM::PlanContext.new(@tour, nil, nil, @option)
 		context.each_page do |pc, i, page_max|
 			if pc_index != pc.index
-				@schedules[:routes] << []
+				@schedules[:tour_plan_schedule_routes] << {
+					id: @plan.tour_plan_routes[pc_index - 1].id,
+					name: @plan.tour_plan_routes[pc_index - 1].name,
+					tour_plan_schedule_points: []
+				}
 				pc_index = pc.index
+				pt_index = 0
 			end
 
 			context.each_node do |node|
 				s = {}
-				s[:name] = node.info.name
-				s[:comment] = node.info.text
+
+				s[:id] = @plan.tour_plan_routes[pc_index - 1].tour_plan_points[pt_index].id
+				s[:name] = node.info.name || ""
+				s[:comment] = node.info.text || ""
 				s[:rest_time] = node.info.rest_time
 
 				s[:target_speed] = node.info.target_speed
@@ -350,7 +358,8 @@ class TourPlanGenerator
 				s[:road_sw] = node.info.road_sw || ""
 				s[:road_s] = node.info.road_s || ""
 				s[:road_se] = node.info.road_se || ""
-				s[:direction_image] = ""
+				s[:source] = node.info.orig || ""
+				s[:destination] = node.info.dest || ""
 
 				s[:pc_total_distance] = context.pc_total_distance
 				s[:total_distance] = node.distance_from_start
@@ -358,9 +367,14 @@ class TourPlanGenerator
 				s[:pc_total_target_time] = context.pc.total_target_time
 				s[:pc_total_limit_time] = context.pc.total_time
 
-				s[:pass] = node.info.pass
+				s[:total_target_time] = node.time_target
+				s[:total_limit_time] = node.time
 
-				@schedules[:routes].last << s
+				s[:pass] = node.info.pass || false
+
+				@schedules[:tour_plan_schedule_routes].last[:tour_plan_schedule_points] << s
+
+				pt_index += 1
 			end
 
 			context.update_resource_status do
