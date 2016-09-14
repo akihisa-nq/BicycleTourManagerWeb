@@ -341,7 +341,7 @@ class TourPlanGenerator
 				s[:id] = @plan.tour_plan_routes[pc_index - 1].tour_plan_points[pt_index].id
 				s[:name] = node.info.name || ""
 				s[:comment] = node.info.text || ""
-				s[:rest_time] = node.info.rest_time
+				s[:rest_time] = node.info.rest_time || 0.0
 
 				s[:target_speed] = node.info.target_speed
 				s[:limit_speed] = node.info.limit_speed
