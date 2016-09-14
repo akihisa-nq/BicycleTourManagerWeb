@@ -44,6 +44,7 @@ module Api
 			attrs["published"] = tour_plan["published"] ? true : false
 			attrs.delete("planning_sheet_scale")
 			attrs["distance"] = tour_plan.distance(false)
+			attrs["elevation"] ||= 0
 			attrs
 		end
 	end
