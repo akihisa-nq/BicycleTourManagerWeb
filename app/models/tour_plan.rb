@@ -326,8 +326,8 @@ class TourPlanGenerator
 		context.each_page do |pc, i, page_max|
 			if pc_index != pc.index
 				@schedules[:tour_plan_schedule_routes] << {
-					id: @plan.tour_plan_routes[pc_index - 1].id,
-					name: @plan.tour_plan_routes[pc_index - 1].name,
+					id: @plan.tour_plan_routes[pc_index].id,
+					name: @plan.tour_plan_routes[pc_index].name,
 					tour_plan_schedule_points: []
 				}
 				pc_index = pc.index
@@ -337,7 +337,7 @@ class TourPlanGenerator
 			context.each_node do |node|
 				s = {}
 
-				s[:id] = @plan.tour_plan_routes[pc_index - 1].tour_plan_points[pt_index].id
+				s[:id] = @plan.tour_plan_routes[pc_index].tour_plan_points[pt_index].id
 				s[:name] = node.info.name || ""
 				s[:comment] = node.info.text || ""
 				s[:rest_time] = node.info.rest_time
