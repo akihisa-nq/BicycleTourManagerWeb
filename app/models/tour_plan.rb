@@ -325,13 +325,14 @@ class TourPlanGenerator
 		context = BTM::PlanContext.new(@tour, nil, nil, @option)
 		context.each_page do |pc, i, page_max|
 			if pc_index != pc.index
+				pc_index = pc.index
+				pt_index = 0
+
 				@schedules[:tour_plan_schedule_routes] << {
 					id: @plan.tour_plan_routes[pc_index - 1].id,
 					name: @plan.tour_plan_routes[pc_index - 1].name,
 					tour_plan_schedule_points: []
 				}
-				pc_index = pc.index
-				pt_index = 0
 			end
 
 			context.each_node do |node|
