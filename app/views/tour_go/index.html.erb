@@ -16,14 +16,15 @@
 			<%= will_paginate @tour_gos, renderer: FoundationPagination::Rails %>
 		</div>
 
-		<% @tour_go.each do |tour_go| %>
+		<% @tour_gos.each do |tour_go| %>
 		<div class="btmw-tour-go-item" id="tour_item_<%= tour_go.id %>">
           <div class="row">
 		    <div class="medium-9 columns">
               <div><%= tour_go.start_time.strftime("%Y/%m/%d") %></div>
-		      <h3><%= tour_go.name %></h3>
+		      <h3><%= tour_go.tour_plan.name %></h3>
 
 			  <ul class="button-group round">
+			  <li><%= link_to("表示", { action: :show, id: tour_go }, class: "tiny button") %></li>
               <% if can?(:delete, TourGo) || can?(:edit, TourGo) %>
 			  <li><a href="#" data-dropdown="manage_<%= tour_go.id %>" class="tiny button">&nbsp;</a></li>
               <% end %>

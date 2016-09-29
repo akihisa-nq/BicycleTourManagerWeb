@@ -474,6 +474,7 @@ end
 class TourPlan < ActiveRecord::Base
 	has_many :tour_plan_routes, -> { order("position ASC") }, dependent: :destroy
 	has_many :tour_results, -> { order("start_time DESC") }, dependent: :destroy
+	has_many :tour_gos, -> { order("start_time DESC") }, dependent: :destroy
 	belongs_to :resource_set
 
 	def self.all_with_auth(user, offset, limit)

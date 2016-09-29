@@ -1,3 +1,28 @@
 // Place all the styles related to the TourGoController controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+.btmw-tour-go-list
+{
+	padding-top: 10px;
+	padding-bottom: 24px;
+}
+
+.btmw-tour-go-list-nav
+{
+	text-align: center;
+}
+
+.btmw-tour-go-item
+{
+	margin-top: 10px;
+	margin-bottom: 10px;
+	padding-bottom: 10px;
+	border-bottom: 1px black solid;
+}
+
+.btmw-tour-go-item .button-group
+{
+	float: right;
+}
+

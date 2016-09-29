@@ -60,6 +60,7 @@ BicycleTourManagerWeb::Application.routes.draw do
 
   get "/tour_go", to: "tour_go#index"
   get "/tour_go/page/:page", to: "tour_go#index"
+  get "/tour_go/:id/show", to: "tour_go#show"
   delete "/tour_go/:id/destroy", to: "tour_go#destroy"
   
   namespace :api do
