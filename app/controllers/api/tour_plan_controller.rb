@@ -2,7 +2,7 @@ module Api
 	class TourPlanController < Api::BaseController
 		def list
 			offset = params[:offset] || 0
-			limit = params[:limit] || 1000
+			limit = params[:limit].to_i || 1000
 			tour_plans = TourPlan
 				.all_with_auth(current_user, offset, limit)
 				.map {|tour_plan| filter_attributes_tour_plan(tour_plan) }

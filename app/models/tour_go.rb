@@ -3,7 +3,7 @@ class TourGo < ActiveRecord::Base
 
 	def self.all_with_auth(user, offset, limit)
 		if user.can? :edit, TourGo
-			TourGo.order("created_at DESC").offset(offset).limit(limit)
+			TourGo.order("start_time DESC").offset(offset).limit(limit)
 		else
 			[]
 		end
