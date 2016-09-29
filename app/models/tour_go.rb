@@ -1,5 +1,5 @@
 class TourGo < ActiveRecord::Base
-	has_many :tour_go_events, -> { order("occured_on ASC") }
+	has_many :tour_go_events, -> { order("occured_on ASC") }, dependent: :destroy
 
 	def self.all_with_auth(user, offset, limit)
 		if user.can? :edit, TourGo
@@ -21,7 +21,7 @@ class TourGo < ActiveRecord::Base
 
 	def self.destroy_with_auth(user, id)
 		if user.can?(:edit, TourGo)
-			TourGo.where(["id = ?", id]).delete_all
+			destroy([id])
 		end
 	end
 

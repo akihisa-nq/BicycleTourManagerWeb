@@ -77,7 +77,7 @@ BicycleTourManagerWeb::Application.routes.draw do
 		  get "schedule"
 	  end
 
-	  resources :tour_go, only: [ :show, :create ] do
+	  resources :tour_go, only: [ :show, :create, :destroy, :update ] do
 		  collection do
 			  get :list
 		  end

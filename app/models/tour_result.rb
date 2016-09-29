@@ -5,9 +5,9 @@ require "stringio"
 require "fileutils"
 
 class TourResult < ActiveRecord::Base
-	has_many :public_result_routes, -> { order("position ASC") }
-	has_many :private_result_routes, -> { order("position ASC") }
-	has_many :tour_images, -> { order("shot_on ASC") }
+	has_many :public_result_routes, -> { order("position ASC") }, dependent: :destroy
+	has_many :private_result_routes, -> { order("position ASC") }, dependent: :destroy
+	has_many :tour_images, -> { order("shot_on ASC") }, dependent: :destroy
 	belongs_to :tour_plan
 
 	before_save -> { update_elevation }

@@ -1,6 +1,6 @@
 class ResourceSet < ActiveRecord::Base
-	has_many :resource_entries
-	has_many :device_entries
+	has_many :resource_entries, dependent: :destroy
+	has_many :device_entries, dependent: :destroy
 
 	def self.create_with_auth(user, attr)
 		if user.can?(:edit, ResourceSet)

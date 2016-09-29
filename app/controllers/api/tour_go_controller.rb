@@ -17,19 +17,46 @@ module Api
 		end
 
 		def create
-			tour_go = TourGo.create_with_auth(current_user, params.permit(:tour_plan_id, :start_time))
+			tour_go = TourGo.create_with_auth(current_user, tour_go_params)
 
-			params.require("tour_go_events").each do |e|
-				tour_go.tour_go_events.build(
-					e.permit(:occured_on, :event_type, :tour_plan_point_id)
-					)
+			if tour_go
+				tour_go_events_params {|e| tour_go.tour_go_events.build(e) }
+				tour_go.save!
 			end
-			tour_go.save!
 
-			render json: { id: tour_go.id }.to_json
+			render json: { id: tour_go ? tour_go.id : nil }.to_json
+		end
+
+		def update
+			tour_go = TourGo
+				.find_with_auth(current_user, params[:id])
+
+			if tour_go
+				tour_go.tour_go_events.clear
+				tour_go_events_params {|e| tour_go.tour_go_events.build(e) }
+
+				tour_go.update(tour_go_params)
+			end
+
+			render json: { result: tour_go ? true : false }.to_json
+		end
+
+		def destroy
+			TourGo.destroy_with_auth(current_user, params[:id])
+			render json: { result: true }.to_json
 		end
 
 		private
+
+		def tour_go_params
+			params.permit(:tour_plan_id, :start_time)
+		end
+
+		def tour_go_events_params(&block)
+			params.require("tour_go_events").each do |e|
+				block.call(e.permit(:occured_on, :event_type, :tour_plan_point_id))
+			end
+		end
 
 		def filter_attributes_tour_go(tour_go)
 			attrs = tour_go.as_json

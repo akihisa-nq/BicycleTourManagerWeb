@@ -472,8 +472,8 @@ class TourPlanGenerator
 end
 
 class TourPlan < ActiveRecord::Base
-	has_many :tour_plan_routes, -> { order("position ASC") }
-	has_many :tour_results, -> { order("start_time DESC") }
+	has_many :tour_plan_routes, -> { order("position ASC") }, dependent: :destroy
+	has_many :tour_results, -> { order("start_time DESC") }, dependent: :destroy
 	belongs_to :resource_set
 
 	def self.all_with_auth(user, offset, limit)
@@ -546,7 +546,7 @@ class TourPlan < ActiveRecord::Base
 
 	def self.destroy_with_auth(user, id)
 		if user.can?(:edit, TourPlan)
-			TourPlan.where(["id = ?", id]).delete_all
+			destroy([id])
 		end
 	end
 

@@ -2,8 +2,8 @@ class TourPlanRoute < ActiveRecord::Base
 	belongs_to :tour_plan
 	acts_as_list scope: :tour_plan
 
-	has_many :tour_plan_points, -> { order("position ASC") }
-	has_many :tour_plan_paths, -> { order("position ASC") }
+	has_many :tour_plan_points, dependent: :destroy, -> { order("position ASC") }
+	has_many :tour_plan_paths, dependent: :destroy, -> { order("position ASC") }
 
 	def set_point_lines
 		parser = RGeo::WKRep::WKBParser.new(private_line.factory, support_ewkb: true, support_wkb12: true)
