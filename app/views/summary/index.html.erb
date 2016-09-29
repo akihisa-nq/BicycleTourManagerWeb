@@ -10,6 +10,13 @@
 		自転車旅の予定。
 		</p>
 
+        <% if can?(:delete, TourGo) || can?(:edit, TourGo) %>
+        <h2><%= link_to "旅の経過", controller: :tour_go, action: :index %></h2>
+		<p>
+		実行中の自転車旅の経過。
+		</p>
+		<% end %>
+
         <h2><%= link_to "旅の記録", controller: :tour_result, action: :index %></h2>
 		<p>
 		実際に走った自転車旅の記録。

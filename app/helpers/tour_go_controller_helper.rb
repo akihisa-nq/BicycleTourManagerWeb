@@ -1,0 +1,2 @@
+module TourGoControllerHelper
+end

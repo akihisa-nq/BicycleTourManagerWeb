@@ -1,0 +1,57 @@
+<% content_for(:title) do %>
+旅の経過
+<% end %>
+
+<% content_for(:menus) do %>
+<li class="active"><%= link_to "戻る", controller: :summary, action: :index %></li>
+<% end %>
+
+<% content_for(:manage) do %>
+<% end %>
+
+<div class="btmw-tour-go-list">
+  <div class="row">
+    <div class="medium-12 columns">
+		<div class="pagination-centered">
+			<%= will_paginate @tour_gos, renderer: FoundationPagination::Rails %>
+		</div>
+
+		<% @tour_go.each do |tour_go| %>
+		<div class="btmw-tour-go-item" id="tour_item_<%= tour_go.id %>">
+          <div class="row">
+		    <div class="medium-9 columns">
+              <div><%= tour_go.start_time.strftime("%Y/%m/%d") %></div>
+		      <h3><%= tour_go.name %></h3>
+
+			  <ul class="button-group round">
+              <% if can?(:delete, TourGo) || can?(:edit, TourGo) %>
+			  <li><a href="#" data-dropdown="manage_<%= tour_go.id %>" class="tiny button">&nbsp;</a></li>
+              <% end %>
+			  </ul>
+              <% if can?(:delete, TourGo) || can?(:edit, TourGo) %>
+			  <ul id="manage_<%= tour_go.id %>" data-dropdown-content class="f-dropdown">
+                <% if can? :delete, TourGo %>
+				<li><%= link_to("削除", {action: :destroy, id: tour_go}, method: :delete, data: { confirm: "削除しますか?" }) %></li>
+                <% end %>
+              </ul>
+              <% end %>
+            </div>
+		    <div class="medium-3 columns">
+				<table>
+					<tbody>
+						<tr>
+							<th>イベント数</th><td><%= tour_go.tour_go_events.count %> 個</td>
+						</tr>
+					</tbody>
+				</table>
+            </div>
+		  </div>
+		</div>
+		<% end %>
+
+		<div class="pagination-centered">
+			<%= will_paginate @tour_gos, renderer: FoundationPagination::Rails %>
+		</div>
+	</div>
+  </div>
+</div>

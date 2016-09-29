@@ -58,6 +58,10 @@ BicycleTourManagerWeb::Application.routes.draw do
   post "/tour_plan/:id/routes/nodes/update", to: "tour_plan#update_node"
   delete "/tour_plan/:tour_plan_id/routes/nodes/:id/destroy", to: "tour_plan#destroy_node"
 
+  get "/tour_go", to: "tour_go#index"
+  get "/tour_go/page/:page", to: "tour_go#index"
+  delete "/tour_go/:id/destroy", to: "tour_go#destroy"
+  
   namespace :api do
 	  resources :exclusion_area, only: [ :show ] do
 		  collection do
@@ -71,6 +75,12 @@ BicycleTourManagerWeb::Application.routes.draw do
 		  end
 
 		  get "schedule"
+	  end
+
+	  resources :tour_go, only: [ :show, :create ] do
+		  collection do
+			  get :list
+		  end
 	  end
   end
 end
