@@ -10,7 +10,7 @@
 
   <%= javascript_include_tag "application", "data-turbolinks-track" => true %>
   <%= javascript_include_tag "vendor/modernizr", "data-turbolinks-track" => true %>
-  <%= javascript_include_tag "http://maps.google.com/maps/api/js?key=#{ENV["GMAP_API_KEY"]}", "data-turbolinks-track" => true %>
+  <%= javascript_include_tag "//maps.google.com/maps/api/js?key=#{ENV["GMAP_API_KEY"]}", "data-turbolinks-track": :reload %>
 
   <%= csrf_meta_tags %>
 </head>

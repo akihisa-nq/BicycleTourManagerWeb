@@ -90,12 +90,9 @@
                  }
              }
          });
-
-         $(document).unbind('ready page:load', ShowViewer);
-
      }
 
-     $(document).on('ready page:load', ShowViewer);
+	google.maps.event.addDomListener(window, 'load', ShowViewer)
 
     function cancelEditText(id)
     {
