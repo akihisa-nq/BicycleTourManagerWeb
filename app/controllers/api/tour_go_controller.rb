@@ -19,7 +19,7 @@ module Api
 		def create
 			tour_go = TourGo.create_with_auth(current_user, tour_go_params)
 
-			if tour_go
+			if tour_go && params["tour_go"]["tour_go_events"]
 				tour_go_events_params {|e| tour_go.tour_go_events.build(e) }
 				tour_go.save!
 			end
@@ -53,7 +53,7 @@ module Api
 		end
 
 		def tour_go_events_params(&block)
-			params.reqire(:tour_go).require("tour_go_events").each do |e|
+			params.require(:tour_go).require("tour_go_events").each do |e|
 				block.call(e.permit(:occured_on, :event_type, :tour_plan_point_id))
 			end
 		end
