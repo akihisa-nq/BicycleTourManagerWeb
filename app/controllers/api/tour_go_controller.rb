@@ -49,11 +49,11 @@ module Api
 		private
 
 		def tour_go_params
-			params.permit(:tour_plan_id, :start_time)
+			params.require(:tour_go).permit(:tour_plan_id, :start_time)
 		end
 
 		def tour_go_events_params(&block)
-			params.require("tour_go_events").each do |e|
+			params.reqire(:tour_go).require("tour_go_events").each do |e|
 				block.call(e.permit(:occured_on, :event_type, :tour_plan_point_id))
 			end
 		end
