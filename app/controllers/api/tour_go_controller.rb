@@ -31,7 +31,7 @@ module Api
 			tour_go = TourGo
 				.find_with_auth(current_user, params[:id])
 
-			if tour_go
+			if tour_go && params["tour_go"]["tour_go_events"]
 				tour_go.tour_go_events.clear
 				tour_go_events_params {|e| tour_go.tour_go_events.build(e) }
 
