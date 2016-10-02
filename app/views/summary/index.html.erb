@@ -78,7 +78,7 @@ function loadMaps()
 		window.marker = new google.maps.Marker(markerOptions);
 
         window.info_window = new google.maps.InfoWindow({
-            content: "<div><%= @date.strftime("#{@center.name} %e 日目 %H:%M 通過") %></div>",
+            content: "<div><%= @date.strftime("#{@center.name} %m/%d %H:%M 通過") %></div>",
             size: new google.maps.Size(100,100)
         });
 
