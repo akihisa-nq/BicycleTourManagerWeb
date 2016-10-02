@@ -20,8 +20,8 @@
 		<div class="btmw-tour-go-item" id="tour_item_<%= tour_go.id %>">
           <div class="row">
 		    <div class="medium-9 columns">
-              <div><%= tour_go.start_time.strftime("%Y/%m/%d") %></div>
-		      <h3><%= tour_go.tour_plan.name %></h3>
+              <div><%= tour_go.start_time && tour_go.start_time.strftime("%Y/%m/%d") %></div>
+		      <h3><%= tour_go.tour_plan && tour_go.tour_plan.name %></h3>
 
 			  <ul class="button-group round">
 			  <li><%= link_to("表示", { action: :show, id: tour_go }, class: "tiny button") %></li>
