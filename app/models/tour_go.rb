@@ -5,11 +5,11 @@ class TourGo < ActiveRecord::Base
 	PER_PAGE = 10
 
 	def self.all_with_auth(user, offset, limit)
-		if user.can? :edit, TourGo
-			TourGo.order("start_time DESC").offset(offset).limit(limit)
-		else
-			[]
+		list = TourGo.order("start_time DESC").offset(offset).limit(limit)
+		unless user.can? :edit, TourGo
+			list = list.select {|g| g.tour_plan.published }
 		end
+		list
 	end
 
 	def self.create_with_auth(user, attr_go)

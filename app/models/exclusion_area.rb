@@ -13,7 +13,7 @@ class ExclusionArea < ActiveRecord::Base
 	def self.create_with_auth(user, attr)
 		if user.can?(:edit, ExclusionArea)
 			area = ExclusionArea.new
-			area.point = rgeo_factory_for_column(:point).point(attr[:lon], attr[:lat])
+			area.point = BTM.factory.point(attr[:lon], attr[:lat])
 			area.distance = attr[:distance]
 			area.save
 			area
@@ -23,7 +23,7 @@ class ExclusionArea < ActiveRecord::Base
 	def self.update_with_auth(user, id, attr)
 		if user.can?(:edit, ExclusionArea)
 			area = ExclusionArea.find(id)
-			area.point = rgeo_factory_for_column(:point).point(attr[:lon], attr[:lat])
+			area.point = BTM.factory.point(attr[:lon], attr[:lat])
 			area.distance = attr[:distance]
 			area.save
 		else
