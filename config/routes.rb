@@ -83,6 +83,9 @@ BicycleTourManagerWeb::Application.routes.draw do
 			  get :list
 		  end
 	  end
+
+	  resources :user, only: [ :show ] do
+	  end
   end
 end
 
