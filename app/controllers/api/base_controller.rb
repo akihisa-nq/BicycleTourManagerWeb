@@ -4,9 +4,6 @@ class Api::BaseController < ActionController::Base
 	clear_respond_to
 	respond_to :json
 
-	before_action :doorkeeper_authorize!
-	before_action :authenticate_user!
-
 	# check_authorization unless: :devise_controller?
 
 	rescue_from CanCan::AccessDenied do |e|
@@ -29,8 +26,8 @@ class Api::BaseController < ActionController::Base
 		render json: { errors: ['User is not authenticated!'] }, status: :unauthorized
 	end
 
-	def current_user
-		Thread.current[:current_user]
+	def current_user_or_guest
+		Thread.current[:current_user] || current_user || User.new
 	end
 
 	def errors_json(messages)

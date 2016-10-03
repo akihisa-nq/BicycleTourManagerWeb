@@ -4,20 +4,20 @@ module Api
 			offset = params[:offset] || 0
 			limit = params[:limit].to_i || 1000
 			tour_gos = TourGo
-				.all_with_auth(current_user, offset, limit)
+				.all_with_auth(current_user_or_guest, offset, limit)
 				.map {|tour_go| filter_attributes_tour_go(tour_go) }
 			render json: { tour_gos: tour_gos, total_count: TourGo.count, offset: offset, limit: limit }.to_json
 		end
 
 		def show
 			tour_go = TourGo
-				.find_with_auth(current_user, params[:id])
+				.find_with_auth(current_user_or_guest, params[:id])
 			attrs = filter_attributes_tour_go(tour_go)
 			render json: attrs.to_json
 		end
 
 		def create
-			tour_go = TourGo.create_with_auth(current_user, tour_go_params)
+			tour_go = TourGo.create_with_auth(current_user_or_guest, tour_go_params)
 
 			if tour_go
 				tour_go_events_params {|e| tour_go.tour_go_events.build(e) }
@@ -29,7 +29,7 @@ module Api
 
 		def update
 			tour_go = TourGo
-				.find_with_auth(current_user, params[:id])
+				.find_with_auth(current_user_or_guest, params[:id])
 
 			if tour_go
 				tour_go.tour_go_events.clear
@@ -42,7 +42,7 @@ module Api
 		end
 
 		def destroy
-			TourGo.destroy_with_auth(current_user, params[:id])
+			TourGo.destroy_with_auth(current_user_or_guest, params[:id])
 			render json: { result: true }.to_json
 		end
 

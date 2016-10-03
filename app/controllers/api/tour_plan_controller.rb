@@ -4,14 +4,14 @@ module Api
 			offset = params[:offset] || 0
 			limit = params[:limit].to_i || 1000
 			tour_plans = TourPlan
-				.all_with_auth(current_user, offset, limit)
+				.all_with_auth(current_user_or_guest, offset, limit)
 				.map {|tour_plan| filter_attributes_tour_plan(tour_plan) }
 			render json: { tour_plans: tour_plans, total_count: TourPlan.count, offset: offset, limit: limit }.to_json
 		end
 
 		def show
 			tour_plan = TourPlan
-				.find_with_auth(current_user, params[:id])
+				.find_with_auth(current_user_or_guest, params[:id])
 			attrs = filter_attributes_tour_plan(tour_plan)
 
 			if params["all"] == "1"
@@ -31,7 +31,7 @@ module Api
 
 		def schedule
 			tour_plan = TourPlan
-				.find_with_auth(current_user, params[:tour_plan_id])
+				.find_with_auth(current_user_or_guest, params[:tour_plan_id])
 			attrs = filter_attributes_tour_plan(tour_plan)
 			attrs[:tour_plan_schedules] = tour_plan.schedules
 			render json: attrs.to_json
