@@ -5,11 +5,19 @@ class TourGo < ActiveRecord::Base
 	PER_PAGE = 10
 
 	def self.all_with_auth(user, offset, limit)
-		list = TourGo.order("start_time DESC").offset(offset).limit(limit)
-		unless user.can? :edit, TourGo
-			list = list.select {|g| g.tour_plan.published }
+		if user.can? :edit, TourGo
+			TourGo
+				.order("start_time DESC")
+				.offset(offset)
+				.limit(limit)
+		else
+			TourGo
+				.joins(:tour_plan)
+				.where(tour_plans: { published: true })
+				.order("start_time DESC")
+				.offset(offset)
+				.limit(limit)
 		end
-		list
 	end
 
 	def self.create_with_auth(user, attr_go)
@@ -38,16 +46,34 @@ class TourGo < ActiveRecord::Base
 
 	def self.list_all(user, page)
 		if user.can? :edit, TourGo
-			TourGo.paginate(page: page, per_page: PER_PAGE).order("start_time DESC")
+			TourGo
+				.paginate(page: page, per_page: PER_PAGE)
+				.order("start_time DESC")
 		else
-			[]
+			TourGo
+				.joins(:tour_plan)
+				.where(tour_plans: { published: true })
+				.paginate(page: page, per_page: PER_PAGE)
+				.order("start_time DESC")
 		end
 	end
 
 	def self.page_for(user, id)
 		go = find_with_auth(user, id)
 		if go
-			(TourPlan.where(["start_time >= ?", go.start_time]).count - 1) / PER_PAGE + 1
+			count = 0
+			if user.can? :edit, TourGo
+				count = TourGo
+					.where(["start_time >= ?", go.start_time])
+					.count
+			else
+				count = TourGo
+					.joins(:tour_plan)
+					.where(tour_plans: { published: true })
+					.where(["start_time >= ?", go.start_time])
+					.count
+			end
+			(count - 1) / PER_PAGE + 1
 		else
 			1
 		end

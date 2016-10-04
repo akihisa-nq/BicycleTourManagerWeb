@@ -496,7 +496,13 @@ class TourPlan < ActiveRecord::Base
 	def self.page_for(user, id)
 		tour = find_with_auth(user, id)
 		if tour
-			(TourPlan.where(["created_at >= ?", tour.created_at]).count - 1) / 10 + 1
+			count = 0
+			if user.can? :edit, TourResult
+				count = TourPlan.where(["created_at >= ?", tour.created_at]).count
+			else
+				count = TourPlan.where(["published = true AND created_at >= ?", tour.created_at]).count
+			end
+			(count - 1) / 10 + 1
 		else
 			1
 		end
