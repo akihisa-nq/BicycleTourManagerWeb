@@ -1,3 +1,5 @@
+require "base64"
+
 module Api
 	class TourGoController < Api::BaseController
 		def list
@@ -54,7 +56,16 @@ module Api
 
 		def tour_go_events_params(&block)
 			params.require("tour_go_events").each do |e|
-				block.call(e.permit(:occured_on, :event_type, :tour_plan_point_id))
+				params_e = e.permit(
+					:occured_on,
+					:event_type,
+					:tour_plan_point_id,
+					:blob
+					)
+				if params_e[:blob]
+					params_e[:blob] = Base64.decode64(params_e[:blob])
+				end
+				block.call(params_e)
 			end
 		end
 
