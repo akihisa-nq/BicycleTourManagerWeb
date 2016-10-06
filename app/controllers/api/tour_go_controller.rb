@@ -21,8 +21,11 @@ module Api
 		def create
 			tour_go = TourGo.create_with_auth(current_user_or_guest, tour_go_params)
 
-			if tour_go && params["tour_go"]["tour_go_events"]
-				tour_go_events_params {|e| tour_go.tour_go_events.build(e) }
+			if tour_go
+				if params["tour_go"]["tour_go_events"]
+					tour_go_events_params {|e| tour_go.tour_go_events.build(e) }
+				end
+
 				tour_go.save!
 			end
 
@@ -33,9 +36,11 @@ module Api
 			tour_go = TourGo
 				.find_with_auth(current_user_or_guest, params[:id])
 
-			if tour_go && params["tour_go"]["tour_go_events"]
-				tour_go.tour_go_events.clear
-				tour_go_events_params {|e| tour_go.tour_go_events.build(e) }
+			if tour_go
+				if params["tour_go"]["tour_go_events"]
+					tour_go.tour_go_events.clear
+					tour_go_events_params {|e| tour_go.tour_go_events.build(e) }
+				end
 
 				tour_go.update(tour_go_params)
 			end
