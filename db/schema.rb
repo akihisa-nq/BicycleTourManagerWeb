@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160929051211) do
+ActiveRecord::Schema.define(version: 20161006042212) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -131,6 +131,7 @@ ActiveRecord::Schema.define(version: 20160929051211) do
     t.datetime "occured_on"
     t.integer  "event_type",         limit: 2, default: 0, null: false
     t.integer  "tour_plan_point_id"
+    t.binary   "blob"
   end
 
   create_table "tour_gos", force: :cascade do |t|
