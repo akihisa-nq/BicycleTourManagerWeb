@@ -3,12 +3,17 @@ require "base64"
 module Api
 	class TourGoController < Api::BaseController
 		def list
-			offset = params[:offset] || 0
-			limit = params[:limit].to_i || 1000
+			offset = params[:offset] ? params[:offset].to_i : 0
+			limit = params[:limit] ? params[:limit].to_i : 1000
 			tour_gos = TourGo
 				.all_with_auth(current_user_or_guest, offset, limit)
 				.map {|tour_go| filter_attributes_tour_go(tour_go) }
-			render json: { tour_gos: tour_gos, total_count: TourGo.count, offset: offset, limit: limit }.to_json
+			render json: {
+				tour_gos: tour_gos,
+				total_count: TourGo.count_with_auth(current_user_or_guest),
+				offset: offset,
+				limit: limit
+			}.to_json
 		end
 
 		def show
@@ -19,7 +24,7 @@ module Api
 		end
 
 		def create
-			tour_go = TourGo.create_with_auth(current_user_or_guest, tour_go_params)
+			tour_go = TourGo.new_with_auth(current_user_or_guest, tour_go_params)
 
 			if tour_go
 				if params["tour_go"]["tour_go_events"]

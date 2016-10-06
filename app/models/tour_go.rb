@@ -20,6 +20,25 @@ class TourGo < ActiveRecord::Base
 		end
 	end
 
+	def self.count_with_auth(user)
+		if user.can? :edit, TourGo
+			TourGo.count
+		else
+			TourGo
+				.joins(:tour_plan)
+				.where(tour_plans: { published: true })
+				.count
+		end
+	end
+
+	def self.new_with_auth(user, attr_go)
+		if user.can? :edit, TourGo
+			TourGo.new(attr_go)
+		else
+			nil
+		end
+	end
+
 	def self.create_with_auth(user, attr_go)
 		if user.can? :edit, TourGo
 			go = TourGo.new(attr_go)
