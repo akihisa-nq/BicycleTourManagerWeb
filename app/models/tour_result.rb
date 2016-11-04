@@ -273,12 +273,13 @@ class TourResult < ActiveRecord::Base
 	end
 
 	def distance(is_public_data)
-		table_name = is_public_data ? "public_result_routes" : "private_result_routes"
-		ret = TourResult.find_by_sql([<<-EOS, id])[0].length
-SELECT ST_Length(t.path, false) as length FROM
-	(SELECT ST_Collect(path) AS path FROM #{table_name} WHERE tour_result_id = ?) as t
-		EOS
-		ret.to_i / 1000
+		table_name = is_public_data ? :public_result_routes : :private_result_routes
+		ret = TourResult
+			.left_joins(table_name)
+			.group("id")
+			.select("ST_Length(ST_Collect(#{table_name}.path), false) As length")
+			.find(id)
+		ret.length.to_i / 1000
 	end
 
 	def start_time_on_local

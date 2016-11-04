@@ -769,11 +769,12 @@ class TourPlan < ActiveRecord::Base
 
 	def distance(is_public_data)
 		column_name = is_public_data ? "public_line" : "private_line"
-		ret = TourPlan.find_by_sql([<<-EOS, id])[0].length
-SELECT ST_Length(t.path, false) as length FROM
-	(SELECT ST_Collect(#{column_name}) AS path FROM tour_plan_routes WHERE tour_plan_id = ?) as t
-		EOS
-		ret.to_i / 1000
+		ret = TourPlan
+			.left_joins(:tour_plan_routes)
+			.group("id")
+			.select("ST_Length(ST_Collect(tour_plan_routes.#{column_name}), false) As length")
+			.find(id)
+		ret.length.to_i / 1000
 	end
 
 	def self.toggle_visible(user, id)

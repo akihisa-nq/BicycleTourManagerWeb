@@ -26,7 +26,7 @@ gem "i18n_generators"
 gem "uglifier"
 gem "activerecord-postgresql-adapter"
 gem "activerecord-postgis-adapter"
-gem "rails", '= 4.2.7.1'
+gem "rails", '= 5.0.0.1'
 gem "jquery-rails"
 gem "jquery-ui-rails"
 gem "jquery-turbolinks"
