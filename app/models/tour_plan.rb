@@ -777,6 +777,37 @@ class TourPlan < ActiveRecord::Base
 		ret.length.to_i / 1000
 	end
 
+	def as_raster(is_public_data, tx, ty, zoom)
+		w = 360.0 / (2.0 ** zoom)
+		h = 170.0 / (2.0 ** zoom)
+		x = tx.to_f * w - 180.0
+		y = 85.0 - ty.to_f * h
+
+		points = [
+			[ x,     y     ],
+			[ x + w, y     ],
+			[ x + w, y - h ],
+			[ x,     y - h ],
+		].map {|pt| BTM.factory.point(*pt) }
+		view = BTM.factory.polygon(BTM.factory.linear_ring(points))
+
+		column_name = is_public_data ? "public_line" : "private_line"
+		ret = TourPlan
+			.left_joins(:tour_plan_routes)
+			.group("id")
+			.select(
+				"ST_AsPNG(" \
+					+ "ST_AsRaster(" \
+						+ "ST_Union(" \
+							+ "ST_Intersection(" \
+								+ "ST_Collect(tour_plan_routes.#{column_name})," \
+								+ "ST_GeomFromText(\'#{view.to_s}\', 4326))," \
+							+ "ST_GeomFromText(\'#{BTM.factory.linear_ring(points).to_s}\', 4326))," \
+						+ "256, 256)) As png")
+			.find(id)
+		ret.png
+	end
+
 	def self.toggle_visible(user, id)
 		if user.can? :edit, TourPlan
 			TourPlan.where(["id = ?", id]).update_all("published = CASE WHEN published = TRUE THEN FALSE ELSE TRUE END")
