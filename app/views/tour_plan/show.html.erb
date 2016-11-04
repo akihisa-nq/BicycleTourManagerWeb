@@ -23,8 +23,8 @@
                  window.info_window = [];
 
                  <% i = 0; @tour_plan.tour_plan_routes.each do |route|; route.tour_plan_points.each do |point| %>
-	 		     <% unless point.exclude? %>
-				 CreatePoint(<%= i %>, <%= point.point.y %>, <%= point.point.x %>, "<%=j icon_name(point) %>", $("#marker_<%= i %>").html() );
+                 <% unless point.exclude? %>
+                 CreatePoint(<%= i %>, <%= point.point.y %>, <%= point.point.x %>, "<%=j icon_name(point) %>", $("#marker_<%= i %>").html() );
                  <% end; i += 1; end; end %>
              }
          });
@@ -34,7 +34,7 @@
          window.marker[id] = new google.maps.Marker({
              position: new google.maps.LatLng(lat,lon),
              map: window.map,
-			 icon: icon
+             icon: icon
          });
 
          window.info_window[id] = new google.maps.InfoWindow({
@@ -67,6 +67,21 @@
          };
          window.map = new google.maps.Map(document.getElementById("map"), mapOptions);
 
+        var imgMapTypeOptions = {
+          getTileUrl : function(point, zoom) {
+            var tileUrl = "/tile.png?x=" + point.x + "&y=" + point.y + "&zoom=" + zoom;
+            return tileUrl;                          //画像のURLを返す
+          },
+          tileSize: new google.maps.Size(256, 256),  //必ず正方形。通常256px
+          alt: "",                                   //画像がないときに表示する文字
+          maxZoom: 19,                               //マップタイプの最大値
+          minZoom: 10,                               //マップタイプの最小値
+          name: "MyMapType",                         //マップタイプ名
+          opacity: 0.5                               //透明度(0.0～1.0)
+        };
+        var myMapType = new google.maps.ImageMapType(imgMapTypeOptions);
+        window.map.overlayMapTypes.insertAt(0, myMapType);
+
          loadGPXFileIntoGoogleMap("<%= url_for(action: :show_gpx, id: @tour_plan) %>");
 
          $('body').layout({
@@ -93,7 +108,7 @@
          });
      }
 
-	google.maps.event.addDomListener(window, 'load', ShowViewer)
+    google.maps.event.addDomListener(window, 'load', ShowViewer)
 //]]>
 </script>
 
@@ -145,97 +160,97 @@
    <div class="large-12 columns">
      <%
      target_speed = 15
-	 limit_speed = 15
-	 %>
+     limit_speed = 15
+     %>
      <% i = 0; @tour_plan.tour_plan_routes.each.with_index do |route, ri| %>
-	 <div>
-	   <h3><%= route.name %></h3>
-	   <table style="width:100%;">
-	     <theader>
-		   <th>場所</th>
-		   <th>到着</th>
-		 </theader>
-	     <tbody>
-		   <% pi = 0 %>
-		   <% peak_index = 0 %>
+     <div>
+       <h3><%= route.name %></h3>
+       <table style="width:100%;">
+         <theader>
+           <th>場所</th>
+           <th>到着</th>
+         </theader>
+         <tbody>
+           <% pi = 0 %>
+           <% peak_index = 0 %>
            <% route.tour_plan_points.each do |point| %>
-		   <%
-		   target_speed = point.target_speed if point.target_speed && point.target_speed > 0
-		   limit_speed = point.limit_speed if point.limit_speed && point.limit_speed > 0
-		   pi += 1 unless point.pass
-		   peak_index += 1 if point.pass
-		   %>
+           <%
+           target_speed = point.target_speed if point.target_speed && point.target_speed > 0
+           limit_speed = point.limit_speed if point.limit_speed && point.limit_speed > 0
+           pi += 1 unless point.pass
+           peak_index += 1 if point.pass
+           %>
            <tr>
-		     <% if point.exclude? %>
-			 <td>--</td>
-			 <td>--</td>
-			 <% else %>
-			 <td>
-				 <% if point.pass %>
-				 <a href="javascript:FocusPoint(<%= i %>);"><%= peak_type_text(point, ri + 1, peak_index) %> <%= point.name %></a>
-				 <% else %>
-				 <a href="javascript:FocusPoint(<%= i %>);">★<%= ri + 1 %>-<%= pi %> <%= point.name %></a>
-				 <% end %>
-			 </td>
-			 <td>
-			   <%= point.target_time && point.target_time.strftime("%e日目 %H:%M") %> ～ <%= point.limit_time && point.limit_time.strftime("%e日目 %H:%M") %>
+             <% if point.exclude? %>
+             <td>--</td>
+             <td>--</td>
+             <% else %>
+             <td>
+                 <% if point.pass %>
+                 <a href="javascript:FocusPoint(<%= i %>);"><%= peak_type_text(point, ri + 1, peak_index) %> <%= point.name %></a>
+                 <% else %>
+                 <a href="javascript:FocusPoint(<%= i %>);">★<%= ri + 1 %>-<%= pi %> <%= point.name %></a>
+                 <% end %>
+             </td>
+             <td>
+               <%= point.target_time && point.target_time.strftime("%e日目 %H:%M") %> ～ <%= point.limit_time && point.limit_time.strftime("%e日目 %H:%M") %>
                <div class="hide" id="marker_<%= i %>">
-			     <table style="width:300px">
-				   <tbody>
-				     <tr>
-						 <% if point.pass %>
-						 <th colspan="3"><%= peak_type_text(point, ri + 1, peak_index) %> <%= point.name %></th>
-						 <% else %>
-						 <th colspan="3">★<%= ri + 1 %>-<%= pi %> <%= point.name %></th>
-						 <% end %>
-				     </tr>
-					 <tr>
-						 <th>距離/高度</th>
-						 <td colspan="2"><%= point.distance %> km / <%= point.point.z.to_i %> m</td>
-					 </tr>
-				     <tr>
-					   <th rowspan="2">目標</th>
-					   <th>到着</th>
-					   <td><%= point.target_time && point.target_time.strftime("%e日目 %H:%M") %></td>
-					 </tr>
-				     <tr>
-					   <th>速度</th>
-					   <td><%= target_speed.to_i %> km/h</td>
-					 </tr>
-				     <tr>
-					   <th rowspan="2">制限</th>
-					   <th>到着</th>
-					   <td><%= point.target_time && point.limit_time.strftime("%e日目 %H:%M") %></td>
-					 </tr>
-				     <tr>
-					   <th>速度</th>
-					   <td><%= limit_speed.to_i %> km/h</td>
-					 </tr>
-					<tr>
-						<th>斜度</th>
-						<td colspan="2">
-							<ul>
-							<% point.tour_plan_up_hills.each do |up_hill| %>
-								<li><%= "%.1f" % [ up_hill.distance - point.distance ] %> km 先 <%= "%.1f" % [up_hill.gradient] %>% <%= "%.1f" % [up_hill.length] %> km</li>
-							<% end %>
-							</ul>
-						</td>
-					</tr>
-					 <tr>
-					   <th>備考</th>
-					   <td colspan="2"><%= point.comment %></td>
-					 </tr>
-				   </tbody>
-				 </table>
+                 <table style="width:300px">
+                   <tbody>
+                     <tr>
+                         <% if point.pass %>
+                         <th colspan="3"><%= peak_type_text(point, ri + 1, peak_index) %> <%= point.name %></th>
+                         <% else %>
+                         <th colspan="3">★<%= ri + 1 %>-<%= pi %> <%= point.name %></th>
+                         <% end %>
+                     </tr>
+                     <tr>
+                         <th>距離/高度</th>
+                         <td colspan="2"><%= point.distance %> km / <%= point.point.z.to_i %> m</td>
+                     </tr>
+                     <tr>
+                       <th rowspan="2">目標</th>
+                       <th>到着</th>
+                       <td><%= point.target_time && point.target_time.strftime("%e日目 %H:%M") %></td>
+                     </tr>
+                     <tr>
+                       <th>速度</th>
+                       <td><%= target_speed.to_i %> km/h</td>
+                     </tr>
+                     <tr>
+                       <th rowspan="2">制限</th>
+                       <th>到着</th>
+                       <td><%= point.target_time && point.limit_time.strftime("%e日目 %H:%M") %></td>
+                     </tr>
+                     <tr>
+                       <th>速度</th>
+                       <td><%= limit_speed.to_i %> km/h</td>
+                     </tr>
+                    <tr>
+                        <th>斜度</th>
+                        <td colspan="2">
+                            <ul>
+                            <% point.tour_plan_up_hills.each do |up_hill| %>
+                                <li><%= "%.1f" % [ up_hill.distance - point.distance ] %> km 先 <%= "%.1f" % [up_hill.gradient] %>% <%= "%.1f" % [up_hill.length] %> km</li>
+                            <% end %>
+                            </ul>
+                        </td>
+                    </tr>
+                     <tr>
+                       <th>備考</th>
+                       <td colspan="2"><%= point.comment %></td>
+                     </tr>
+                   </tbody>
+                 </table>
                </div>
-			 </td>
-			 <% end %>
-	       </tr>
+             </td>
+             <% end %>
+           </tr>
            <% i += 1; end%>
-	     <tbody>
+         <tbody>
        </table>
      </div>
-	 <% end %>
+     <% end %>
    </div>
   </div>
 <% end %>
