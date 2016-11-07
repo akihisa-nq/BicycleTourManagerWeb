@@ -803,13 +803,22 @@ class TourPlan < ActiveRecord::Base
 			.group("id")
 			.select(
 				"ST_AsPNG(" \
-					+ "ST_AsRaster(" \
-						+ "ST_Union(" \
-							+ "ST_Intersection(" \
-								+ "ST_Collect(tour_plan_routes.#{column_name})," \
-								+ "ST_GeomFromText(\'#{view.to_s}\', 4326))," \
-							+ "ST_GeomFromText(\'#{BTM.factory.linear_ring(points).to_s}\', 4326))," \
-						+ "256, 256)) As png")
+					+ "ST_MapAlgebra(" \
+						+ "ST_AddBand(" \
+							+ "ST_MakeEmptyRaster(256, 256, #{x}, #{y}, #{w / 256.0}, #{- h / 256.0}, 0, 0, 4326)," \
+							+ "1, '8BUI', 0, 0)," \
+						+ "ST_AsRaster(" \
+							+ "ST_Union(" \
+								+ "ST_Intersection(" \
+									+ "ST_Collect(tour_plan_routes.#{column_name})," \
+									+ "ST_GeomFromText(\'#{view.to_s}\', 4326))," \
+								+ "ST_GeomFromText('#{BTM.factory.line_string(points)}', 4326))," \
+							+ "#{w / 256.0}, #{- h / 256.0}," \
+							+ "\'8BUI\'," \
+							+ "1, 0," \
+							+ "#{x}, #{y})," \
+						+ "'[rast2]', '8BUI', 'INTERSECTION', '[rast2]', '[rast1]', NULL)" \
+					+ ") As png")
 			.find(id)
 		ret.png
 	end
