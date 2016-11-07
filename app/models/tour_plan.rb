@@ -779,9 +779,15 @@ class TourPlan < ActiveRecord::Base
 
 	def as_raster(is_public_data, tx, ty, zoom)
 		w = 360.0 / (2.0 ** zoom)
-		h = 170.0 / (2.0 ** zoom)
 		x = tx.to_f * w - 180.0
-		y = 85.0 - ty.to_f * h
+
+		calc_y = lambda do |tile|
+			base = Math.atanh(Math.sin(Math::PI * 85.05112878 / 180.0))
+			Math.asin(Math.tanh(- Math::PI * tile / (2 ** (zoom - 1)) + base )) * 180.0 / Math::PI
+		end
+
+		y = calc_y.call(ty)
+		h = y - calc_y.call(ty + 1)
 
 		points = [
 			[ x,     y     ],

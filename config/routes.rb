@@ -58,6 +58,8 @@ BicycleTourManagerWeb::Application.routes.draw do
   post "/tour_plan/:id/routes/nodes/update", to: "tour_plan#update_node"
   delete "/tour_plan/:tour_plan_id/routes/nodes/:id/destroy", to: "tour_plan#destroy_node"
 
+  get "/tour_plan/:id/tile", to: "tour_plan#tile"
+  
   get "/tour_go", to: "tour_go#index"
   get "/tour_go/page/:page", to: "tour_go#index"
   get "/tour_go/:id/show", to: "tour_go#show"

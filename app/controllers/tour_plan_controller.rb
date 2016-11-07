@@ -35,20 +35,20 @@ class TourPlanController < ApplicationController
 	def show_gpx
 		tour_plan = TourPlan.find_with_auth(current_user_or_guest, params[:id])
 		headers["Content-Type"] = "application/xml; charset=UTF-8"
-		render(:text => tour_plan.to_gpx(true), :layout => false)
+		render(:body => tour_plan.to_gpx(true), :layout => false)
 	end
 
 	def show_private_gpx
 		tour_plan = TourPlan.edit_route_with_auth(current_user_or_guest, params[:id])
 		headers["Content-Type"] = "application/xml; charset=UTF-8"
 		headers["Content-Disposition"] = %Q|attachment; filename="route.gpx"|
-		render(:text => tour_plan.to_gpx(false), :layout => false)
+		render(:body => tour_plan.to_gpx(false), :layout => false)
 	end
 
 	def show_pdf
 		tour_plan = TourPlan.edit_route_with_auth(current_user_or_guest, params[:id])
 		headers["Content-Type"] = "application/pdf"
-		render(:text => File.open(tour_plan.pdf_path(), "rb") {|f| f.read }, :layout => false)
+		render(:body => File.open(tour_plan.pdf_path(), "rb") {|f| f.read }, :layout => false)
 	end
 
 	def toggle_visible
@@ -112,5 +112,11 @@ class TourPlanController < ApplicationController
 	def update_node
 		TourPlan.update_point_with_auth(current_user_or_guest, params[:node] || [])
 		redirect_to( action: :edit_node, id: params[:id], page: params[:page] )
+	end
+
+	def tile
+		@tour_plan = TourPlan.find_with_auth(current_user_or_guest, params[:id])
+		headers["Content-Type"] = "image/png"
+		render(body: @tour_plan.as_raster(true, params[:x].to_i, params[:y].to_i, params[:zoom].to_i))
 	end
 end
