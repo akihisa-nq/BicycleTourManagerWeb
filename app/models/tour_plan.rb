@@ -803,20 +803,24 @@ class TourPlan < ActiveRecord::Base
 			.group("id")
 			.select(<<EOF
 				ST_AsPNG(
-					ST_MapAlgebra(
-						ST_AddBand(
-							ST_MakeEmptyRaster(256, 256, #{x}, #{y}, #{w / 256.0}, #{- h / 256.0}, 0, 0, 4326),
-							1, '8BUI', 0, 0),
-						ST_AsRaster(
-							ST_Intersection(
-								ST_Collect(tour_plan_routes.#{column_name}),
-								ST_GeomFromText('#{view.to_s}', 4326)),
+					ST_AddBand(
+						ST_MapAlgebra(
 							ST_AddBand(
 								ST_MakeEmptyRaster(256, 256, #{x}, #{y}, #{w / 256.0}, #{- h / 256.0}, 0, 0, 4326),
-								1, '8BUI', 0, 0),
-							'8BUI',
-							1, 0),
-						'[rast2]', '8BUI', 'UNION', '[rast2]', '[rast1]', NULL)
+								1, '8BUI', 255, NULL),
+							ST_AsRaster(
+								ST_Intersection(
+									ST_Collect(ST_Buffer(tour_plan_routes.#{column_name}, 0.01)),
+									ST_GeomFromText('#{view.to_s}', 4326)),
+								ST_MakeEmptyRaster(256, 256, #{x}, #{y}, #{w / 256.0}, #{- h / 256.0}, 0, 0, 4326),
+								'8BUI',
+								1, 255),
+							'[rast2]', '8BUI', 'FIRST', '[rast2]', '255', NULL),
+						ARRAY [
+							ROW(1, '8BUI', 191, NULL),
+							ROW(2, '8BUI', 191, NULL),
+							ROW(3, '8BUI', 191, NULL)
+						] :: addbandarg[])
 					) As png
 EOF
 				)
