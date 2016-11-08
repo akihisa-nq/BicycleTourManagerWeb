@@ -811,8 +811,9 @@ class TourPlan < ActiveRecord::Base
 							ST_Intersection(
 								ST_Collect(tour_plan_routes.#{column_name}),
 								ST_GeomFromText('#{view.to_s}', 4326)),
-							#{w / 256.0}, #{- h / 256.0},
-							#{w / 256.0}, #{- h / 256.0},
+							ST_AddBand(
+								ST_MakeEmptyRaster(256, 256, #{x}, #{y}, #{w / 256.0}, #{- h / 256.0}, 0, 0, 4326),
+								1, '8BUI', 0, 0),
 							'8BUI',
 							1, 0),
 						'[rast2]', '8BUI', 'UNION', '[rast2]', '[rast1]', NULL)
