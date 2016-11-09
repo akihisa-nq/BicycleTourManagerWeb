@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -11,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161006042212) do
+ActiveRecord::Schema.define(version: 20161109090257) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -46,9 +45,8 @@ ActiveRecord::Schema.define(version: 20161006042212) do
     t.datetime "created_at",        null: false
     t.datetime "revoked_at"
     t.string   "scopes"
+    t.index ["token"], name: "index_oauth_access_grants_on_token", unique: true, using: :btree
   end
-
-  add_index "oauth_access_grants", ["token"], name: "index_oauth_access_grants_on_token", unique: true, using: :btree
 
   create_table "oauth_access_tokens", force: :cascade do |t|
     t.integer  "resource_owner_id"
@@ -60,11 +58,10 @@ ActiveRecord::Schema.define(version: 20161006042212) do
     t.datetime "created_at",                          null: false
     t.string   "scopes"
     t.string   "previous_refresh_token", default: "", null: false
+    t.index ["refresh_token"], name: "index_oauth_access_tokens_on_refresh_token", unique: true, using: :btree
+    t.index ["resource_owner_id"], name: "index_oauth_access_tokens_on_resource_owner_id", using: :btree
+    t.index ["token"], name: "index_oauth_access_tokens_on_token", unique: true, using: :btree
   end
-
-  add_index "oauth_access_tokens", ["refresh_token"], name: "index_oauth_access_tokens_on_refresh_token", unique: true, using: :btree
-  add_index "oauth_access_tokens", ["resource_owner_id"], name: "index_oauth_access_tokens_on_resource_owner_id", using: :btree
-  add_index "oauth_access_tokens", ["token"], name: "index_oauth_access_tokens_on_token", unique: true, using: :btree
 
   create_table "oauth_applications", force: :cascade do |t|
     t.string   "name",                      null: false
@@ -74,9 +71,8 @@ ActiveRecord::Schema.define(version: 20161006042212) do
     t.string   "scopes",       default: "", null: false
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
+    t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true, using: :btree
   end
-
-  add_index "oauth_applications", ["uid"], name: "index_oauth_applications_on_uid", unique: true, using: :btree
 
   create_table "private_result_routes", force: :cascade do |t|
     t.integer  "tour_result_id"
@@ -89,10 +85,9 @@ ActiveRecord::Schema.define(version: 20161006042212) do
     t.geometry "path",           limit: {:srid=>4326, :type=>"line_string", :has_z=>true}
     t.float    "speed",                                                                    array: true
     t.datetime "time",                                                                     array: true
+    t.index ["speed"], name: "index_private_result_routes_on_speed", using: :gin
+    t.index ["time"], name: "index_private_result_routes_on_time", using: :gin
   end
-
-  add_index "private_result_routes", ["speed"], name: "index_private_result_routes_on_speed", using: :gin
-  add_index "private_result_routes", ["time"], name: "index_private_result_routes_on_time", using: :gin
 
   create_table "public_result_routes", force: :cascade do |t|
     t.integer  "tour_result_id"
@@ -105,10 +100,9 @@ ActiveRecord::Schema.define(version: 20161006042212) do
     t.geometry "path",           limit: {:srid=>4326, :type=>"line_string", :has_z=>true}
     t.float    "speed",                                                                    array: true
     t.datetime "time",                                                                     array: true
+    t.index ["speed"], name: "index_public_result_routes_on_speed", using: :gin
+    t.index ["time"], name: "index_public_result_routes_on_time", using: :gin
   end
-
-  add_index "public_result_routes", ["speed"], name: "index_public_result_routes_on_speed", using: :gin
-  add_index "public_result_routes", ["time"], name: "index_public_result_routes_on_time", using: :gin
 
   create_table "resource_entries", force: :cascade do |t|
     t.integer "resource_set_id"
@@ -184,6 +178,15 @@ ActiveRecord::Schema.define(version: 20161006042212) do
     t.geometry "private_line", limit: {:srid=>4326, :type=>"line_string", :has_z=>true}
   end
 
+  create_table "tour_plan_tiles", force: :cascade do |t|
+    t.integer "x",      null: false
+    t.integer "y",      null: false
+    t.integer "zoom",   null: false
+    t.binary  "image",  null: false
+    t.boolean "public", null: false
+    t.index ["x", "y", "zoom", "public"], name: "index_tour_plan_tiles_on_x_and_y_and_zoom_and_public", using: :btree
+  end
+
   create_table "tour_plan_up_hills", force: :cascade do |t|
     t.geometry "point",              limit: {:srid=>4326, :type=>"point", :has_z=>true}
     t.integer  "distance"
@@ -231,10 +234,9 @@ ActiveRecord::Schema.define(version: 20161006042212) do
     t.string   "role",                   limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.index ["email"], name: "index_users_on_email", unique: true, using: :btree
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   end
-
-  add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
-  add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
   add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"

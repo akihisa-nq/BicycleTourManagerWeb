@@ -1,6 +1,6 @@
 GIT
   remote: git@github.com:akihisa-nq/BicycleTourManager.git
-  revision: bfb1e935aebc6506a4266991d35c1f0ea9fc23ee
+  revision: e8fb9839fefddb0e300b8edb61e2982326412316
   specs:
     bicycle_tour_manager (0.0.2)
       nokogiri
@@ -62,7 +62,7 @@ GEM
       activemodel (= 5.0.0.1)
       activesupport (= 5.0.0.1)
       arel (~> 7.0)
-    activerecord-postgis-adapter (4.0.0)
+    activerecord-postgis-adapter (4.0.1)
       activerecord (~> 5.0.0)
       rgeo-activerecord (~> 5.0.0)
     activerecord-postgresql-adapter (0.0.1)
@@ -72,7 +72,8 @@ GEM
       i18n (~> 0.7)
       minitest (~> 5.1)
       tzinfo (~> 1.1)
-    addressable (2.4.0)
+    addressable (2.5.0)
+      public_suffix (~> 2.0, >= 2.0.2)
     arel (7.1.4)
     bcrypt (3.1.11-x86-mingw32)
     builder (3.2.2)
@@ -157,6 +158,7 @@ GEM
     orm_adapter (0.5.0)
     pg (0.19.0-x86-mingw32)
     polylines (0.3.0)
+    public_suffix (2.0.4)
     rack (2.0.1)
     rack-test (0.6.3)
       rack (>= 1.0)
@@ -215,7 +217,7 @@ GEM
       sprockets (>= 2.8, < 4.0)
       sprockets-rails (>= 2.0, < 4.0)
       tilt (>= 1.1, < 3)
-    selenium-webdriver (3.0.0)
+    selenium-webdriver (3.0.1)
       childprocess (~> 0.5)
       rubyzip (~> 1.0)
       websocket (~> 1.0)

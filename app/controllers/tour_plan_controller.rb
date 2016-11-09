@@ -115,8 +115,7 @@ class TourPlanController < ApplicationController
 	end
 
 	def tile
-		@tour_plan = TourPlan.find_with_auth(current_user_or_guest, params[:id])
 		headers["Content-Type"] = "image/png"
-		render(body: @tour_plan.as_raster(true, params[:x].to_i, params[:y].to_i, params[:zoom].to_i))
+		render(body: TourPlanTile.tile(params[:x].to_i, params[:y].to_i, params[:zoom].to_i, true))
 	end
 end

@@ -69,12 +69,12 @@
 
         var imgMapTypeOptions = {
           getTileUrl : function(point, zoom) {
-            var tileUrl = "/tour_plan/<%= @tour_plan.id %>/tile?x=" + point.x + "&y=" + point.y + "&zoom=" + zoom;
+            var tileUrl = "/tour_plan/tile?x=" + point.x + "&y=" + point.y + "&zoom=" + zoom;
             return tileUrl;                          //画像のURLを返す
           },
           tileSize: new google.maps.Size(256, 256),  //必ず正方形。通常256px
           alt: "",                                   //画像がないときに表示する文字
-          maxZoom: 19,                               //マップタイプの最大値
+          maxZoom: 14,                               //マップタイプの最大値
           minZoom: 10,                               //マップタイプの最小値
           name: "MyMapType",                         //マップタイプ名
           opacity: 0.75                              //透明度(0.0～1.0)

@@ -777,55 +777,34 @@ class TourPlan < ActiveRecord::Base
 		ret.length.to_i / 1000
 	end
 
-	def as_raster(is_public_data, tx, ty, zoom)
-		w = 360.0 / (2.0 ** zoom)
-		x = tx.to_f * w - 180.0
-
-		calc_y = lambda do |tile|
-			base = Math.atanh(Math.sin(Math::PI * 85.05112878 / 180.0))
-			Math.asin(Math.tanh(- Math::PI * tile / (2 ** (zoom - 1)) + base )) * 180.0 / Math::PI
-		end
-
-		y = calc_y.call(ty)
-		h = y - calc_y.call(ty + 1)
-
-		points = [
-			[ x,     y     ],
-			[ x + w, y     ],
-			[ x + w, y - h ],
-			[ x,     y - h ],
-		].map {|pt| BTM.factory.point(*pt) }
-		view = BTM.factory.polygon(BTM.factory.linear_ring(points))
-
+	def generate_tiles(is_public_data, zoom_min, zoom_max)
 		column_name = is_public_data ? "public_line" : "private_line"
-		ret = TourPlan
-			.left_joins(:tour_plan_routes)
-			.group("id")
+
+		extent = TourPlan
 			.select(<<EOF
-				ST_AsPNG(
-					ST_AddBand(
-						ST_MapAlgebra(
-							ST_AddBand(
-								ST_MakeEmptyRaster(256, 256, #{x}, #{y}, #{w / 256.0}, #{- h / 256.0}, 0, 0, 4326),
-								1, '8BUI', 255, NULL),
-							ST_AsRaster(
-								ST_Intersection(
-									ST_Collect(ST_Buffer(tour_plan_routes.#{column_name}, 0.01)),
-									ST_GeomFromText('#{view.to_s}', 4326)),
-								ST_MakeEmptyRaster(256, 256, #{x}, #{y}, #{w / 256.0}, #{- h / 256.0}, 0, 0, 4326),
-								'8BUI',
-								1, 255),
-							'[rast2]', '8BUI', 'FIRST', '[rast2]', '255', NULL),
-						ARRAY [
-							ROW(1, '8BUI', 191, NULL),
-							ROW(2, '8BUI', 191, NULL),
-							ROW(3, '8BUI', 191, NULL)
-						] :: addbandarg[])
-					) As png
+				ST_AsText(ST_Envelope(
+					ST_Collect(ST_Buffer(tour_plan_routes.#{column_name}, 0.01))
+				)) as extent
 EOF
 				)
-			.find(id)
-		ret.png
+			.left_joins(:tour_plan_routes)
+			.group("id")
+			.order("")
+			.first
+			.extent
+
+		line = TourPlan
+			.select(<<EOF
+				ST_AsText(ST_Collect(ST_Buffer(tour_plan_routes.#{column_name}, 0.01))) as line
+EOF
+				)
+			.left_joins(:tour_plan_routes)
+			.where("ST_Buffer(tour_plan_routes.#{column_name}, 0.01) && ST_GeomFromText('#{extent}', 4326)")
+			.order("")
+			.first
+			.line
+
+		TourPlanTile.generate_range(is_public_data, extent, zoom_min, zoom_max, line)
 	end
 
 	def self.toggle_visible(user, id)
