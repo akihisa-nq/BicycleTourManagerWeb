@@ -40,25 +40,42 @@ BicycleTourManagerWeb::Application.routes.draw do
   delete "/tour_result/:id/destroy_image/:image_id", to: "tour_result#destroy_image"
   post "/tour_result/update_image_text/:id", to: "tour_result#update_image_text"
 
-  get "/tour_plan", to: "tour_plan#index"
-  post "/tour_plan/create", to: "tour_plan#create"
-  delete "/tour_plan/:id/destroy", to: "tour_plan#destroy"
-  post "/tour_plan/:id/toggle_visible", to: "tour_plan#toggle_visible"
-  get "/tour_plan/:id/show", to: "tour_plan#show"
-  get "/tour_plan/:id/show/gpx", to: "tour_plan#show_gpx"
-  get "/tour_plan/:id/show/private_gpx", to: "tour_plan#show_private_gpx"
-  get "/tour_plan/:id/show/pdf", to: "tour_plan#show_pdf"
-  post "/tour_plan/:id/generate", to: "tour_plan#generate"
+  resources :tour_plan, only: [ :index ] do
+	collection do
+      post "create"
+      get :tile
+	end
 
-  get "/tour_plan/:id/routes/paths/edit", to: "tour_plan#edit_path"
-  post "/tour_plan/:id/routes/paths/update", to: "tour_plan#update_path"
-  delete "/tour_plan/:tour_plan_id/routes/paths/:id/destroy", to: "tour_plan#destroy_path"
+    delete :destroy
+    post :toggle_visible
 
-  get "/tour_plan/:id/routes/nodes/edit", to: "tour_plan#edit_node"
-  post "/tour_plan/:id/routes/nodes/update", to: "tour_plan#update_node"
-  delete "/tour_plan/:tour_plan_id/routes/nodes/:id/destroy", to: "tour_plan#destroy_node"
+    get "show", to: "tour_plan#show"
+    get "show/gpx", to: "tour_plan#show_gpx"
+    get "show/private_gpx", to: "tour_plan#show_private_gpx"
+    get "show/pdf", to: "tour_plan#show_pdf"
 
-  get "/tour_plan/tile", to: "tour_plan#tile"
+	post :generate
+
+	resources :routes, only: [] do
+	  collection do
+        resources :paths, only: [] do
+          collection do
+            get :edit, to: "tour_plan#edit_path"
+            post :update, to: "tour_plan#update_path"
+          end
+
+          delete :destroy, to: "tour_plan#destroy_path"
+	    end
+
+        resources :nodes, only: [] do
+          collection do
+            get :edit, to: "tour_plan#edit_node"
+            post :update, to: "tour_plan#update_node"
+          end
+        end
+      end
+    end
+  end
   
   get "/tour_go", to: "tour_go#index"
   get "/tour_go/page/:page", to: "tour_go#index"
