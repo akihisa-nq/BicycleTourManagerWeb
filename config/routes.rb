@@ -70,6 +70,7 @@ BicycleTourManagerWeb::Application.routes.draw do
         resources :nodes, only: [] do
           collection do
             get :edit, to: "tour_plan#edit_node"
+			get :info, to: "tour_plan#node_info"
             post :update, to: "tour_plan#update_node"
           end
         end

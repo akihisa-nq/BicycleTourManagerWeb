@@ -22,39 +22,43 @@
 <script type="text/javascript">
 function loadMaps()
 {
-    <% @tour_route.tour_plan_points.each do |node|; @node = node %>
-    var pos = new google.maps.LatLng( <%= @node.lat %>, <%= @node.lon %> );
+	$.ajax({
+		type: "GET",
+		url: '<%= url_for({action: :node_info, tour_plan_id: @tour_route.tour_plan.id}) %>',
+		dataType: 'json'
+	}).done(function(response, textStatus, jqXHR) {
+		$.each(response, function(index, node){
+			var pos = new google.maps.LatLng( node.position.lat, node.position.lon );
 
-    var mapOptions = {
-        zoom: 16,
-        mapTypeId: google.maps.MapTypeId.ROADMAP,
-        center: pos
-    };
-    var map = new google.maps.Map(document.getElementById("map_<%= @node.id %>"), mapOptions);
+			var mapOptions = {
+				zoom: 16,
+				mapTypeId: google.maps.MapTypeId.ROADMAP,
+				center: pos
+			};
+			var map = new google.maps.Map(document.getElementById("map_" + node.id), mapOptions);
 
-	<% if @node.near_line %>
-	{
-		var pointarray = []
-		<% @node.near_line.points.each do |pt| %>
-		pointarray.push(new google.maps.LatLng( <%= pt.y %>, <%= pt.x %> ));
-		<% end %>
-		new google.maps.Polyline({
-			path: pointarray,
-			strokeColor: "#0000ff",
-			strokeWeight: 5,
-			map: map
-			});
-	}
-	<% end %>
-
-	{
-		var markerOptions = {
-			map: map,
-			position: pos
-		};
-		new google.maps.Marker(markerOptions);
-	}
-    <% end %>
+			{
+				var pointarray = [];
+				$.each(node.near_line, function(index2, pt){
+					pointarray.push(new google.maps.LatLng( pt.lat, pt.lon ));
+				});
+				new google.maps.Polyline({
+					path: pointarray,
+					strokeColor: "#0000ff",
+					strokeWeight: 5,
+					map: map
+				});
+			}
+	
+			{
+				var markerOptions = {
+					map: map,
+					position: pos
+				};
+				new google.maps.Marker(markerOptions);
+			}
+		});
+	});
 }
 
 google.maps.event.addDomListener(window, 'load', loadMaps)

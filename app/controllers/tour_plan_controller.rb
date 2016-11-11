@@ -105,8 +105,32 @@ class TourPlanController < ApplicationController
 
 	def edit_node
 		@tour_routes = TourPlan.edit_point_with_auth(current_user_or_guest, params[:tour_plan_id], params[:page])
-		@tour_route = @tour_routes[0]
-		@tour_route.set_point_lines
+		if @tour_routes
+			@tour_route = @tour_routes[0]
+			@tour_route.set_point_lines
+		end
+	end
+
+	def node_info
+		edit_node()
+
+		data = @tour_route.tour_plan_points.map {|node|
+			{
+				id: node.id,
+				position: {
+					lon: node.lon,
+					lat: node.lat,
+				},
+				near_line: node.near_line ? node.near_line.points.map {|pts|
+					{
+						lon: pts.x,
+						lat: pts.y,
+					}
+				} : []
+			}
+		}
+
+		render json: data
 	end
 
 	def update_node
