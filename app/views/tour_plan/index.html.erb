@@ -63,7 +63,7 @@
 			  </p>
 
 			  <ul class="button-group round">
-			  <li><%= link_to("表示", { action: :show, id: tour }, class: "tiny button") %></li>
+			  <li><%= link_to("表示", { action: :show, tour_plan_id: tour }, class: "tiny button") %></li>
               <% if can?(:delete, TourPlan) || can?(:edit, TourPlan) %>
 			  <li><a href="#" data-dropdown="manage_<%= tour.id %>" class="tiny button">&nbsp;</a></li>
               <% end %>
@@ -71,16 +71,16 @@
               <% if can?(:delete, TourPlan) || can?(:edit, TourPlan) %>
 			  <ul id="manage_<%= tour.id %>" data-dropdown-content class="f-dropdown">
                 <% if can? :edit, TourPlan %>
-                <li><%= link_to("パスの編集", action: :edit_path, id: tour) %></li>
-                <li><%= link_to("ノードの編集", action: :edit_node, id: tour) %></li>
-                <li><%= link_to("簡易生成", { action: :generate, id: tour, make_pdf: 0 }, method: :post) %></li>
-                <li><%= link_to("生成", { action: :generate, id: tour, make_pdf: 1 }, method: :post) %></li>
-                <li><%= link_to("PDF の表示", { action: :show_pdf, id: tour }, target: "_blank") %></li>
-				<li><%= link_to("GPX のダウンロード", { action: :show_private_gpx, id: tour }) %></li>
-                <li><%= link_to(tour.published ? "非公開" : "公開", {action: :toggle_visible, id: tour}, method: :post) %></li>
+                <li><%= link_to("パスの編集", action: :edit_path, tour_plan_id: tour) %></li>
+                <li><%= link_to("ノードの編集", action: :edit_node, tour_plan_id: tour) %></li>
+                <li><%= link_to("簡易生成", { action: :generate, tour_plan_id: tour, make_pdf: 0 }, method: :post) %></li>
+                <li><%= link_to("生成", { action: :generate, tour_plan_id: tour, make_pdf: 1 }, method: :post) %></li>
+                <li><%= link_to("PDF の表示", { action: :show_pdf, tour_plan_id: tour }, target: "_blank") %></li>
+				<li><%= link_to("GPX のダウンロード", { action: :show_private_gpx, tour_plan_id: tour }) %></li>
+                <li><%= link_to(tour.published ? "非公開" : "公開", {action: :toggle_visible, tour_plan_id: tour}, method: :post) %></li>
                 <% end %>
                 <% if can? :delete, TourPlan %>
-				<li><%= link_to("削除", {action: :destroy, id: tour}, method: :delete, data: { confirm: "削除しますか?" }) %></li>
+				<li><%= link_to("削除", {action: :destroy, tour_plan_id: tour}, method: :delete, data: { confirm: "削除しますか?" }) %></li>
                 <% end %>
               </ul>
               <% end %>

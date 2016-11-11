@@ -82,7 +82,7 @@
         var myMapType = new google.maps.ImageMapType(imgMapTypeOptions);
         window.map.overlayMapTypes.insertAt(0, myMapType);
 
-         loadGPXFileIntoGoogleMap("<%= url_for(action: :show_gpx, id: @tour_plan) %>");
+         loadGPXFileIntoGoogleMap("<%= url_for(action: :show_gpx, tour_plan_id: @tour_plan) %>");
 
          $('body').layout({
              slidable: true,
@@ -124,7 +124,7 @@
 
 <% if can? :edit, TourPlan %>
 <ul id="pdf" data-dropdown-content class="f-dropdown">
-<li><%= link_to("A7", { action: :show_pdf, id: @tour_plan }, target: "_blank") %></li>
+<li><%= link_to("A7", { action: :show_pdf, tour_plan_id: @tour_plan }, target: "_blank") %></li>
 </ul>
 <% end %>
 
@@ -147,11 +147,11 @@
 <li class="active"><a href="#" data-dropdown="public_pdf">PDF で計画を表示</a></li>
 <% if can? :edit, TourPlan %>
 <li class="active"><a href="#" data-dropdown="pdf">非公開 PDF のダウンロード</a></li>
-<li class="active"><%= link_to("GPX のダウンロード", { action: :show_private_gpx, id: @tour_plan }) %></li>
-<li class="active"><%= link_to(@tour_plan.published ? "非公開" : "公開", {action: :toggle_visible, id: @tour_plan}, method: :post) %></li>
+<li class="active"><%= link_to("GPX のダウンロード", { action: :show_private_gpx, tour_plan_id: @tour_plan }) %></li>
+<li class="active"><%= link_to(@tour_plan.published ? "非公開" : "公開", {action: :toggle_visible, tour_plan_id: @tour_plan}, method: :post) %></li>
 <% end %>
 <% if can? :delete, TourPlan %>
-<li class="active"><%= link_to("削除", {action: :destroy, id: @tour_plan}, method: :delete, data: { confirm: "削除しますか?" }) %></li>
+<li class="active"><%= link_to("削除", {action: :destroy, tour_plan_id: @tour_plan}, method: :delete, data: { confirm: "削除しますか?" }) %></li>
 <% end %>
 <% end %>
 

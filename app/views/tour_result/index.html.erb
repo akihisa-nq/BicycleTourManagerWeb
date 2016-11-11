@@ -71,7 +71,7 @@
 						</tr>
 						<% if tour.tour_plan && (can?(:edit, TourPlan) || tour.tour_plan.published) %>
 						<tr>
-							<th>計画ルート</th><td><%= link_to(tour.tour_plan.name, controller: :tour_plan, action: :show, id: tour.tour_plan ) %></td>
+							<th>計画ルート</th><td><%= link_to(tour.tour_plan.name, controller: :tour_plan, action: :show, tour_plan_id: tour.tour_plan ) %></td>
 						</tr>
 						<% end %>
 						<% if tour.tour_images.count > 0 %>

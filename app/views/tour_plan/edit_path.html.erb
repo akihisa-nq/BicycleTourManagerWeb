@@ -4,19 +4,19 @@
 
 <% content_for(:menus) do %>
 <li class="active"><%= link_to "戻る", action: :index, page: TourPlan.page_for(current_user || User.new, @tour_plan.id) %></li>
-<li><%= link_to "ノードの編集", action: :edit_node, id: @tour_plan %></li>
+<li><%= link_to "ノードの編集", action: :edit_node, tour_plan_id: @tour_plan %></li>
 <% end %>
 
 <% content_for(:manage) do %>
 <% if can? :delete, TourPlan %>
-<li class="active"><%= link_to("削除", {action: :destroy, id: @tour_plan}, method: :delete, data: { confirm: "削除しますか?" }) %></li>
+<li class="active"><%= link_to("削除", {action: :destroy, tour_plan_id: @tour_plan}, method: :delete, data: { confirm: "削除しますか?" }) %></li>
 <% end %>
 <% end %>
 
 <div class="btmw-tour-plan-edit-path">
   <div class="row">
     <div class="medium-12 columns">
-      <%= form_tag(action: :update_path, id: @tour_plan) do %>
+      <%= form_tag(action: :update_path, tour_plan_id: @tour_plan) do %>
         <table>
           <thead>
              <th>ルート</th>
@@ -57,7 +57,7 @@
               <td>
                 <ul class="button-group round">
                   <li><a href="<%= @path.google_map_url %>" class="tiny button" target="_blank">表示</a></li>
-                  <li><%= link_to("削除", {action: :destroy_path, tour_plan_id: @tour_plan.id, id: @path}, method: :delete, data: { confirm: "削除しますか?" }, class: "tiny button") %></li>
+                  <li><%= link_to("削除", {action: :destroy_path, tour_plan_id: @tour_plan.id, path_id: @path}, method: :delete, data: { confirm: "削除しますか?" }, class: "tiny button") %></li>
                 </ul>
               </td>
             </tr>

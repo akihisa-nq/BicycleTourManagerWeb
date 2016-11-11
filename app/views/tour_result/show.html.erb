@@ -141,7 +141,7 @@
 <% content_for :menus do %>
 <li class="active"><%= link_to("戻る", action: :index, page: TourResult.page_for(current_user || User.new, @tour_result.id), anchor: "tour_item_#{@tour_result.id}") %></li>
 <% if @tour_result.tour_plan && (can?(:edit, TourPlan) || @tour_result.tour_plan.published) %>
-<li class="active"><%= link_to("計画のルートを表示", controller: :tour_plan, action: :show, id: @tour_result.tour_plan) %></li>
+<li class="active"><%= link_to("計画のルートを表示", controller: :tour_plan, action: :show, tour_plan_id: @tour_result.tour_plan) %></li>
 <% end %>
 <% end %>
 
