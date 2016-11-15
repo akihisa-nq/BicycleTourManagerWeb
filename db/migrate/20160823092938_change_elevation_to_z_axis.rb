@@ -26,7 +26,7 @@ class ChangeElevationToZAxis < ActiveRecord::Migration
 		if ResultPoint.count > 0
 			change_column :result_points, :point, "GEOMETRY(PointZ,4326) USING ST_Force_3D(point)"
 		else
-			change_column :result_points, :point, "GEOMETRY(PointZ,4326)"
+			change_column :result_points, :point, "GEOMETRY(PointZ,4326) USING point::geometry(PointZ,4326)"
 		end
 		remove_column :result_points, :elevation
 
@@ -48,9 +48,9 @@ class ChangeElevationToZAxis < ActiveRecord::Migration
 
 		add_column :tour_plan_points, :elevation, :integer
 		if TourPlanPoint.count > 0
-			change_column :tour_plan_points, :point, "GEOMETRY(LineString,4326) USING ST_Force_2D(point)"
+			change_column :tour_plan_points, :point, "GEOMETRY(Point,4326) USING ST_Force_2D(point)"
 		else
-			change_column :tour_plan_points, :point, "GEOMETRY(LineString,4326)"
+			change_column :tour_plan_points, :point, "GEOMETRY(Point,4326) USING point::geometry(Point,4326)"
 		end
 
 		if PrivateResultRoute.count > 0
