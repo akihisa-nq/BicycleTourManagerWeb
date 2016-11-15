@@ -1,3 +1,6 @@
+class ResultPoint < ActiveRecord::Base
+end
+
 class ChangeElevationToZAxis < ActiveRecord::Migration
 	def up
 		if PrivateResultRoute.count > 0
