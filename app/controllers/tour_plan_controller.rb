@@ -58,6 +58,7 @@ class TourPlanController < ApplicationController
 
 	def generate
 		TourPlan.geneate_with_auth(current_user_or_guest, params[:tour_plan_id], params[:make_pdf] == "1")
+		GenerateTileJob.perform_later(:tour_plan.to_s, params[:tour_plan_id])
 		redirect_to( action: :show, id: params[:tour_plan_id])
 	end
 

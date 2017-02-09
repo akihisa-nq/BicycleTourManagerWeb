@@ -40,6 +40,9 @@ gem "cancan"
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
 gem 'bcrypt-ruby', '3.1.1.rc1', :require => 'bcrypt'
 
+gem "sidekiq"
+gem "sinatra", '= 2.0.0.beta2'
+
 gem "acts_as_tree", :git => %Q|https://github.com/amerine/acts_as_tree.git|
 gem "acts_as_list", :git => %Q|https://github.com/swanandp/acts_as_list.git|
 gem "will_paginate", :git => %Q|https://github.com/mislav/will_paginate.git|

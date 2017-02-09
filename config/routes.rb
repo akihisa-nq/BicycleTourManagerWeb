@@ -1,3 +1,5 @@
+require 'sidekiq/web'
+
 BicycleTourManagerWeb::Application.routes.draw do
   use_doorkeeper
 
@@ -107,5 +109,6 @@ BicycleTourManagerWeb::Application.routes.draw do
 	  resources :user, only: [ :show ] do
 	  end
   end
-end
 
+  mount Sidekiq::Web => '/sidekiq'
+end
