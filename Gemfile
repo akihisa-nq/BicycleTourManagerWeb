@@ -38,6 +38,7 @@ gem "devise"
 gem "doorkeeper"
 gem "cancan"
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
+gem 'bcrypt-ruby', '3.1.1.rc1', :require => 'bcrypt'
 
 gem "acts_as_tree", :git => %Q|https://github.com/amerine/acts_as_tree.git|
 gem "acts_as_list", :git => %Q|https://github.com/swanandp/acts_as_list.git|
