@@ -22,7 +22,7 @@ function loadMaps()
     };
     var map = new google.maps.Map(document.getElementById("map"), mapOptions);
 
-    <% if @tour_go %>
+    <% if @tour_go && @tour_go.tour_plan %>
     <% index = -1 %>
 	{
 		var pointarray = []
@@ -54,9 +54,7 @@ function loadMaps()
 			map: map
 			});
     }
-    <% end %>
 
-    <% if @tour_go %>
     <% @tour_go.tour_plan.tour_plan_routes.each do |route| %>
     <% route.tour_plan_points.each do |point| %>
     <% next if point == @center %>
