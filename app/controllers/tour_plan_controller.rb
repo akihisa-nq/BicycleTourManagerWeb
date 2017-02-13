@@ -19,7 +19,7 @@ class TourPlanController < ApplicationController
 			)
 		attr_path = params[:tour_path].permit(:google_map_url)
 		plan = TourPlan.create_with_auth(current_user_or_guest, attr_plan, attr_path)
-		redirect_to( action: :edit_path, id: plan.id )
+		redirect_to( action: :edit_path, tour_plan_id: plan.id )
 	end
 
 	def destroy
@@ -53,13 +53,13 @@ class TourPlanController < ApplicationController
 
 	def toggle_visible
 		TourPlan.toggle_visible(current_user_or_guest, params[:tour_plan_id])
-		redirect_to(action: :index, id: nil, page: TourPlan.page_for(current_user_or_guest, params[:tour_plan_id]), anchor: "tour_item_#{params[:tour_plan_id]}")
+		redirect_to(action: :index, tour_plan_id: nil, page: TourPlan.page_for(current_user_or_guest, params[:tour_plan_id]), anchor: "tour_item_#{params[:tour_plan_id]}")
 	end
 
 	def generate
 		TourPlan.geneate_with_auth(current_user_or_guest, params[:tour_plan_id], params[:make_pdf] == "1")
 		GenerateTileJob.perform_later(:tour_plan.to_s, params[:tour_plan_id])
-		redirect_to( action: :show, id: params[:tour_plan_id])
+		redirect_to( action: :show, tour_plan_id: params[:tour_plan_id])
 	end
 
 	def edit_path
@@ -96,12 +96,12 @@ class TourPlanController < ApplicationController
 
 		TourPlan.create_points(current_user_or_guest, params[:tour_plan_id])
 
-		redirect_to( action: :edit_path, id: params[:tour_plan_id] )
+		redirect_to( action: :edit_path, tour_plan_id: params[:tour_plan_id] )
 	end
 
 	def destroy_path
 		TourPlanPath.destroy_with_auth(current_user_or_guest, params[:path_id])
-		redirect_to(action: :edit_path, id: params[:tour_plan_id])
+		redirect_to(action: :edit_path, tour_plan_id: params[:tour_plan_id])
 	end
 
 	def edit_node
@@ -136,7 +136,7 @@ class TourPlanController < ApplicationController
 
 	def update_node
 		TourPlan.update_point_with_auth(current_user_or_guest, params[:node] || [])
-		redirect_to( action: :edit_node, id: params[:tour_plan_id], page: params[:page] )
+		redirect_to( action: :edit_node, tour_plan_id: params[:tour_plan_id], page: params[:page] )
 	end
 
 	def tile
