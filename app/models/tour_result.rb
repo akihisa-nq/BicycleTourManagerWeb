@@ -213,7 +213,9 @@ class TourResult < ActiveRecord::Base
 			tour.routes.last.path_list.last.way_points << tour.routes.last.path_list.last.steps[0]
 		end
 
-		tour.routes.last.path_list.last.way_points << tour.routes.last.path_list.last.steps.last
+		if tour.routes.count > 0
+			tour.routes.last.path_list.last.way_points << tour.routes.last.path_list.last.steps.last
+		end
 
 		tour.set_start_end
 		tour
