@@ -1,5 +1,5 @@
-require 'spec_helper'
+require 'rails_helper'
 
-describe TourPlanPoint do
+RSpec.describe TourPlanPoint, type: :model do
   pending "add some examples to (or delete) #{__FILE__}"
 end

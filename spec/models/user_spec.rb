@@ -1,6 +1,6 @@
-require 'spec_helper'
+require 'rails_helper'
 
-describe User do
+RSpec.describe User, type: :model do
 	it "update roles for all users" do
 		user1 = User.create(email: "test@test.com", password: "testtest")
 		expect(user1.role).to eq "manager"

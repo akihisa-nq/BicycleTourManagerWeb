@@ -1,5 +1,5 @@
-require 'spec_helper'
+require 'rails_helper'
 
-describe ManagementController do
+RSpec.describe ManagementController, type: :controller do
 
 end

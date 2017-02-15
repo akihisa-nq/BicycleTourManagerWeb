@@ -1,5 +1,5 @@
-require 'spec_helper'
+require 'rails_helper'
 
-describe SummaryController do
+RSpec.describe SummaryController, type: :controller do
 
 end

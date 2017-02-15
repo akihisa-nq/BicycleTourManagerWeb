@@ -1,5 +1,5 @@
-require 'spec_helper'
+require 'rails_helper'
 
-describe PrivateResultRoute do
+RSpec.describe PrivateResultRoute, type: :model do
   pending "add some examples to (or delete) #{__FILE__}"
 end

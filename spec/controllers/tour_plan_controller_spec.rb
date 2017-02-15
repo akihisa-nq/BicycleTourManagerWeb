@@ -1,5 +1,5 @@
-require 'spec_helper'
+require 'rails_helper'
 
-describe TourPlanController do
+RSpec.describe TourPlanController, type: :controller do
 
 end

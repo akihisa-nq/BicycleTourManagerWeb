@@ -1,10 +1,10 @@
 # coding: utf-8
 
-require 'spec_helper'
+require 'rails_helper'
 
 require "stringio"
 
-describe TourResult do
+RSpec.describe TourResult, type: :model do
 	it "load gpx stream" do
 		path = File.join(File.dirname(__FILE__), "track.gpx")
 		expect(File.exist?(path)).to eq true

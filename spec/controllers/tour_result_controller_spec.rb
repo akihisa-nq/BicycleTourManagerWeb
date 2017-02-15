@@ -1,5 +1,5 @@
-require 'spec_helper'
+require 'rails_helper'
 
-describe TourResultController do
+RSpec.describe TourResultController, type: :controller do
 
 end
