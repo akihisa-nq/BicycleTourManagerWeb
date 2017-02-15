@@ -2,8 +2,6 @@ class ExclusionArea < ActiveRecord::Base
 	validates :point, presence: true
 	validates :distance, presence: true
 
-	attribute :point, :point
-
 	def self.all_with_auth(user)
 		if user.can?(:edit, ExclusionArea)
 			ExclusionArea.all
