@@ -65,7 +65,7 @@
 			  <ul class="button-group round">
 			  <li><%= link_to("表示", { action: :show, tour_plan_id: tour }, class: "tiny button") %></li>
               <% if can?(:delete, TourPlan) || can?(:edit, TourPlan) %>
-			  <li><a href="#" data-dropdown="manage_<%= tour.id %>" class="tiny button">&nbsp;</a></li>
+			  <li><a href="#" data-dropdown="manage_<%= tour.id %>" class="tiny button">▼</a></li>
               <% end %>
 			  </ul>
               <% if can?(:delete, TourPlan) || can?(:edit, TourPlan) %>
