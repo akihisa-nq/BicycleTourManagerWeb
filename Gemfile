@@ -10,6 +10,7 @@ group :development, :test do
 	gem "launchy"
 	gem "selenium-webdriver"
 	gem "thin"
+	gem "spork", git: "git@github.com:sporkrb/spork.git"
 end
 
 platforms :ruby do
@@ -20,7 +21,7 @@ end
 gem "ffi-geos"
 
 gem "exifr"
-gem "bicycle_tour_manager", :git => "git@github.com:akihisa-nq/BicycleTourManager.git"
+gem "bicycle_tour_manager", git: "git@github.com:akihisa-nq/BicycleTourManager.git"
 
 gem "i18n_generators"
 gem "uglifier"

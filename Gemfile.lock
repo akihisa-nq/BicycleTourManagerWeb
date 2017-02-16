@@ -8,6 +8,12 @@ GIT
       rgeo
 
 GIT
+  remote: git@github.com:sporkrb/spork.git
+  revision: 224df492657e617a0c93c0319e78f0eefee5b636
+  specs:
+    spork (1.0.0rc4)
+
+GIT
   remote: https://github.com/amerine/acts_as_tree.git
   revision: 5fc75e9561bfc53a3307552a56fe30deb88f002a
   specs:
@@ -317,6 +323,7 @@ DEPENDENCIES
   selenium-webdriver
   sidekiq
   sinatra (= 2.0.0.beta2)
+  spork!
   sqlite3
   therubyracer
   thin
