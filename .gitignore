@@ -7,3 +7,4 @@ public/assets
 public/generated
 private
 cacert.pem
+.rspec
